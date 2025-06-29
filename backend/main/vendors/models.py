@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-
+from django.conf import settings
 from users.models import CustomUser
 
 
@@ -18,7 +18,7 @@ class Vendor(models.Model): # Vendor
     category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name='serviceprovider')
     price_range = models.DecimalField(max_digits=10, decimal_places=2)  # Price with 2 decimal places
     description = models.TextField()
-    rating = models.DecimalField(max_digits=5, decimal_places=2,default=0.0)
+    rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     testimonial = models.TextField(blank=True)
     portfolio = models.ImageField(upload_to='portfolio/')
 
@@ -36,7 +36,12 @@ class Service(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendorservices')
     number_of_guests = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Price with 2 decimal places
-    rating = models.DecimalField(max_digits=5, decimal_places=2,default=0.0)
+    rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    likes = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="liked_services",
+        blank=True,
+    )
     location_tags = models.CharField(max_length=50, choices=[
         ('JHB', 'JHB'),
         ('CPT', 'CPT'),
@@ -49,8 +54,10 @@ class Service(models.Model):
 
     def get_absolute_url(self):
         """Return URL to access a detail record for this vendor."""
-        return reverse('service_dashboard', kwargs={'pk': self.pk})
+        return reverse('service_detail', kwargs={'pk': self.pk})
 
+    def total_likes(self):
+        return self.likes.count()
 
 class Review(models.Model):
     comment = models.TextField(null=True, blank=True)

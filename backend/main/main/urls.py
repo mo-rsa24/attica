@@ -26,8 +26,8 @@ from .views import index
     
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', VendorPostsListView.as_view(), name='index'),
-    path('', ReactAppView.as_view(), name='index'),
+    path('', VendorPostsListView.as_view(), name='index'),
+    # path('', ReactAppView.as_view(), name='index'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('events/', include('events.urls')),
     path('chat/', include('chat.urls')),

@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Prefetch
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.views.generic import CreateView, DeleteView, UpdateView, ListView
-
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from events.models import Event
 from .models import Vendor, Category, VendorPost, Service
 import pdb
@@ -147,3 +148,40 @@ class VendorPostsListView(ListView):
         # Pass grouped data to the context
         context['categories_with_services'] = categories
         return context
+
+class ServiceDetailView(generic.DetailView):
+    model = Service
+    template_name = 'services/service_detail.html'
+    context_object_name = 'service'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviews'] = self.object.reviews.all()
+        return context
+
+
+class VendorProfileView(generic.DetailView):
+    model = Vendor
+    template_name = 'vendors/vendor_profile.html'
+    context_object_name = 'vendor'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Vendor, user__username=self.kwargs['username'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['services'] = self.object.vendorservices.all()
+        return context
+
+
+
+
+@login_required
+@require_POST
+def like_service_view(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+    if request.user in service.likes.all():
+        service.likes.remove(request.user)
+    else:
+        service.likes.add(request.user)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', service.get_absolute_url()))

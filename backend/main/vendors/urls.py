@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 from .views import VendorPostDashboardView, VendorListView, VendorPostCreateView, VendorPostUpdateView, \
-    VendorPostDeleteView,VendorProfileUpdateView
+    VendorPostDeleteView, VendorProfileUpdateView, ServiceDetailView, like_service_view, VendorProfileView
 
 urlpatterns = [
     path('', VendorListView.as_view(), name='vendor_explore'),
@@ -9,4 +9,7 @@ urlpatterns = [
     path('post/create/', VendorPostCreateView.as_view(), name='vendor_post_create'),
     path('post/<int:pk>/update/', VendorPostUpdateView.as_view(), name='vendor_post_update'),
     path('post/<int:pk>/delete/', VendorPostDeleteView.as_view(), name='vendor_post_delete'),
+    path('services/<int:pk>/', ServiceDetailView.as_view(), name='service_detail'),
+    path('services/<int:pk>/like/', like_service_view, name='like_service'),
+    path('vendor/<str:username>/', VendorProfileView.as_view(), name='vendor_profile'),
 ]

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ vendor.name }}{% endblock %}
+{% block content %}
+<h1>{{ vendor.name }}</h1>
+<img src="{{ vendor.portfolio.url }}" class="img-fluid mb-3" alt="{{ vendor.name }}">
+<p>{{ vendor.description }}</p>
+<h3 class="mt-4">Services</h3>
+<div class="row">
+    {% for service in services %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <a href="{% url 'service_detail' service.id %}">
+                    <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'service_detail' service.id %}">{{ service.name }}</a>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No services available.</p>
+    {% endfor %}
+</div>
+{% endblock %}

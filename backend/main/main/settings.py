@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # = lobola/backend/main
 PROJECT_ROOT = BASE_DIR.parent                    # = lobola/backend
 LOBOLA_ROOT = PROJECT_ROOT.parent                 # = lobola
 FRONTEND_DIST = LOBOLA_ROOT / "frontend" / "dist"
-
+templates = BASE_DIR / 'templates'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -73,8 +73,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # 'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'DIRS':[FRONTEND_DIST],
+        'DIRS':[templates],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

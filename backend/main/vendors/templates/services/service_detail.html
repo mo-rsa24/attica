@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}{{ service.name }}{% endblock %}
+{% block content %}
+<h1>{{ service.name }}</h1>
+<img src="{{ service.image.url }}" class="img-fluid mb-3" alt="{{ service.name }}">
+<p><strong>Vendor:</strong> <a href="{% url 'vendor_profile' service.vendor.user.username %}">{{ service.vendor.name }}</a></p>
+<p><strong>Guests:</strong> {{ service.number_of_guests }}</p>
+<p><strong>Price:</strong> R{{ service.price|floatformat:2 }}</p>
+<p><strong>Location:</strong> {{ service.location_tags }}</p>
+<p><strong>Likes:</strong> {{ service.total_likes }}</p>
+<form method="post" action="{% url 'like_service' service.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Like</button>
+</form>
+<h3 class="mt-4">Reviews</h3>
+<ul class="list-group">
+    {% for review in reviews %}
+        <li class="list-group-item">{{ review.comment }}</li>
+    {% empty %}
+        <li class="list-group-item">No reviews yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

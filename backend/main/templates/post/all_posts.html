@@ -15,32 +15,23 @@
                                     <div class="card h-100 bg-dark text-white">
 
                                             <!-- Overlay Rectangle -->
-                                        <div class="overlay-bar d-flex align-items-center position-absolute"
-                                             style="display:flex; align-items: center; top: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.6); padding: 10px;">
-                                            <!-- Profile  Picture -->
-                                        <a href="{% url 'vendor_profile' service.vendor.user.username %}"
+                                         <a href="{% url 'vendor_profile' service.vendor.user.username %}"
                                            class="overlay-bar d-flex align-items-center position-absolute text-white text-decoration-none"
                                            style="display:flex; align-items: center; top: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.6); padding: 10px;">
                                             <img src="{{ service.vendor.portfolio.url }}" alt="Vendor Profile"
                                                  class="rounded-circle"
                                                  style="width: 50px; height: 50px; object-fit: cover; border: 2px solid white;">
-
-                                            <!-- Username -->
                                             <div class="ms-3">
                                                 <h6 class="mb-0">{{ service.vendor.name }}</h6>
                                             </div>
-{#                                        </div>#}
-                                        </a>
+                                         </a>
 
-                                        <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}"
-                                             style="height: 200px; object-fit: cover;">
                                         <a href="{% url 'service_detail' service.id %}">
                                             <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}"
                                                  style="height: 200px; object-fit: cover;">
                                         </a>
 
                                         <div class="card-body">
-                                            <h5 class="card-title">{{ service.name }}</h5>
                                             <h5 class="card-title">
                                                 <a href="{% url 'service_detail' service.id %}" class="text-white text-decoration-none">{{ service.name }}</a>
                                             </h5>
@@ -53,10 +44,12 @@
                                                 <span class="me-2">⭐</span>
                                                 <span>{{ service.rating }}</span>
                                             </div>
-                                            <form method="post" action="{% url 'like_service' service.id %}">
+
+                                             <form method="post" action="{% url 'like_service' service.id %}">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-outline-light btn-sm mt-2">❤️ {{ service.total_likes }}</button>
                                             </form>
+
                                         </div>
                                     </div>
                                 </div>
@@ -92,4 +85,3 @@
         </div>
     </div>
 {% endblock %}
-</div>
