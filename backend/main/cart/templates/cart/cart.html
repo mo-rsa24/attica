@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}My Cart{% endblock %}
+{% block content %}
+<h1>🛒 My Cart</h1>
+<ul class="list-group mb-3">
+    {% for item in cart_items %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ item.post.vendor.name }}</strong> - {{ item.post.caption }}
+            </div>
+            <span>${{ item.post.vendor.price_range }}</span>
+            <form method="post" action="{% url 'remove_from_cart' item.id %}" class="ms-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+        </li>
+    {% empty %}
+        <li class="list-group-item">Your cart is empty.</li>
+    {% endfor %}
+</ul>
+<h3 class="text-end">Total: <strong>${{ total_cost }}</strong></h3>
+<a href="#" class="btn btn-primary">Proceed to Checkout</a>
+{% endblock %}

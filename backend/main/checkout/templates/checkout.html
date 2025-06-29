@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Checkout</h1>
+  <h2>Order Summary</h2>
+  <ul>
+    {% for item in cart_items %}
+      <li>{{ item.vendor.name }} - R{{ item.vendor.price_range }}</li>
+    {% endfor %}
+  </ul>
+  <p>Total Cost: R{{ total_cost }}</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirm Purchase</button>
+  </form>
+{% endblock %}

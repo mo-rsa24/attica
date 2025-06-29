@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Include the reusable welcome and buttons section -->
+{% include 'home.html' %}
+
+<!-- Include the reusable all posts section -->
+<div class="container mt-5">
+    {% include 'post/all_posts.html' %}
+</div>
+{% endblock %}
