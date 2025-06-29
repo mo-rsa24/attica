@@ -21,11 +21,11 @@ from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from vendors.views import VendorPostsListView
-from .views import index
+from .views import ReactAppView
     
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', VendorPostsListView.as_view(), name='index'),
+    path('', ReactAppView.as_view(), name='index'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('events/', include('events.urls')),
     path('chat/', include('chat.urls')),
