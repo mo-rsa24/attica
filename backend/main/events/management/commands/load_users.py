@@ -1,6 +1,8 @@
 import csv
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):
@@ -15,6 +17,7 @@ class Command(BaseCommand):
 
                 for row in reader:
                     # Create user if not already present
+                    User = get_user_model()
                     user, created = User.objects.get_or_create(
                         id=row["id"],
                         defaults={

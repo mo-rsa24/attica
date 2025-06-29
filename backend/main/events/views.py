@@ -1,7 +1,6 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-from uaclient.contract import event
 
 from .models import Event
 from .forms import EventForm

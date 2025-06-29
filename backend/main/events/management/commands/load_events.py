@@ -1,8 +1,10 @@
 import csv
 from decimal import Decimal
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from events.models import Event
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):
@@ -18,6 +20,7 @@ class Command(BaseCommand):
                 for row in reader:
                     try:
                         # Fetch users
+                        User = get_user_model()
                         user = User.objects.get(id=row["user_id"])
                         partner_user = User.objects.get(id=row["partner_user_id"])
 
