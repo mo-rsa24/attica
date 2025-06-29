@@ -13,8 +13,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+BASE_DIR = Path(__file__).resolve().parent.parent  # = lobola/backend/main
+PROJECT_ROOT = BASE_DIR.parent                    # = lobola/backend
+LOBOLA_ROOT = PROJECT_ROOT.parent                 # = lobola
+FRONTEND_DIST = LOBOLA_ROOT / "frontend" / "dist"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -68,20 +70,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Allow React development server
-]
-
-ROOT_URLCONF = 'main.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # 'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-            BASE_DIR / "../../frontend" / "dist",
-        ],
+        'DIRS':[FRONTEND_DIST],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,6 +86,12 @@ TEMPLATES = [
         },
     },
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Allow React development server
+]
+
+ROOT_URLCONF = 'main.urls'
+
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
@@ -146,7 +145,8 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Additional directories where Django will search for static files
 STATICFILES_DIRS = [
-    BASE_DIR / "../../frontend" / "dist",
+    FRONTEND_DIST,                  # For vite.svg etc.
+    FRONTEND_DIST / "assets",       # For /assets/index-XYZ.js
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
