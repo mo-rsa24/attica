@@ -2,6 +2,15 @@ from rest_framework import serializers
 from .models import Service, Category, Review, ServiceImage, Vendor
 
 
+class VendorBriefSerializer(serializers.ModelSerializer):
+    """Minimal vendor information for nested use"""
+
+    profile_image = serializers.ImageField(source="portfolio")
+
+    class Meta:
+        model = Vendor
+        fields = ["id", "name", "profile_image", "rating"]
+
 class ServiceImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceImage
@@ -9,7 +18,8 @@ class ServiceImageSerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    vendor = serializers.PrimaryKeyRelatedField(read_only=True)  # avoid full circular nesting
+    # vendor = serializers.PrimaryKeyRelatedField(read_only=True)  # avoid full circular nesting
+    vendor = VendorBriefSerializer(read_only=True)
     category_name = serializers.CharField(source="category.name", read_only=True)
     likes = serializers.SerializerMethodField()
     liked = serializers.SerializerMethodField()

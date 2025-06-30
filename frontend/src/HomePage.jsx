@@ -8,7 +8,7 @@ function HomePage() {
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
-    fetch('/vendors/api/popular-services/')
+    fetch('/vendors/api/services/popular/')
       .then(res => res.json())
       .then(setPopular)
       .catch(() => {})

@@ -4,7 +4,8 @@ import TwitterIcon from '@mui/icons-material/Twitter'
 
 function Footer() {
   return (
-      <footer className="bg-gray-100 mt-5 pt-6 text-gray-600">
+      <footer className="bg-gray-800 text-white mt-5 pt-6" style={{minHeight: '100px'}}>
+
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>

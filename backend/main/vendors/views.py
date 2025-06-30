@@ -265,6 +265,6 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
 
 class VendorViewSet(viewsets.ReadOnlyModelViewSet):
     """Read only API for vendors"""
-
+    permission_classes = [AllowAny]
     queryset = Vendor.objects.prefetch_related("vendorservices")
     serializer_class = VendorSerializer
