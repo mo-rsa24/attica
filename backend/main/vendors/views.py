@@ -8,6 +8,8 @@ from django.views.generic import CreateView, DeleteView, UpdateView, ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from rest_framework import generics
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
 from events.models import Event
 from .models import Vendor, Category, VendorPost, Service
@@ -197,11 +199,13 @@ def like_service_view(request, pk):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', service.get_absolute_url()))
 
 class PopularServicesAPIView(generics.ListAPIView):
+    permission_classes = [AllowAny]
     serializer_class = ServiceSerializer
 
     def get_queryset(self):
         return Service.objects.order_by('-rating')[:10]
 
 class CategoriesWithServicesAPIView(generics.ListAPIView):
+    permission_classes = [AllowAny]
     serializer_class = CategorySerializer
     queryset = Category.objects.prefetch_related('servicecategory').all()

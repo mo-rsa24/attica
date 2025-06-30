@@ -6,7 +6,10 @@ function HomePage() {
 
   useEffect(() => {
     fetch('/vendors/api/popular-services/')
-      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        return res.json();
+      })
       .then(setPopular)
       .catch(() => {})
 

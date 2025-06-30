@@ -13,6 +13,9 @@ export default defineConfig({
     },
     proxy: {
       '/api': 'http://localhost:8000',  // Proxy all /api requests to Django
+      '/vendors': 'http://localhost:8000',   // Vendor related endpoints
+      '/cart': 'http://localhost:8000',      // Cart endpoints
+      '/checkout': 'http://localhost:8000',
     },
   },
 })

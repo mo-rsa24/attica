@@ -73,7 +73,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS':[templates],
+        'DIRS':[templates, FRONTEND_DIST],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -144,10 +144,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Additional directories where Django will search for static files
-# STATICFILES_DIRS = [
-#     FRONTEND_DIST,                  # For vite.svg etc.
-#     FRONTEND_DIST / "assets",       # For /assets/index-XYZ.js
-# ]
+STATICFILES_DIRS = [
+    FRONTEND_DIST,                  # For vite.svg etc.
+    FRONTEND_DIST / "assets",       # For /assets/index-XYZ.js
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

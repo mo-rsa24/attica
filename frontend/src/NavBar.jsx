@@ -1,14 +1,6 @@
 import { useEffect, useState } from 'react'
 
 function NavBar() {
-  const [cartCount, setCartCount] = useState(0)
-
-  useEffect(() => {
-    fetch('/cart/api/items/count/')
-      .then(res => res.ok ? res.json() : {count: 0})
-      .then(data => setCartCount(data.count || 0))
-      .catch(() => {})
-  }, [])
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
@@ -20,7 +12,7 @@ function NavBar() {
         <div className="collapse navbar-collapse" id="mainNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <a className="nav-link" href="/cart/">🛒 Cart <span className="badge bg-secondary">{cartCount}</span></a>
+              <a className="nav-link">🛒 Cart <span className="badge bg-secondary">1</span></a>
             </li>
           </ul>
           <ul className="navbar-nav ms-auto align-items-center">
