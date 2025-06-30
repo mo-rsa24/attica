@@ -10,6 +10,8 @@ class Event(models.Model):
     partner_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="partnered_events",null=True,blank=True)
     name = models.CharField(max_length=100)  # Name of the event
     date = models.DateField()  # Date of the event
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
     location = models.CharField(max_length=100)  # Location of the event
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Event budget
     guest_count = models.IntegerField(default=0)  # Number of guests

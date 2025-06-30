@@ -1,87 +1,47 @@
-{#{% extends 'base.html' %}#}
-{% block title %}All Vendor Posts{% endblock %}
+{% block title %}Service Providers{% endblock %}
 {% block content %}
-    <div class="container mt-4">
-        <h1 class="my-4">All Vendor Posts</h1>
-        {{ posts }}
-        <div class="row">
-            {% for category in categories_with_services %}
-                {% if category.name == 'Catering' %}
-                    <div class="category-section">
-                        <h3>{{ category.name }}</h3>
-                        <div class="row">
-                            {% for service in category.servicecategory.all %}
-                                <div class="col-md-4 mb-4">
-                                    <div class="card h-100 bg-dark text-white">
-
-                                            <!-- Overlay Rectangle -->
-                                         <a href="{% url 'vendor_profile' service.vendor.user.username %}"
-                                           class="overlay-bar d-flex align-items-center position-absolute text-white text-decoration-none"
-                                           style="display:flex; align-items: center; top: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.6); padding: 10px;">
-                                            <img src="{{ service.vendor.portfolio.url }}" alt="Vendor Profile"
-                                                 class="rounded-circle"
-                                                 style="width: 50px; height: 50px; object-fit: cover; border: 2px solid white;">
-                                            <div class="ms-3">
-                                                <h6 class="mb-0">{{ service.vendor.name }}</h6>
-                                            </div>
-                                         </a>
-
-                                        <a href="{% url 'service_detail' service.id %}">
-                                            <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}"
-                                                 style="height: 200px; object-fit: cover;">
-                                        </a>
-
-                                        <div class="card-body">
-                                            <h5 class="card-title">
-                                                <a href="{% url 'service_detail' service.id %}" class="text-white text-decoration-none">{{ service.name }}</a>
-                                            </h5>
-                                            <p class="card-text">
-                                                {{ service.name }} for {{ service.number_of_guests }} guests<br>
-                                                <strong>R{{ service.price |floatformat:2 }}</strong>
-                                            </p>
-                                            <!-- Rating -->
-                                            <div class="d-flex align-items-center">
-                                                <span class="me-2">⭐</span>
-                                                <span>{{ service.rating }}</span>
-                                            </div>
-
-                                             <form method="post" action="{% url 'like_service' service.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-light btn-sm mt-2">❤️ {{ service.total_likes }}</button>
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            {% empty %}
-                                <p>No services available under this category.</p>
-                            {% endfor %}
+{% for category in categories_with_services %}
+        <div class="mb-5">
+            <h4 class="mb-3">{{ category.name }}</h4>
+            <div class="d-flex overflow-auto" style="gap:1rem;">
+                {% for service in category.servicecategory.all %}
+                    <div class="card" style="min-width:220px;">
+                        <a href="{% url 'service_detail' service.id %}">
+                            <img src="{{ service.image.url }}" class="card-img-top" style="height:150px;object-fit:cover;" alt="{{ service.name }}">
+                        </a>
+                        <div class="card-body">
+                            <h6 class="card-title">{{ service.vendor.name }}</h6>
+                            <p class="card-text small text-muted">{{ service.location_tags }}</p>
+                            <div class="d-flex align-items-center">
+                                <span class="me-1">⭐</span>{{ service.rating }}
+                            </div>
                         </div>
                     </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No services available under this category.</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+    <div class="pagination">
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a href="?page=1" class="page-link">First</a></li>
+                    <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link">Previous</a></li>
                 {% endif %}
-            {% endfor %}
-        </div>
-        <div class="pagination">
-            {% if is_paginated %}
-                <ul class="pagination">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item"><a href="?page=1" class="page-link">First</a></li>
-                        <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link">Previous</a>
-                        </li>
-                    {% endif %}
-                    {% for num in page_obj.paginator.page_range %}
-                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                            <a href="?page={{ num }}" class="page-link">{{ num }}</a>
-                        </li>
-                    {% endfor %}
-                    {% if page_obj.has_next %}
-                        <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">Next</a>
-                        </li>
-                        <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}"
-                                                 class="page-link">Last</a></li>
-                    {% endif %}
-                </ul>
-            {% endif %}
-        </div>
+                {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">Next</a></li>
+                    <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
     </div>
 {% endblock %}

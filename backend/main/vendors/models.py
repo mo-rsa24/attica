@@ -35,6 +35,7 @@ class Service(models.Model):
     image = models.ImageField(upload_to='service/')
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendorservices')
     number_of_guests = models.IntegerField()
+    description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Price with 2 decimal places
     rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     likes = models.ManyToManyField(
@@ -79,3 +80,7 @@ class VendorPost(models.Model):
 
     def __str__(self):
         return f"Post by {self.vendor.name} at {self.created_at}"
+
+class ServiceImage(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='service_gallery/')

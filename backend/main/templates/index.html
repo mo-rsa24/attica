@@ -5,7 +5,25 @@
 <!-- Include the reusable welcome and buttons section -->
 {% include 'home.html' %}
 
-<!-- Include the reusable all posts section -->
+<section class="mt-5">
+    <h3 class="mb-3">Popular Service Providers</h3>
+    <div class="d-flex overflow-auto" style="gap:1rem;">
+        {% for service in popular_services %}
+            <div class="card" style="min-width:250px;">
+                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="height:160px;object-fit:cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.vendor.name }}</h5>
+                    <p class="card-text small text-muted">{{ service.category.name }} - {{ service.location_tags }}</p>
+                    <div class="d-flex align-items-center">
+                        <span class="me-1">⭐</span>{{ service.rating }}
+                    </div>
+                    <p class="small mt-2">{{ service.name }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+    
 <div class="container mt-5">
     {% include 'post/all_posts.html' %}
 </div>

@@ -1,0 +1,5 @@
+name,vendor_id,category_id,number_of_guests,price,rating,description,location_tags,image_url,gallery_urls
+Wedding Shoot,1,1,100,5000,4.9,"Full day photography package","JHB","https://picsum.photos/seed/service1/600/400","https://picsum.photos/seed/service1a/400/300;https://picsum.photos/seed/service1b/400/300"
+Floral Magic,2,2,200,3000,4.7,"Elegant floral arrangements","CPT","https://picsum.photos/seed/service2/600/400","https://picsum.photos/seed/service2a/400/300;https://picsum.photos/seed/service2b/400/300"
+Banquet Hall,3,3,500,10000,4.8,"Modern venue with all amenities","PTA","https://picsum.photos/seed/service3/600/400","https://picsum.photos/seed/service3a/400/300;https://picsum.photos/seed/service3b/400/300"
+Limo Ride,4,4,4,2000,4.6,"Luxury limo service","JHB","https://picsum.photos/seed/service4/600/400","https://picsum.photos/seed/service4a/400/300;https://picsum.photos/seed/service4b/400/300"

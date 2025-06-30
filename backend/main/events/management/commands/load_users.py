@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = "Load users from a CSV file"
 
     def handle(self, *args, **kwargs):
-        csv_file_path = "realistic_users_dummy_data.csv"  # Update this path if needed
+        csv_file_path = "sample_data/realistic_users_dummy_data.csv"  # Update this path if needed
 
         try:
             with open(csv_file_path, "r") as file:

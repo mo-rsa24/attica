@@ -6,7 +6,7 @@ class Command(BaseCommand):
     help = "Load categories from a CSV file"
 
     def handle(self, *args, **kwargs):
-        with open('realistic_categories_dummy_data.csv', 'r') as file:
+        with open('sample_data/realistic_categories_dummy_data.csv', 'r') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 Category.objects.get_or_create(id=row['id'], name=row['name'])

@@ -1,9 +1,26 @@
-<div class="text-center mt-5">
-    <h1 class="display-4">Welcome to Attica</h1>
-    <p class="lead">Plan your perfect traditional wedding with the best vendors and services.</p>
-    <div class="mt-4">
-        <a href="{% url 'vendor_explore' %}" class="btn btn-primary btn-lg">Explore Vendors</a>
-        <a href="{% url 'event_explore' %}" class="btn btn-warning btn-lg">Explore Events</a>
-        <a href="{% url 'event_create' %}" class="btn btn-success btn-lg">Create an Event</a>
-    </div>
+<div class="bg-light p-4 rounded shadow-sm mt-4">
+    <h2 class="mb-3">Welcome to Attica</h2>
+    <form method="get" action="{% url 'vendor_explore' %}">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Where</label>
+                <input type="text" name="where" class="form-control" placeholder="Location">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Event Date</label>
+                <input type="date" name="event_date" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Time Slot Start</label>
+                <input type="time" name="start_time" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Time Slot End</label>
+                <input type="time" name="end_time" class="form-control">
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-primary" type="submit">🔍 Search</button>
+            </div>
+        </div>
+    </form>
 </div>

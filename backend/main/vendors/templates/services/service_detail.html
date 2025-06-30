@@ -1,23 +1,114 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ service.name }}{% endblock %}
 {% block content %}
-<h1>{{ service.name }}</h1>
-<img src="{{ service.image.url }}" class="img-fluid mb-3" alt="{{ service.name }}">
-<p><strong>Vendor:</strong> <a href="{% url 'vendor_profile' service.vendor.user.username %}">{{ service.vendor.name }}</a></p>
-<p><strong>Guests:</strong> {{ service.number_of_guests }}</p>
-<p><strong>Price:</strong> R{{ service.price|floatformat:2 }}</p>
-<p><strong>Location:</strong> {{ service.location_tags }}</p>
-<p><strong>Likes:</strong> {{ service.total_likes }}</p>
-<form method="post" action="{% url 'like_service' service.id %}">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-primary">Like</button>
-</form>
-<h3 class="mt-4">Reviews</h3>
-<ul class="list-group">
-    {% for review in reviews %}
-        <li class="list-group-item">{{ review.comment }}</li>
-    {% empty %}
-        <li class="list-group-item">No reviews yet.</li>
-    {% endfor %}
-</ul>
+<div class="container">
+    <div class="row g-2">
+        <div class="col-md-7">
+            <img src="{{ service.image.url }}" class="img-fluid w-100 rounded" style="height:400px;object-fit:cover;" alt="{{ service.name }}">
+        </div>
+        <div class="col-md-5">
+            <div class="row g-2">
+                {% for img in gallery|slice:':4' %}
+                <div class="col-6">
+                    <img src="{{ img.image.url }}" class="img-fluid rounded" style="height:195px;object-fit:cover;" alt="gallery image">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-light mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Show all photos</button>
+
+    <div class="row mt-4">
+        <div class="col-lg-7">
+            <h2>{{ service.name }}</h2>
+            <p class="text-muted">Hosted by {{ service.vendor.name }}</p>
+            <ul class="list-unstyled">
+                <li>{{ service.number_of_guests }} guests</li>
+                <li>Category: {{ service.category.name }}</li>
+            </ul>
+            <p id="desc" class="collapse">{{ service.description }}</p>
+            <a class="text-decoration-none" data-bs-toggle="collapse" href="#desc" role="button">Show more</a>
+            <hr>
+            <h5>What this service offers</h5>
+            <ul class="list-unstyled row small">
+                <li class="col-6">📸 Professional quality</li>
+                <li class="col-6">📍 On location</li>
+                <li class="col-6">✅ Experienced staff</li>
+                <li class="col-6">⭐ Rated {{ service.rating }}</li>
+            </ul>
+            <hr>
+            <h5>Comments</h5>
+            {% for review in reviews %}
+            <div class="d-flex mb-3">
+                <img src="{% static 'default_profile.jpg' %}" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;" alt="profile">
+                <div>
+                    <div class="small">⭐ {{ service.rating }}</div>
+                    <p class="mb-0">{{ review.comment }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p>No comments yet.</p>
+            {% endfor %}
+        </div>
+        <div class="col-lg-5">
+            <div class="card p-3 sticky-top" style="top:80px;">
+                <div class="d-flex">
+                    <h3 class="mb-0">R{{ service.price|floatformat:2 }}</h3>
+                    <span class="ms-auto">⭐ {{ service.rating }}</span>
+                </div>
+                <form class="mt-3">
+                    <div class="mb-2">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Time slot</label>
+                        <input type="time" class="form-control">
+                    </div>
+                    <button class="btn btn-primary w-100" type="button">Reserve</button>
+                    <small class="text-muted d-block mt-2">You won't be charged yet</small>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h5>Location</h5>
+        <div class="ratio ratio-16x9">
+            <iframe src="https://maps.google.com/maps?q={{ service.location_tags }}&output=embed" class="rounded" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <div class="mt-4 p-3 border rounded d-flex align-items-center">
+        <img src="{{ service.vendor.portfolio.url }}" class="rounded-circle me-3" style="width:64px;height:64px;object-fit:cover;" alt="vendor">
+        <div>
+            <h5 class="mb-1">Meet your service provider</h5>
+            <p class="mb-0 small">{{ service.vendor.description|truncatewords:25 }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">All photos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-2">
+          <div class="col-12 mb-2">
+              <img src="{{ service.image.url }}" class="img-fluid rounded" alt="main">
+          </div>
+          {% for img in gallery %}
+          <div class="col-md-4 mb-2">
+            <img src="{{ img.image.url }}" class="img-fluid rounded" alt="gallery">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

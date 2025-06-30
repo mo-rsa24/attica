@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = "Load vendors from a CSV file"
 
     def handle(self, *args, **kwargs):
-        with open('realistic_vendors_dummy_data.csv', 'r') as file:
+        with open('sample_data/realistic_vendors_dummy_data.csv', 'r') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 try:

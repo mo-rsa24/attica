@@ -25,6 +25,7 @@ class VendorListView(generic.ListView):
         price_min = self.request.GET.get('price_min')
         price_max = self.request.GET.get('price_max')
         rating = self.request.GET.get('rating')
+        where = self.request.GET.get('where')
         if category:
             queryset = queryset.filter(category__name__icontains=category)
         if price_min:
@@ -33,7 +34,8 @@ class VendorListView(generic.ListView):
             queryset = queryset.filter(price_range__lte=price_max)
         if rating:
             queryset = queryset.filter(rating__gte=rating)
-
+        if where:
+            queryset = queryset.filter(vendorservices__location_tags__icontains=where).distinct()
         return queryset
 
 
@@ -145,6 +147,8 @@ class VendorPostsListView(ListView):
             Prefetch("servicecategory", queryset=Service.objects.all())
         )
 
+        context["popular_services"] = Service.objects.order_by("-rating")[:10]
+
         # Pass grouped data to the context
         context['categories_with_services'] = categories
         return context
@@ -157,6 +161,7 @@ class ServiceDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['reviews'] = self.object.reviews.all()
+        context['gallery'] = self.object.images.all()
         return context
 
 

@@ -1,0 +1,9 @@
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Smooth horizontal scrolling */
+.overflow-auto {
+    scroll-behavior: smooth;
+}
