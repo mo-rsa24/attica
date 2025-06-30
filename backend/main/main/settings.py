@@ -86,6 +86,7 @@ TEMPLATES = [
     },
 ]
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
     "http://localhost:3000",  # Allow React development server
 ]
 
@@ -143,10 +144,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Additional directories where Django will search for static files
-STATICFILES_DIRS = [
-    FRONTEND_DIST,                  # For vite.svg etc.
-    FRONTEND_DIST / "assets",       # For /assets/index-XYZ.js
-]
+# STATICFILES_DIRS = [
+#     FRONTEND_DIST,                  # For vite.svg etc.
+#     FRONTEND_DIST / "assets",       # For /assets/index-XYZ.js
+# ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -155,6 +156,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'  # Redirect to homepage after login
 LOGOUT_REDIRECT_URL = '/accounts/login-redirect/'  # Redirect to login page after logout
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'users.CustomUser'
 

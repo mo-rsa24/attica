@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.http import JsonResponse
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -24,9 +25,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from vendors.views import VendorPostsListView
 from .views import ReactAppView
 from .views import index
-    
+
+def hello_world(request):
+    return JsonResponse({"message": "Hello from Django!"})
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/hello/', hello_world),
     path('', VendorPostsListView.as_view(), name='index'),
     # path('', ReactAppView.as_view(), name='index'),
     path('accounts/', include('django.contrib.auth.urls')),

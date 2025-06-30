@@ -7,9 +7,14 @@ from django.views import generic
 from django.views.generic import CreateView, DeleteView, UpdateView, ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from rest_framework import generics
+
 from events.models import Event
 from .models import Vendor, Category, VendorPost, Service
 import pdb
+
+from .serializers import ServiceSerializer, CategorySerializer
+
 
 # Create your views here.
 
@@ -190,3 +195,13 @@ def like_service_view(request, pk):
     else:
         service.likes.add(request.user)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', service.get_absolute_url()))
+
+class PopularServicesAPIView(generics.ListAPIView):
+    serializer_class = ServiceSerializer
+
+    def get_queryset(self):
+        return Service.objects.order_by('-rating')[:10]
+
+class CategoriesWithServicesAPIView(generics.ListAPIView):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.prefetch_related('servicecategory').all()
