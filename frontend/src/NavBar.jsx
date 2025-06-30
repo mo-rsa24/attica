@@ -1,31 +1,43 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { AppBar, Toolbar, Typography, Box, Button, Avatar, IconButton, Menu, MenuItem } from '@mui/material'
+import SearchForm from './SearchForm.jsx'
+
 
 function NavBar() {
 
+  const [anchorEl, setAnchorEl] = useState(null)
+
+  const handleOpen = (e) => {
+    setAnchorEl(e.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-      <div className="container-fluid">
-        <a className="navbar-brand" href="/">Attica</a>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="mainNav">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <a className="nav-link">🛒 Cart <span className="badge bg-secondary">1</span></a>
-            </li>
-          </ul>
-          <ul className="navbar-nav ms-auto align-items-center">
-            <li className="nav-item me-3">
-              <a href="/vendors/profile/update/" className="nav-link">Become a Vendor</a>
-            </li>
-            <li className="nav-item me-3">
-              <img src="/static/default_profile.jpg" className="rounded-circle" style={{width:'40px',height:'40px',objectFit:'cover'}} alt="Profile" />
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+   <AppBar position="static" color="inherit" elevation={1} sx={{ mb: 2 }}>
+      <Toolbar sx={{ gap: 2 }}>
+        <Typography variant="h6" component="a" href="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
+          Attica
+        </Typography>
+        <Box sx={{ flexGrow: 1 }}>
+          <SearchForm />
+        </Box>
+        <Button href="/vendors/profile/update/" color="primary" sx={{ mr: 2 }}>
+          Become a Vendor
+        </Button>
+        <IconButton onClick={handleOpen} size="small">
+          <Avatar src="/static/default_profile.jpg" sx={{ width: 40, height: 40 }} />
+        </IconButton>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+          <MenuItem onClick={handleClose}>Notifications</MenuItem>
+          <MenuItem onClick={handleClose}>Messages</MenuItem>
+          <MenuItem onClick={handleClose}>Profile</MenuItem>
+          <MenuItem onClick={handleClose}>Logout</MenuItem>
+        </Menu>
+      </Toolbar>
+    </AppBar>
   )
 }
 
