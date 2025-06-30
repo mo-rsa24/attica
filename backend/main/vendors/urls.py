@@ -1,7 +1,13 @@
 from django.urls import path, include, re_path
+from rest_framework.routers import DefaultRouter
+
 from .views import VendorPostDashboardView, VendorListView, VendorPostCreateView, VendorPostUpdateView, \
     VendorPostDeleteView, VendorProfileUpdateView, ServiceDetailView, like_service_view, VendorProfileView, \
-    PopularServicesAPIView, CategoriesWithServicesAPIView
+    PopularServicesAPIView, CategoriesWithServicesAPIView, ServiceViewSet, VendorViewSet
+
+router = DefaultRouter()
+router.register(r"api/services", ServiceViewSet, basename="service")
+router.register(r"api/vendors", VendorViewSet, basename="vendor")
 
 urlpatterns = [
     path('', VendorListView.as_view(), name='vendor_explore'),
@@ -16,3 +22,4 @@ urlpatterns = [
     path('api/popular-services/', PopularServicesAPIView.as_view(), name='api_popular_services'),
     path('api/categories-with-services/', CategoriesWithServicesAPIView.as_view(), name='api_categories_with_services'),
 ]
+urlpatterns += router.urls

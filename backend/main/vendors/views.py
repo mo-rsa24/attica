@@ -7,15 +7,16 @@ from django.views import generic
 from django.views.generic import CreateView, DeleteView, UpdateView, ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from rest_framework import generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import generics, viewsets, permissions
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from events.models import Event
 from .models import Vendor, Category, VendorPost, Service
 import pdb
 
-from .serializers import ServiceSerializer, CategorySerializer
+from .serializers import ServiceSerializer, CategorySerializer, VendorSerializer, ServiceDetailSerializer
 
 
 # Create your views here.
@@ -203,9 +204,67 @@ class PopularServicesAPIView(generics.ListAPIView):
     serializer_class = ServiceSerializer
 
     def get_queryset(self):
-        return Service.objects.order_by('-rating')[:10]
+        return (
+            Service.objects.select_related("vendor", "category")
+            .prefetch_related("images")
+            .order_by("-rating")[:10]
+        )
 
 class CategoriesWithServicesAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = CategorySerializer
-    queryset = Category.objects.prefetch_related('servicecategory').all()
+    queryset = (
+        Category.objects.prefetch_related(
+            Prefetch(
+                "servicecategory",
+                queryset=Service.objects.select_related("vendor", "category"),
+            )
+        ).all()
+    )
+
+class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint for listing and retrieving services"""
+
+    queryset = Service.objects.select_related("vendor", "category").prefetch_related(
+        "images", "reviews"
+    )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return ServiceDetailSerializer
+        return ServiceSerializer
+
+    @action(detail=False, methods=["get"], url_path="popular", permission_classes=[AllowAny])
+    def popular(self, request):
+        services = (
+            Service.objects.select_related("vendor", "category")
+            .order_by("-rating")[:10]
+        )
+        serializer = ServiceSerializer(services, many=True, context={"request": request})
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post", "delete"], permission_classes=[AllowAny])
+    def like(self, request, pk=None):
+        service = self.get_object()
+        if request.method == "POST":
+            service.likes.add(request.user)
+        else:
+            service.likes.remove(request.user)
+        return Response(
+            {
+                "likes": service.likes.count(),
+                "liked": request.user in service.likes.all(),
+            }
+        )
+
+
+class VendorViewSet(viewsets.ReadOnlyModelViewSet):
+    """Read only API for vendors"""
+
+    queryset = Vendor.objects.prefetch_related("vendorservices")
+    serializer_class = VendorSerializer

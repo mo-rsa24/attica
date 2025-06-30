@@ -1,42 +1,41 @@
-import { Box, Grid, Typography, Link } from '@mui/material'
 import FacebookIcon from '@mui/icons-material/Facebook'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import TwitterIcon from '@mui/icons-material/Twitter'
 
 function Footer() {
   return (
-      <Box component="footer" sx={{ bgcolor: 'grey.100', mt: 5, pt: 4 }}>
-        <Box className="container">
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <Typography variant="subtitle2" gutterBottom>Support</Typography>
-              <Link href="#" underline="hover" display="block">Help Center</Link>
-              <Link href="#" underline="hover" display="block">Cancellation</Link>
-              <Link href="#" underline="hover" display="block">Contact</Link>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="subtitle2" gutterBottom>Hosting</Typography>
-              <Link href="#" underline="hover" display="block">Become a Vendor</Link>
-              <Link href="#" underline="hover" display="block">Community</Link>
-              <Link href="#" underline="hover" display="block">Rules</Link>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="subtitle2" gutterBottom>Attica</Typography>
-              <Link href="#" underline="hover" display="block">About</Link>
-              <Link href="#" underline="hover" display="block">Careers</Link>
-              <Link href="#" underline="hover" display="block">Blog</Link>
-            </Grid>
-          </Grid>
-        </Box>
-        <Box sx={{ bgcolor: 'grey.200', mt: 4, py: 2, textAlign: 'center' }}>
-          <Typography variant="body2" component="span">© {new Date().getFullYear()} Attica Inc.</Typography>
-          <Box sx={{ ml: 1, display: 'inline-flex', gap: 1 }}>
-            <FacebookIcon fontSize="small" />
-            <InstagramIcon fontSize="small" />
-            <TwitterIcon fontSize="small" />
-          </Box>
-        </Box>
-      </Box>
+      <footer className="bg-gray-100 mt-5 pt-6 text-gray-600">
+        <div className="max-w-screen-xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Support</h4>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Help Center</a>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Cancellation</a>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Contact</a>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Hosting</h4>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Become a Vendor</a>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Community</a>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Rules</a>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Attica</h4>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">About</a>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Careers</a>
+              <a href="#" className="block text-sm hover:underline hover:text-gray-900">Blog</a>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gray-200 mt-6 py-2 text-center text-sm flex justify-center items-center gap-2 border-t">
+          <span>© {new Date().getFullYear()} Attica Inc.</span>
+          <div className="flex gap-2">
+            <FacebookIcon fontSize="small" className="hover:text-rose-500"/>
+            <InstagramIcon fontSize="small" className="hover:text-rose-500"/>
+            <TwitterIcon fontSize="small" className="hover:text-rose-500"/>
+          </div>
+        </div>
+      </footer>
   )
 }
 
