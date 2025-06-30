@@ -11,7 +11,9 @@ function HomePage() {
       .catch(() => {})
 
     fetch('/vendors/api/categories-with-services/')
-      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        return res.json()})
       .then(setCategories)
       .catch(() => {})
   }, [])
