@@ -1,10 +1,17 @@
 import { AiOutlineHome } from 'react-icons/ai';
 import { BiBell } from 'react-icons/bi';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FiGlobe } from 'react-icons/fi';
 import { HiOutlineMenu } from 'react-icons/hi';
 import { FaAirbnb } from 'react-icons/fa';
 
 export default function NavBar() {
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setAuthenticated(document.cookie.includes('sessionid='));
+  }, []);
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
@@ -54,8 +61,32 @@ export default function NavBar() {
             >
               Become a host
             </a>
+          {authenticated ? (
+              <img
+                src="/static/default_profile.jpg"
+                alt="profile"
+                className="h-6 w-6 rounded-full"
+              />
+            ) : (
+              <Link
+                to="/login"
+                className="text-sm font-medium text-gray-700 hover:text-gray-900"
+              >
+                Login
+              </Link>
+            )}
+
+
             <button className="p-2 rounded-full hover:bg-gray-100">
-              <FiGlobe className="h-5 w-5 text-gray-700" />
+{authenticated ? (
+                <img
+                  src="/static/default_profile.jpg"
+                  alt="profile"
+                  className="h-5 w-5 rounded-full"
+                />
+              ) : (
+                <FiGlobe className="h-5 w-5 text-gray-700" />
+              )}
             </button>
             <button className="p-2 rounded-full hover:bg-gray-100">
               <HiOutlineMenu className="h-5 w-5 text-gray-700" />

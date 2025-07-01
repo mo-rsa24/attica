@@ -26,19 +26,29 @@ function HomePage() {
                 <SearchForm/>
             </div>
 
-           <div className="mt-10">
+            <div className="mt-10">
                 <h3 className="text-xl font-semibold mb-4">Popular Service Providers</h3>
-                <div className="flex sm:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-x-auto sm:overflow-visible pb-4 snap-x snap-mandatory sm:snap-none">
-                    {popular.length ? (
-                        popular.map(service => (
-                            <ServiceCard key={service.id} service={service} />
-                        ))
-                    ) : (
-                        Array.from({ length: 4 }).map((_,i) => <ServiceCardSkeleton key={i} />)
-                    )}
+                <div className="overflow-x-auto flex snap-x snap-mandatory pb-4">
+                    {(popular.length ? popular : Array.from({length: 8}))
+                        .reduce((groups, item, idx) => {
+                            if (idx % 8 === 0) groups.push([])
+                            groups[groups.length - 1].push(item)
+                            return groups
+                        }, [])
+                        .map((group, i) => (
+                            <div key={i}
+                                 className="grid grid-cols-2 sm:grid-cols-4 grid-rows-2 gap-6 flex-shrink-0 w-full snap-start">
+                                {group.map((service, idx) => (
+                                    service ? <ServiceCard key={service.id} service={service}/> :
+                                        <ServiceCardSkeleton key={idx}/>
+                                ))}
+                            </div>
+                        ))}
                 </div>
             </div>
 
+            <hr className="my-10 mx-auto w-1/2 border-t border-dashed"/>
+            
             <div className="mt-10">
                 {categories.map(cat => (
                     <div key={cat.id} className="mb-10">
