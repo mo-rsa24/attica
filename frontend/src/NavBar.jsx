@@ -1,44 +1,69 @@
-import { useState } from 'react'
-import { AppBar, Toolbar, Typography, Box, Button, Avatar, IconButton, Menu, MenuItem } from '@mui/material'
-import SearchForm from './SearchForm.jsx'
+import { AiOutlineHome } from 'react-icons/ai';
+import { BiBell } from 'react-icons/bi';
+import { FiGlobe } from 'react-icons/fi';
+import { HiOutlineMenu } from 'react-icons/hi';
+import { FaAirbnb } from 'react-icons/fa';
 
-
-function NavBar() {
-
-  const [anchorEl, setAnchorEl] = useState(null)
-
-  const handleOpen = (e) => {
-    setAnchorEl(e.currentTarget)
-  }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
+export default function NavBar() {
   return (
-   <AppBar position="static" color="inherit" elevation={1} sx={{ mb: 2 }}>
-      <Toolbar sx={{ gap: 2 }}>
-        <Typography variant="h6" component="a" href="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
-          Attica
-        </Typography>
-        <Box sx={{ flexGrow: 1 }}>
-          <SearchForm />
-        </Box>
-        <Button href="/vendors/profile/update/" color="primary" sx={{ mr: 2 }}>
-          Become a Vendor
-        </Button>
-        <IconButton onClick={handleOpen} size="small">
-          <Avatar src="/static/default_profile.jpg" sx={{ width: 40, height: 40 }} />
-        </IconButton>
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-          <MenuItem onClick={handleClose}>Notifications</MenuItem>
-          <MenuItem onClick={handleClose}>Messages</MenuItem>
-          <MenuItem onClick={handleClose}>Profile</MenuItem>
-          <MenuItem onClick={handleClose}>Logout</MenuItem>
-        </Menu>
-      </Toolbar>
-    </AppBar>
-  )
-}
+    <nav className="bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
 
-export default NavBar
+          {/* Logo and Nav Links */}
+          <div className="flex items-center space-x-12">
+            <a href="/" className="flex items-center space-x-2">
+              <FaAirbnb className="h-6 w-6 text-pink-600" />
+              <span className="text-xl font-bold lowercase text-gray-800">attica</span>
+            </a>
+
+            <div className="flex items-center space-x-8">
+              {/* Homes (active) */}
+              <a
+                href="#"
+                className="inline-flex items-center space-x-2 text-sm font-medium text-gray-900 border-b-2 border-black pb-2"
+              >
+                <AiOutlineHome className="h-5 w-5" />
+                <span>Homes</span>
+              </a>
+
+              {/* Experiences */}
+              <a
+                href="#"
+                className="inline-flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 relative"
+              >
+                <span>Experiences</span>
+              </a>
+
+              {/* Services */}
+              <a
+                href="#"
+                className="inline-flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 relative"
+              >
+                <BiBell className="h-5 w-5" />
+                <span>Services</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex items-center space-x-4">
+            <a
+              href="/vendors/profile/update/"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+              Become a host
+            </a>
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <FiGlobe className="h-5 w-5 text-gray-700" />
+            </button>
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <HiOutlineMenu className="h-5 w-5 text-gray-700" />
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </nav>
+  );
+}

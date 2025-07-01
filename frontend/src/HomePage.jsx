@@ -4,51 +4,52 @@ import ServiceCard from './ServiceCard.jsx'
 import SearchForm from './SearchForm.jsx'
 
 function HomePage() {
-  const [popular, setPopular] = useState([])
-  const [categories, setCategories] = useState([])
+    const [popular, setPopular] = useState([])
+    const [categories, setCategories] = useState([])
 
-  useEffect(() => {
-    fetch('/vendors/api/services/popular/')
-      .then(res => res.json())
-      .then(setPopular)
-      .catch(() => {})
+    useEffect(() => {
+        fetch('/vendors/api/services/popular/')
+            .then(res => res.json())
+            .then(setPopular)
+            .catch(() => {})
 
-    fetch('/vendors/api/categories-with-services/')
-      .then(res => res.json())
-      .then(setCategories)
-      .catch(() => {})
-  }, [])
+        fetch('/vendors/api/categories-with-services/')
+            .then(res => res.json())
+            .then(setCategories)
+            .catch(() => {})
+    }, [])
 
-  return (
-    <Container sx={{ mt: 4 }}>
-      <Box className="bg-light p-4 rounded shadow-sm mt-4">
-        <Typography variant="h5" mb={2}>Welcome to Attica</Typography>
-        <SearchForm />
-      </Box>
+    return (
+        <div className="max-w-screen-xl mx-auto mt-6 px-4">
+            <div className="bg-white p-6 rounded-xl shadow-md">
+                <h2 className="text-2xl font-semibold mb-4">Welcome to Attica</h2>
+                <SearchForm/>
+            </div>
 
-      <Box mt={5}>
-        <Typography variant="h6" mb={2}>Popular Service Providers</Typography>
-        <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
-          {popular.map(service => (
-            <ServiceCard key={service.id} service={service} />
-          ))}
-        </Box>
-      </Box>
+            <div className="mt-8">
+                <h3 className="text-xl font-semibold mb-3">Popular Service Providers</h3>
+                <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory">
+                    {popular.map(service => (
+                        <ServiceCard key={service.id} service={service} />
+                    ))}
+                </div>
+            </div>
 
-      <Box mt={5}>
-        {categories.map(cat => (
-          <Box key={cat.id} mb={5}>
-            <Typography variant="h6" mb={2}>{cat.name}</Typography>
-            <Box sx={{ display: 'flex', overflowX: 'auto', gap: 2 }}>
-              {cat.services.map(service => (
-               <ServiceCard key={service.id} service={service} />
-              ))}
-            </Box>
-          </Box>
-        ))}
-      </Box>
-    </Container>
-  )
+            <div className="mt-8">
+                {categories.map(cat => (
+                    <div key={cat.id} className="mb-8">
+                        <h3 className="text-xl font-semibold mb-3">{cat.name}</h3>
+                        <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory">
+                            {cat.services.map(service => (
+                                <ServiceCard key={service.id} service={service}/>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+
+            </div>
+        </div>
+    )
 }
 
 export default HomePage
