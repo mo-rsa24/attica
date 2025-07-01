@@ -1,18 +1,18 @@
-import { Card, CardMedia, CardContent, Typography, Box, IconButton } from '@mui/material'
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
-import {useState} from "react";
+import { useState } from 'react'
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
 
 function ServiceCard({ service }) {
     const [liked, setLiked] = useState(service.liked)
     const [count, setCount] = useState(service.likes)
+    const [loaded, setLoaded] = useState(false)
 
   const toggleLike = () => {
     fetch(`/vendors/api/services/${service.id}/like/`, {
       method: liked ? 'DELETE' : 'POST',
-      credentials: 'include'
+      credentials: 'include',
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setLiked(data.liked)
         setCount(data.likes)
       })
@@ -20,37 +20,48 @@ function ServiceCard({ service }) {
   }
 
   return (
-    <Card sx={{ minWidth: 220, position: 'relative' }}>
-      <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <CardMedia
-          component="img"
-          image={service.vendor.profile_image || '/static/default_profile.jpg'}
-          alt={service.vendor.name}
-          sx={{ width: 40, height: 40, borderRadius: '50%', cursor: 'pointer' }}
-          onClick={() => window.location.href = `/vendor/${service.vendor.id}`}
-        />
-         <Typography variant="subtitle2" onClick={() => window.location.href = `/vendor/${service.vendor.id}`} style={{cursor: 'pointer'}}>{service.vendor.name}</Typography>
-      </Box>
-      <IconButton sx={{ position: 'absolute', top: 8, right: 8 }} onClick={toggleLike}>
-        {liked ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
-        <Typography variant="caption" ml={0.5}>{count}</Typography>
-      </IconButton>
-      <CardMedia
-        component="img"
-        height="150"
-        image={service.image}
-        alt={service.name}
-        sx={{ mt: 5, objectFit: 'cover' }}
-      />
-      <CardContent>
-        <Typography variant="body2" color="text.secondary">
-          {service.category_name} - {service.location_tags}
-        </Typography>
-        <Typography variant="body2" mt={1}>
-          ⭐ {service.rating}
-        </Typography>
-      </CardContent>
-    </Card>
+      <div
+          className="relative rounded-xl bg-white shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden min-w-[250px]">
+          <button
+              onClick={toggleLike}
+              className="absolute top-2 right-2 z-10 text-gray-600 hover:text-rose-500"
+          >
+              {liked ? <AiFillHeart className="w-5 h-5"/> : <AiOutlineHeart className="w-5 h-5"/>}
+              <span className="ml-1 text-xs font-medium">{count}</span>
+          </button>
+          {!loaded && <div className="absolute inset-0 bg-gray-100 animate-pulse"/>}
+          <img
+              src={service.image}
+              alt={service.name}
+              className={`w-full h-48 object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+              onLoad={() => setLoaded(true)}
+              loading="lazy"
+          />
+          <div className="p-4 space-y-1">
+              <div className="flex items-center gap-2 mb-1">
+                  <img
+                      src={service.vendor.profile_image || '/static/default_profile.jpg'}
+                      alt={service.vendor.name}
+                      className="w-8 h-8 rounded-full object-cover cursor-pointer"
+                      onClick={() => (window.location.href = `/vendor/${service.vendor.id}`)}
+                  />
+                  <span
+                      onClick={() => (window.location.href = `/vendor/${service.vendor.id}`)}
+                      className="text-sm font-medium cursor-pointer truncate"
+                  >
+            {service.vendor.name}
+          </span>
+              </div>
+              <h4 className="text-base font-semibold truncate">{service.name}</h4>
+              <p className="text-sm text-gray-500 truncate">
+                  {service.category_name} · {service.location_tags}
+              </p>
+              <div className="flex items-center justify-between text-sm mt-1">
+                  <span>⭐ {service.rating}</span>
+                  {service.price && <span className="font-medium">${service.price}</span>}
+              </div>
+          </div>
+      </div>
   )
 }
 

@@ -33,6 +33,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "category_name",
             "image",
             "rating",
+            "price",
             "location_tags",
             "likes",
             "liked",

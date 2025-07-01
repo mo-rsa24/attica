@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Container, Typography, Box } from '@mui/material'
+import ServiceCardSkeleton from './ServiceCardSkeleton.jsx'
 import ServiceCard from './ServiceCard.jsx'
 import SearchForm from './SearchForm.jsx'
 
@@ -26,20 +26,25 @@ function HomePage() {
                 <SearchForm/>
             </div>
 
-            <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-3">Popular Service Providers</h3>
-                <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory">
-                    {popular.map(service => (
-                        <ServiceCard key={service.id} service={service} />
-                    ))}
+           <div className="mt-10">
+                <h3 className="text-xl font-semibold mb-4">Popular Service Providers</h3>
+                <div className="flex sm:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-x-auto sm:overflow-visible pb-4 snap-x snap-mandatory sm:snap-none">
+                    {popular.length ? (
+                        popular.map(service => (
+                            <ServiceCard key={service.id} service={service} />
+                        ))
+                    ) : (
+                        Array.from({ length: 4 }).map((_,i) => <ServiceCardSkeleton key={i} />)
+                    )}
                 </div>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-10">
                 {categories.map(cat => (
-                    <div key={cat.id} className="mb-8">
-                        <h3 className="text-xl font-semibold mb-3">{cat.name}</h3>
-                        <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory">
+                    <div key={cat.id} className="mb-10">
+                        <h3 className="text-xl font-semibold mb-4">{cat.name}</h3>
+                        <div
+                            className="flex sm:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-x-auto sm:overflow-visible pb-4 snap-x snap-mandatory sm:snap-none">
                             {cat.services.map(service => (
                                 <ServiceCard key={service.id} service={service}/>
                             ))}
