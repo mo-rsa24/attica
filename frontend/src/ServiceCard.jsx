@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "./AuthProvider.jsx";
 
 function ServiceCard({ service }) {
     const navigate = useNavigate()
+    const { tokens } = useAuth()
     const [liked, setLiked] = useState(service.liked)
     const [count, setCount] = useState(service.likes)
     const [loaded, setLoaded] = useState(false)
@@ -11,7 +13,7 @@ function ServiceCard({ service }) {
   const toggleLike = () => {
     fetch(`/api/vendors/services/${service.id}/like/`, {
       method: liked ? 'DELETE' : 'POST',
-      credentials: 'include',
+      headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : {},
     })
       .then((res) => res.json())
       .then((data) => {
@@ -26,7 +28,7 @@ function ServiceCard({ service }) {
           className="relative rounded-xl bg-white shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden min-w-[250px]"
           onClick={() => navigate(`/services/${service.id}`)}>
           <button
-              onClick={toggleLike}
+               onClick={e => {e.stopPropagation(); toggleLike()}}
               className="absolute top-2 right-2 z-10 text-gray-600 hover:text-rose-500"
           >
               {liked ? <AiFillHeart className="w-5 h-5"/> : <AiOutlineHeart className="w-5 h-5"/>}

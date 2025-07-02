@@ -190,12 +190,12 @@ class VendorProfileView(generic.DetailView):
 
 
 class VendorByUsernameAPIView(generics.RetrieveAPIView):
-    """API view for retrieving a vendor profile by username."""
-
     queryset = Vendor.objects.prefetch_related("vendorservices", "posts")
     serializer_class = VendorDetailSerializer
-    lookup_field = "user__username"
+    lookup_field = "user__username"     # filter by Vendor.user__username
+    lookup_url_kwarg = "username"       # read from <str:username> in the URL
     permission_classes = [AllowAny]
+
 
 
 class CurrentVendorAPIView(generics.RetrieveAPIView):

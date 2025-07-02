@@ -12,6 +12,7 @@ import PostCreate from "./PostCreate.jsx";
 import Register from "./Register.jsx";
 import Profile from "./Profile.jsx";
 import Login from "./Login.jsx";
+import Logout from "./Logout.jsx";
 
 function App() {
     const theme = createTheme()
@@ -29,6 +30,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/me" element={<Profile />} />
+          <Route path="/logout" element={<Logout />} />
       </Routes>
       <Footer />
     </ThemeProvider>

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Container, TextField, Button, Stack } from '@mui/material'
+import {useAuth} from "./AuthProvider.jsx";
 
 export default function PostCreate() {
+  const { tokens } = useAuth()
   const [caption, setCaption] = useState('')
   const [image, setImage] = useState(null)
 
@@ -10,9 +12,9 @@ export default function PostCreate() {
     const formData = new FormData()
     if (image) formData.append('image', image)
     formData.append('caption', caption)
-    fetch('/api/vendor-posts/', {
+    fetch('/api/vendors/posts/', {
       method: 'POST',
-      credentials: 'include',
+      headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : {},
       body: formData
     }).catch(() => {})
   }

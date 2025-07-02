@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Container, TextField, Button, Stack } from '@mui/material'
+import { useAuth } from './AuthProvider.jsx'
 
 export default function VendorProfileEdit() {
+  const { tokens } = useAuth()
   const [form, setForm] = useState({ id: null, name: '', description: '' })
 
   useEffect(() => {
-    fetch('/api/vendors/profile/', { credentials: 'include' })
+    fetch('/api/vendors/profile/', {
+      headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : {},
+    })
       .then(res => res.json())
       .then(data => setForm({ id: data.id, name: data.name, description: data.description }))
       .catch(() => {})
@@ -19,8 +23,10 @@ export default function VendorProfileEdit() {
     e.preventDefault()
     fetch('/api/vendors/' + form.id + '/', {
       method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(tokens ? { Authorization: `Bearer ${tokens.access}` } : {}),
+      },
       body: JSON.stringify(form)
     }).catch(() => {})
   }

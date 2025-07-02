@@ -105,7 +105,7 @@ class VendorPostSerializer(serializers.ModelSerializer):
 
 
 class VendorDetailSerializer(VendorSerializer):
-    posts = VendorPostSerializer(many=True, source="posts", read_only=True)
+    posts = VendorPostSerializer(many=True, read_only=True)
 
     class Meta(VendorSerializer.Meta):
         fields = VendorSerializer.Meta.fields + [

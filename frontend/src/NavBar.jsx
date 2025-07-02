@@ -52,8 +52,8 @@ export default function NavBar() {
           {/* Right Actions */}
           <div className="flex items-center space-x-4">
             <a
-              href="/vendors/profile/update/"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                href="/vendors/profile/update/"
+                className="text-sm font-medium text-gray-700 hover:text-gray-900"
             >
               Become a host
             </a>

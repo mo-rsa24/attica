@@ -21,7 +21,7 @@ urlpatterns = [
     path("categories-with-services/", CategoriesWithServicesAPIView.as_view(), name="categories_with_services"),
     path("profile/", CurrentVendorAPIView.as_view(), name="current_vendor"),
     path(
-        "vendors/by-username/<str:username>/",
+        "by-username/<str:username>/",
         VendorByUsernameAPIView.as_view(),
         name="vendor_profile",
     ),

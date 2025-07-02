@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Container, Typography, Box, Card, CardMedia, CardContent } from '@mui/material'
+import { useAuth } from './AuthProvider.jsx'
 
 export default function VendorDashboard() {
+  const { tokens } = useAuth()
   const [vendor, setVendor] = useState(null)
 
   useEffect(() => {
-    fetch('/api/vendors/profile/', { credentials: 'include' })
+    fetch('/api/vendors/profile/', {
+      headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : {},
+    })
       .then(res => res.json())
       .then(setVendor)
       .catch(() => {})
