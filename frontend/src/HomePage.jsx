@@ -8,12 +8,12 @@ function HomePage() {
     const [categories, setCategories] = useState([])
 
     useEffect(() => {
-        fetch('/vendors/api/services/popular/')
+        fetch('/api/vendors/services/popular/')
             .then(res => res.json())
             .then(setPopular)
             .catch(() => {})
 
-        fetch('/vendors/api/categories-with-services/')
+        fetch('/api/vendors/categories-with-services/')
             .then(res => res.json())
             .then(setCategories)
             .catch(() => {})

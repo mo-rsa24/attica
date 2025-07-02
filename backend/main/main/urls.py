@@ -37,9 +37,8 @@ urlpatterns = [
     path('chat/', include('chat.urls')),
     path('accounts/', include('users.urls')),
     path('api/accounts/', include('users.api_urls')),
-    path('vendors/', include('vendors.urls')),
-    path('vendors/api/', include('vendors.api_urls')),
-    path('api/', include('vendors.api_urls')),
+    path('vendors/', include('vendors.urls')), # This is for Django Templates
+    path('api/vendors/', include('vendors.api_urls')), # This is for React
     path('cart/', include('cart.urls')),
     path('checkout/', include('checkout.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

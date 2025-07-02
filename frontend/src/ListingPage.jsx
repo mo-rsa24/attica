@@ -56,7 +56,7 @@ export default function ListingPage() {
   const [service, setService] = useState(null)
 
   useEffect(() => {
-    fetch(`/vendors/api/services/${id}/`)
+    fetch(`/api/vendors/services/${id}/`)
       .then(res => res.json())
       .then(data => setService(data))
       .catch(() => {})
