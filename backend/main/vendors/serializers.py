@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Service, Category, Review, ServiceImage, Vendor, VendorPost
+from .models import Service, Category, Review, ServiceImage, Vendor, VendorPost, Booking, Region, Policy, Amenity
 
 
 class VendorBriefSerializer(serializers.ModelSerializer):
@@ -10,6 +10,38 @@ class VendorBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
         fields = ["id", "name", "profile_image", "rating", "username"]
+class AmenitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Amenity
+        fields = ["id", "name", "icon"]
+
+
+class PolicySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Policy
+        fields = ["id", "type", "text"]
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = ["id", "name", "slug"]
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = [
+            "id",
+            "user",
+            "service",
+            "start_date",
+            "end_date",
+            "timeslot",
+            "status",
+            "created_at",
+        ]
+        read_only_fields = ["id", "user", "status", "created_at"]
 
 class ServiceImageSerializer(serializers.ModelSerializer):
     class Meta:

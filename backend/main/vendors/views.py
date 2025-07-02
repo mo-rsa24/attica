@@ -13,11 +13,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from events.models import Event
-from .models import Vendor, Category, VendorPost, Service
+from .models import Vendor, Category, VendorPost, Service, Region, Policy, Amenity, Booking
 import pdb
 
 from .serializers import ServiceSerializer, CategorySerializer, VendorSerializer, ServiceDetailSerializer, \
-    VendorPostSerializer, VendorDetailSerializer
+    VendorPostSerializer, VendorDetailSerializer, RegionSerializer, PolicySerializer, AmenitySerializer, \
+    BookingSerializer
 
 
 # Create your views here.
@@ -334,3 +335,31 @@ class VendorPostViewSet(viewsets.ModelViewSet):
         if self.request.user != instance.vendor.user:
             raise permissions.PermissionDenied()
         instance.delete()
+
+class BookingViewSet(viewsets.ModelViewSet):
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        return Booking.objects.select_related("user", "service")
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class AmenityViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Amenity.objects.all()
+    serializer_class = AmenitySerializer
+    permission_classes = [AllowAny]
+
+
+class PolicyViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Policy.objects.all()
+    serializer_class = PolicySerializer
+    permission_classes = [AllowAny]
+
+
+class RegionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
+    permission_classes = [AllowAny]

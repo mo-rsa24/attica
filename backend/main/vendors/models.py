@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models import Avg
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django.urls import reverse
 from django.conf import settings
 from users.models import CustomUser
@@ -29,6 +32,25 @@ class Vendor(models.Model): # Vendor
         """Return URL to access a detail record for this vendor."""
         return reverse('vendor_dashboard', kwargs={'pk': self.pk})
 
+    def update_rating(self):
+        avg = self.vendorservices.aggregate(avg=Avg("rating"))['avg'] or 0
+        self.rating = round(avg, 2)
+        self.save(update_fields=["rating"])
+
+class Region(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Amenity(models.Model):
+    name = models.CharField(max_length=100)
+    icon = models.ImageField(upload_to='amenities/', null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
 class Service(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='servicecategory')
@@ -38,6 +60,8 @@ class Service(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Price with 2 decimal places
     rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    amenities = models.ManyToManyField(Amenity, related_name="services", blank=True)
+    regions = models.ManyToManyField(Region, related_name="services", blank=True)
     likes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="liked_services",
@@ -60,10 +84,17 @@ class Service(models.Model):
     def total_likes(self):
         return self.likes.count()
 
+    def update_rating(self):
+        avg = self.reviews.aggregate(avg=Avg("rating"))['avg'] or 0
+        self.rating = round(avg, 2)
+        self.save(update_fields=["rating"])
+        self.vendor.update_rating()
+
 class Review(models.Model):
     comment = models.TextField(null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews')
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='reviewer', null=True, blank=True)
+    rating = models.IntegerField(default=5)
     likes = models.IntegerField(default=0)
 
 class Comment(models.Model):
@@ -84,3 +115,44 @@ class VendorPost(models.Model):
 class ServiceImage(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='service_gallery/')
+
+class Policy(models.Model):
+    POLICY_TYPES = [
+        ('cancellation', 'Cancellation'),
+        ('safety', 'Safety'),
+        ('other', 'Other'),
+    ]
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='policies')
+    type = models.CharField(max_length=20, choices=POLICY_TYPES)
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.get_type_display()} policy for {self.service.name}"
+
+
+class Booking(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='bookings')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='bookings')
+    start_date = models.DateField()
+    end_date = models.DateField()
+    timeslot = models.CharField(max_length=50, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Booking for {self.service.name} by {self.user.username}"
+
+
+@receiver(post_save, sender=Review)
+def update_service_rating_on_save(sender, instance, **kwargs):
+    instance.service.update_rating()
+
+
+@receiver(post_delete, sender=Review)
+def update_service_rating_on_delete(sender, instance, **kwargs):
+    instance.service.update_rating()

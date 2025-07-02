@@ -1,96 +1,289 @@
-import {useEffect, useState} from 'react'
-import {useParams} from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-function ImageGallery({images}) {
-  const [open, setOpen] = useState(false)
-  const [index, setIndex] = useState(0)
-  const hero = images[0]
-  const thumbs = images.slice(1,5)
+/** 1️⃣ Hero Image Gallery **/
+function ImageGallery({ images }) {
+ const [open, setOpen] = useState(false);
+ const [index, setIndex] = useState(0);
+ const hero = images[0];
+ const thumbs = images.slice(1, 5);
 
-  return (
-    <div className="relative">
-      <div className="grid grid-cols-4 grid-rows-2 gap-2 h-80 rounded-xl overflow-hidden">
-        <div className="col-span-2 row-span-2">
-          <img src={hero} alt="" className="h-full w-full object-cover" />
-        </div>
-        {thumbs.map((img, i) => (
-          <button key={i} className="col-span-1" onClick={() => {setIndex(i+1); setOpen(true)}}>
-            <img src={img} alt="" className="h-full w-full object-cover hover:scale-105 transition" />
-          </button>
-        ))}
-        {images.length > 5 && (
-          <button onClick={() => {setIndex(0); setOpen(true)}} className="absolute top-2 right-2 bg-white px-3 py-1 text-sm rounded-md shadow">Show all photos</button>
-        )}
-      </div>
-      {open && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-50">
-          <button onClick={() => setOpen(false)} className="text-white absolute top-4 right-4 text-2xl">✕</button>
-          <div className="flex items-center gap-4 w-full max-w-4xl">
-            <button onClick={() => setIndex((index-1+images.length)%images.length)} className="text-white text-3xl">‹</button>
-            <img src={images[index]} alt="" className="max-h-[80vh] object-contain" />
-            <button onClick={() => setIndex((index+1)%images.length)} className="text-white text-3xl">›</button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
+ return (
+   <div className="relative">
+     {/* Desktop grid, Mobile scroll */}
+     <div className="grid grid-cols-4 grid-rows-2 gap-2 h-96 rounded-xl overflow-hidden sm:block sm:overflow-x-auto sm:flex sm:h-64">
+       <div className="col-span-2 row-span-2 sm:flex-shrink-0 sm:w-[80%]">
+         <button onClick={() => { setIndex(0); setOpen(true); }} className="h-full w-full">
+           <img src={hero} alt="" className="h-full w-full object-cover hover:scale-105 transition-transform rounded-lg shadow" />
+         </button>
+       </div>
+       {thumbs.map((img, i) => (
+         <button key={i} className="col-span-1 sm:flex-shrink-0 sm:w-[45%]" onClick={() => { setIndex(i + 1); setOpen(true); }}>
+           <img src={img} alt="" className="h-full w-full object-cover hover:scale-105 transition-transform rounded-lg shadow" />
+         </button>
+       ))}
+       {images.length > 5 && (
+         <button
+           onClick={() => { setIndex(0); setOpen(true); }}
+           className="absolute top-3 right-3 bg-white px-3 py-1 text-sm rounded-md shadow-md"
+         >
+           Show all photos
+         </button>
+       )}
+     </div>
+
+     {/* Lightbox */}
+     {open && (
+       <div className="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-50">
+         <button
+           onClick={() => setOpen(false)}
+           className="text-white absolute top-5 right-5 text-3xl"
+         >
+           ✕
+         </button>
+         <div className="flex items-center gap-6 w-full max-w-4xl px-4">
+           <button
+             onClick={() => setIndex((index - 1 + images.length) % images.length)}
+             className="text-white text-4xl"
+           >
+             ‹
+           </button>
+           <img src={images[index]} alt="" className="max-h-[80vh] object-contain rounded-lg" />
+           <button
+             onClick={() => setIndex((index + 1) % images.length)}
+             className="text-white text-4xl"
+           >
+             ›
+           </button>
+         </div>
+       </div>
+     )}
+   </div>
+ );
 }
 
-function ReservationWidget({price}) {
-  return (
-    <div className="border p-4 rounded-xl shadow sticky top-24">
-      <div className="text-xl font-semibold">${price} <span className="text-base font-normal">per event</span></div>
-      <div className="mt-4 space-y-2">
-        <input type="date" className="w-full border rounded p-2" />
-        <input type="date" className="w-full border rounded p-2" />
-        <input type="number" min="1" defaultValue="1" className="w-full border rounded p-2" />
-        <button className="w-full bg-red-500 text-white py-2 rounded">Reserve</button>
-        <p className="text-xs text-center mt-2">You won't be charged yet</p>
-      </div>
-    </div>
-  )
+/** 2️⃣ Title, Host & Metadata **/
+function TitleMetadata({ name, rating, reviewsCount, location, vendor }) {
+ return (
+   <div className="mt-6">
+     <h1 className="text-3xl font-semibold">{name}</h1>
+     <div className="flex flex-wrap items-center text-gray-600 text-sm mt-2 space-x-2">
+       <span>★ {rating}</span>
+       <span>· {reviewsCount} reviews</span>
+       {vendor.isSuperhost && <span className="px-2 py-0.5 bg-gray-100 rounded text-xs font-medium">Superhost</span>}
+       <span>· JGB, RSA</span>
+     </div>
+     <p className="text-gray-600 text-sm mt-1">Hosted by <span className="font-medium">{vendor.name}</span></p>
+   </div>
+ );
 }
 
+/** 3️⃣ Quick Facts **/
+function QuickFacts({ stats }) {
+ return (
+   <div className="flex flex-wrap gap-6 text-gray-700 text-sm">
+     {stats.map(({ icon, label }, i) => (
+       <div key={i} className="flex items-center space-x-2">
+         {/* replace with actual <Icon /> */}
+         <span className="w-5 h-5 bg-gray-300 rounded-full flex-shrink-0" />
+         <span>{label}</span>
+       </div>
+     ))}
+   </div>
+ );
+}
+
+/** 4️⃣ Description **/
+function Description({ text }) {
+ const [expanded, setExpanded] = useState(false);
+ return (
+   <div>
+     <h2 className="text-xl font-semibold mb-2">About this place</h2>
+     <p className={`text-gray-800 leading-relaxed transition-[max-height] duration-300 overflow-hidden ${expanded ? 'max-h-[1000px]' : 'max-h-20'}`}>
+       {text}
+     </p>
+     <button className="mt-1 text-sm text-gray-600 hover:underline" onClick={() => setExpanded(!expanded)}>
+       {expanded ? 'Show less' : 'Show more'}
+     </button>
+   </div>
+ );
+}
+
+
+/** 6️⃣ Host Profile **/
+function HostProfile({ host }) {
+ return (
+   <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+     <div className="flex items-center space-x-4">
+       <img src={host.avatar} alt={host.name} className="w-16 h-16 rounded-full object-cover" />
+       <div>
+         <h3 className="text-lg font-semibold">{host.name}</h3>
+         {host.isSuperhost && <p className="text-sm text-gray-600">Superhost</p>}
+         <p className="text-sm text-gray-600">Joined in {new Date(host.joinDate).toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+       </div>
+     </div>
+     <p className="mt-4 text-gray-700">{host.bio}</p>
+   </div>
+ );
+}
+
+/** 7️⃣ Reviews **/
+function Reviews({ reviews }) {
+ return (
+   <div>
+     <h2 className="text-xl font-semibold mb-4">What guests are saying</h2>
+     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+       {reviews.map(r => (
+         <div key={r.id} className="bg-gray-50 p-4 rounded-lg">
+           <div className="flex items-center space-x-3 mb-2">
+             <img src={r.userAvatar} alt={r.userName} className="w-10 h-10 rounded-full object-cover" />
+             <div>
+               <p className="font-medium">{r.userName}</p>
+               <p className="text-sm text-gray-500">{new Date(r.date).toLocaleDateString()}</p>
+             </div>
+           </div>
+           <p className="text-sm text-gray-700 leading-relaxed">{r.comment}</p>
+         </div>
+       ))}
+     </div>
+   </div>
+ );
+}
+
+/** 8️⃣ Location Map **/
+function LocationMap({ coords }) {
+ return (
+   <div>
+     <h2 className="text-xl font-semibold mb-2">Location</h2>
+     <div className="h-64 w-full rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+       {/* Replace with actual map iframe or React Map component */}
+       <span className="text-gray-600">Map Placeholder</span>
+     </div>
+     <p className="mt-2 text-sm text-gray-500">Exact location provided after booking.</p>
+   </div>
+ );
+}
+
+/** 9️⃣ Policies Accordion **/
+function PoliciesAccordion({ policies }) {
+ const [openIndex, setOpenIndex] = useState(null);
+ return (
+   <div>
+     <h2 className="text-xl font-semibold mb-4">Policies & Safety</h2>
+     {policies.map((p, i) => (
+       <div key={i} className="border-t border-gray-200">
+         <button
+           className="w-full text-left py-3 flex justify-between items-center text-gray-700"
+           onClick={() => setOpenIndex(openIndex === i ? null : i)}
+         >
+           <span>{p.title}</span>
+           <span>{openIndex === i ? '–' : '+'}</span>
+         </button>
+         {openIndex === i && (
+           <div className="p-4 text-sm text-gray-600">
+             {p.content}
+           </div>
+         )}
+       </div>
+     ))}
+   </div>
+ );
+}
+
+/** 🔟 Similar Listings Carousel **/
+function SimilarListings({ listings }) {
+ return (
+   <div>
+     <h2 className="text-xl font-semibold mb-4">More homes in this area</h2>
+     <div className="flex overflow-x-auto space-x-4 pb-4">
+       {listings.map(l => (
+         <div key={l.id} className="min-w-[200px] bg-white rounded-lg shadow overflow-hidden">
+           <img src={l.image} alt={l.name} className="h-32 w-full object-cover" />
+           <div className="p-3">
+             <p className="font-medium text-sm">{l.name}</p>
+             <p className="text-sm text-gray-600">${l.price}/night</p>
+           </div>
+         </div>
+       ))}
+     </div>
+   </div>
+ );
+}
+
+/** Reservation Widget (Sticky on Desktop) **/
+function ReservationWidget({ price }) {
+ return (
+   <div className="bg-white p-6 rounded-xl shadow border border-gray-200 sticky top-24">
+     <div className="text-2xl font-semibold">${price} <span className="text-base font-normal">per night</span></div>
+     <div className="mt-4 space-y-3">
+       <input type="date" className="w-full border rounded-lg p-2" />
+       <input type="date" className="w-full border rounded-lg p-2" />
+       <input type="number" min="1" defaultValue="1" className="w-full border rounded-lg p-2" />
+       <button className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition">Reserve</button>
+       <p className="text-xs text-center text-gray-500 mt-2">You won't be charged yet</p>
+     </div>
+   </div>
+ );
+}
+
+/** ✅ Main Listing Page **/
 export default function ListingPage() {
-  const {id} = useParams()
-  const [service, setService] = useState(null)
+ const { id } = useParams();
+ const [service, setService] = useState(null);
 
-  useEffect(() => {
-    fetch(`/api/vendors/services/${id}/`)
-      .then(res => res.json())
-      .then(data => setService(data))
-      .catch(() => {})
-  }, [id])
+ useEffect(() => {
+   fetch(`/api/vendors/services/${id}/`)
+     .then(res => res.json())
+     .then(data => setService(data))
+     .catch(() => {});
+ }, [id]);
 
-  if (!service) return null
-  const images = [service.image, ...(service.gallery?.map(g => g.image) || [])]
+ if (!service) return <div className="text-center py-20">Loading…</div>;
 
-  return (
-    <div className="max-w-screen-lg mx-auto px-4 md:px-8">
-      <h1 className="text-2xl font-semibold mt-6">{service.name}</h1>
-      <p className="text-sm text-gray-600 mt-1">Hosted by {service.vendor.name}</p>
-      <ImageGallery images={images} />
+ // Prepare data
+ const images = [service.image, ...(service.gallery?.map(g => g.image) || [])];
+ const quickStats = [
+   { label: `4 guests` },
+   { label: `4 bedrooms` },
+   { label: `4 beds` },
+   { label: `4 baths` },
+ ];
+ const policies = [
+   { title: 'Cancellation policy', content: 'Something' },
+   { title: 'House rules', content: 'Something' },
+   { title: 'Safety & property', content: 'Something' },
+ ];
 
-      <div className="md:grid md:grid-cols-[70%_30%] gap-6 mt-6">
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-xl font-semibold mb-2">About this service</h2>
-            <p className="leading-relaxed">{service.description}</p>
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Reviews</h2>
-            <div className="space-y-4">
-              {service.reviews.map(r => (
-                <div key={r.id} className="border-b pb-4">
-                  <p className="font-semibold">{r.user}</p>
-                  <p className="text-sm text-gray-600">{r.comment}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <ReservationWidget price={service.price} />
-      </div>
-    </div>
-  )
+ return (
+   <div className="max-w-screen-lg mx-auto px-4 md:px-8 mt-6">
+     <ImageGallery images={images} />
+
+     <TitleMetadata
+       name={service.name}
+       rating={service.rating}
+       reviewsCount={service.reviews.length}
+       location={service.location}
+       vendor={service.vendor}
+     />
+
+     <div className="md:flex md:space-x-8 mt-6">
+       {/* Left/Main Column */}
+       <div className="md:flex-1 space-y-10">
+         <QuickFacts stats={quickStats} />
+         <Description text={service.description} />
+         {/* <Amenities items={service.amenities} /> */}
+         <HostProfile host={service.vendor} />
+         <Reviews reviews={service.reviews} />
+         <LocationMap coords='34' />
+         <PoliciesAccordion policies={policies} />
+         <SimilarListings listings={service.similarListings || []} />
+       </div>
+
+       {/* Right/Sticky Column */}
+       <div className="md:w-80 mt-8 md:mt-0">
+         <ReservationWidget price={service.price} />
+       </div>
+     </div>
+   </div>
+ );
 }
