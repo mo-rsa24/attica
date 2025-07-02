@@ -9,7 +9,7 @@ function ServiceCard({ service }) {
     const [loaded, setLoaded] = useState(false)
 
   const toggleLike = () => {
-    fetch(`/api/services/${service.id}/like/`, {
+    fetch(`/api/vendors/services/${service.id}/like/`, {
       method: liked ? 'DELETE' : 'POST',
       credentials: 'include',
     })

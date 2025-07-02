@@ -5,7 +5,7 @@ export default function VendorProfileEdit() {
   const [form, setForm] = useState({ id: null, name: '', description: '' })
 
   useEffect(() => {
-    fetch('/api/profile/', { credentials: 'include' })
+    fetch('/api/vendors/profile/', { credentials: 'include' })
       .then(res => res.json())
       .then(data => setForm({ id: data.id, name: data.name, description: data.description }))
       .catch(() => {})

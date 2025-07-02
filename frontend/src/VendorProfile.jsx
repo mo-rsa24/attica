@@ -7,7 +7,7 @@ function VendorProfile() {
   const [vendor, setVendor] = useState(null)
 
   useEffect(() => {
-    fetch(`/api/vendors/${username}/`)
+    fetch(`/api/vendors/by-username/${username}/`)
       .then(res => res.json())
       .then(setVendor)
       .catch(() => {})

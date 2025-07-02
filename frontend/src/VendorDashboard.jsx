@@ -5,7 +5,7 @@ export default function VendorDashboard() {
   const [vendor, setVendor] = useState(null)
 
   useEffect(() => {
-    fetch('/api/profile/', { credentials: 'include' })
+    fetch('/api/vendors/profile/', { credentials: 'include' })
       .then(res => res.json())
       .then(setVendor)
       .catch(() => {})
