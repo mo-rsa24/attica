@@ -62,6 +62,12 @@ class Service(models.Model):
     rating = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     amenities = models.ManyToManyField(Amenity, related_name="services", blank=True)
     regions = models.ManyToManyField(Region, related_name="services", blank=True)
+    similar_services = models.ManyToManyField(
+        "self",
+        blank=True,
+        symmetrical=False,
+        related_name="similar_to",
+    )
     likes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="liked_services",

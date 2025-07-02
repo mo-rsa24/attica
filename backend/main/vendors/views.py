@@ -282,6 +282,20 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
             }
         )
 
+    @action(detail=True, methods=["get"], permission_classes=[AllowAny])
+    def similar(self, request, pk=None):
+        service = self.get_object()
+        queryset = service.similar_services.all()
+        if not queryset.exists():
+            queryset = (
+                Service.objects.filter(
+                    category=service.category,
+                    location_tags=service.location_tags,
+                )
+                .exclude(id=service.id)[:10]
+            )
+        serializer = ServiceSerializer(queryset, many=True, context={"request": request})
+        return Response(serializer.data)
 
 class VendorViewSet(viewsets.ModelViewSet):
     """API for viewing and editing vendors."""

@@ -7,9 +7,10 @@ class VendorBriefSerializer(serializers.ModelSerializer):
 
     profile_image = serializers.ImageField(source="portfolio")
     username = serializers.CharField(source="user.username", read_only=True)
+    service_count = serializers.IntegerField(source="vendorservices.count", read_only=True)
     class Meta:
         model = Vendor
-        fields = ["id", "name", "profile_image", "rating", "username"]
+        fields = ["id", "name", "profile_image", "rating", "username", "description", "service_count"]
 
 class AmenitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -105,16 +106,18 @@ class VendorSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(source="user.username", read_only=True)
+    user_name = serializers.CharField(source="user.username", read_only=True)
+    user_avatar = serializers.ImageField(source="user.profile_picture", read_only=True)
 
     class Meta:
         model = Review
-        fields = ["id", "comment", "rating", "likes", "user"]
+        fields = ["id", "comment", "rating", "likes", "user_name", "user_avatar"]
 
 class ServiceDetailSerializer(ServiceSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
     gallery = ServiceImageSerializer(many=True, source="images", read_only=True)
     policies = PolicySerializer(many=True, read_only=True)
+    similar_services = ServiceSerializer(many=True, read_only=True)
     description = serializers.CharField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
     number_of_guests = serializers.IntegerField()
@@ -127,6 +130,7 @@ class ServiceDetailSerializer(ServiceSerializer):
             "reviews",
             "gallery",
             "policies",
+            "similar_services",
         ]
 class CategorySerializer(serializers.ModelSerializer):
     services = ServiceSerializer(many=True, source="servicecategory", read_only=True)
