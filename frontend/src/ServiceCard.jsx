@@ -9,7 +9,7 @@ function ServiceCard({ service }) {
     const [loaded, setLoaded] = useState(false)
 
   const toggleLike = () => {
-    fetch(`/vendors/api/services/${service.id}/like/`, {
+    fetch(`/api/services/${service.id}/like/`, {
       method: liked ? 'DELETE' : 'POST',
       credentials: 'include',
     })
@@ -24,7 +24,7 @@ function ServiceCard({ service }) {
   return (
       <div
           className="relative rounded-xl bg-white shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden min-w-[250px]"
-          onClick={() => navigate(`vendors/services/${service.id}`)}>
+          onClick={() => navigate(`/services/${service.id}`)}>
           <button
               onClick={toggleLike}
               className="absolute top-2 right-2 z-10 text-gray-600 hover:text-rose-500"
@@ -46,10 +46,10 @@ function ServiceCard({ service }) {
                       src={service.vendor.profile_image || '/static/default_profile.jpg'}
                       alt={service.vendor.name}
                       className="w-8 h-8 rounded-full object-cover cursor-pointer"
-                      onClick={(e) => {e.stopPropagation(); navigate(`/vendors/profile/${service.vendor.id}/`)}}
+                      onClick={(e) => {e.stopPropagation(); navigate(`/vendor/${service.vendor.username}`)}}
                   />
                   <span
-                      onClick={(e) => {e.stopPropagation(); navigate(`/vendors/profile/${service.vendor.id}/`)}}
+                      onClick={(e) => {e.stopPropagation(); navigate(`/vendor/${service.vendor.username}`)}}
                       className="text-sm font-medium cursor-pointer truncate"
                   >
             {service.vendor.name}

@@ -3,15 +3,15 @@ import { useParams } from 'react-router-dom'
 import { Container, Typography, Box, CardMedia } from '@mui/material'
 
 function VendorProfile() {
-  const { id } = useParams()
+  const { username } = useParams()
   const [vendor, setVendor] = useState(null)
 
   useEffect(() => {
-    fetch(`/vendors/api/vendors/${id}/`)
+    fetch(`/api/vendors/${username}/`)
       .then(res => res.json())
       .then(setVendor)
       .catch(() => {})
-  }, [id])
+  }, [username])
 
   if (!vendor) return null
 

@@ -189,6 +189,24 @@ class VendorProfileView(generic.DetailView):
 
 
 
+class VendorByUsernameAPIView(generics.RetrieveAPIView):
+    """API view for retrieving a vendor profile by username."""
+
+    queryset = Vendor.objects.prefetch_related("vendorservices", "posts")
+    serializer_class = VendorDetailSerializer
+    lookup_field = "user__username"
+    permission_classes = [AllowAny]
+
+
+class CurrentVendorAPIView(generics.RetrieveAPIView):
+    """Return the vendor profile for the logged-in user"""
+
+    serializer_class = VendorDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.vendor_profile
+
 
 @login_required
 @require_POST

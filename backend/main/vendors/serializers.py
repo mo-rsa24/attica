@@ -6,10 +6,10 @@ class VendorBriefSerializer(serializers.ModelSerializer):
     """Minimal vendor information for nested use"""
 
     profile_image = serializers.ImageField(source="portfolio")
-
+    username = serializers.CharField(source="user.username", read_only=True)
     class Meta:
         model = Vendor
-        fields = ["id", "name", "profile_image", "rating"]
+        fields = ["id", "name", "profile_image", "rating", "username"]
 
 class ServiceImageSerializer(serializers.ModelSerializer):
     class Meta:

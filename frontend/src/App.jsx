@@ -16,8 +16,11 @@ function App() {
       <NavBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/service/:id" element={<ListingPage />} />
-        <Route path="/vendor/:id" element={<VendorProfile />} />
+        <Route path="/services/:id" element={<ListingPage />} />
+        <Route path="/vendor/:username" element={<VendorProfile />} />
+        <Route path="/profile" element={<VendorDashboard />} />
+        <Route path="/profile/update" element={<VendorProfileEdit />} />
+        <Route path="/post/create" element={<PostCreate />} />
         <Route path="/login" element={<LoginPage />} />
       </Routes>
       <Footer />
