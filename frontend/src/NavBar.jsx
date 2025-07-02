@@ -1,17 +1,13 @@
 import { AiOutlineHome } from 'react-icons/ai';
 import { BiBell } from 'react-icons/bi';
-import { useEffect, useState } from 'react';
+import { useAuth } from './AuthProvider.jsx';
 import { Link } from 'react-router-dom';
 import { FiGlobe } from 'react-icons/fi';
 import { HiOutlineMenu } from 'react-icons/hi';
 import { FaAirbnb } from 'react-icons/fa';
 
 export default function NavBar() {
-  const [authenticated, setAuthenticated] = useState(false);
-
-  useEffect(() => {
-    setAuthenticated(document.cookie.includes('sessionid='));
-  }, []);
+  const { user, logout } = useAuth();
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
@@ -61,11 +57,12 @@ export default function NavBar() {
             >
               Become a host
             </a>
-          {authenticated ? (
+           {user ? (
               <img
-                src="/static/default_profile.jpg"
+                src={user.profile_picture || '/static/default_profile.jpg'}
                 alt="profile"
                 className="h-6 w-6 rounded-full"
+                onClick={logout}
               />
             ) : (
               <Link
@@ -78,9 +75,9 @@ export default function NavBar() {
 
 
             <button className="p-2 rounded-full hover:bg-gray-100">
-{authenticated ? (
+              {user ? (
                 <img
-                  src="/static/default_profile.jpg"
+                  src={user.profile_picture || '/static/default_profile.jpg'}
                   alt="profile"
                   className="h-5 w-5 rounded-full"
                 />

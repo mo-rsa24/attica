@@ -1,5 +1,5 @@
 from django.db import models
-from users.management.commands.seed_users import CustomUser
+from users.models import CustomUser
 
 
 class ChatRoom(models.Model):

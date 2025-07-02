@@ -8,7 +8,9 @@ class CheckoutView(LoginRequiredMixin, View):
         cart_items = CartItem.objects.filter(user=request.user)
         if not cart_items:
             return redirect('cart_detail')
-        total_cost = sum(item.vendor.price_range for item in cart_items)
+        total_cost = sum(
+            item.post.vendor.price_range for item in cart_items if item.post
+        )
         return render(request, 'checkout.html', {'cart_items': cart_items, 'total_cost': total_cost})
 
     def post(self, request):

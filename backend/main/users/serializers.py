@@ -4,7 +4,7 @@ from .models import CustomUser
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ["id", "username", "user_type"]
+        fields = ["id", "username", "email", "user_type", "profile_picture"]
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer used for user registration from the React app."""
@@ -13,7 +13,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["id", "username", "email", "password", "user_type"]
+        fields = ["id", "username", "email", "password", "user_type", "profile_picture"]
 
     def create(self, validated_data):
         password = validated_data.pop("password")

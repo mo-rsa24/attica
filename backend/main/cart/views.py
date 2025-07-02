@@ -5,7 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, get_object_or_404
 
 from vendors.models import VendorPost
-from .models import CartItem, Event
+from events.models import Event
+from .models import CartItem
+
 
 
 # Add to Cart View
