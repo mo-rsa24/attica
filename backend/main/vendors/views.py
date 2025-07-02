@@ -9,14 +9,15 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from rest_framework import generics, viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from events.models import Event
 from .models import Vendor, Category, VendorPost, Service
 import pdb
 
-from .serializers import ServiceSerializer, CategorySerializer, VendorSerializer, ServiceDetailSerializer
+from .serializers import ServiceSerializer, CategorySerializer, VendorSerializer, ServiceDetailSerializer, \
+    VendorPostSerializer, VendorDetailSerializer
 
 
 # Create your views here.
@@ -263,8 +264,55 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class VendorViewSet(viewsets.ReadOnlyModelViewSet):
-    """Read only API for vendors"""
-    permission_classes = [AllowAny]
-    queryset = Vendor.objects.prefetch_related("vendorservices")
-    serializer_class = VendorSerializer
+class VendorViewSet(viewsets.ModelViewSet):
+    """API for viewing and editing vendors."""
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Vendor.objects.prefetch_related("vendorservices", "posts")
+
+    def get_serializer_class(self):
+        if self.action in ["list"]:
+            return VendorSerializer
+        return VendorDetailSerializer
+
+    def perform_update(self, serializer):
+        if self.request.user.user_type != "vendor":
+            raise permissions.PermissionDenied()
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=["get", "post"], serializer_class=VendorPostSerializer)
+    def posts(self, request, pk=None):
+        """List or create posts for a vendor."""
+        vendor = self.get_object()
+        if request.method == "GET":
+            posts = vendor.posts.all().order_by("-created_at")
+            serializer = VendorPostSerializer(posts, many=True, context={"request": request})
+            return Response(serializer.data)
+        # POST
+        if request.user != vendor.user:
+            raise permissions.PermissionDenied()
+        serializer = VendorPostSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save(vendor=vendor)
+        return Response(serializer.data)
+
+
+class VendorPostViewSet(viewsets.ModelViewSet):
+    """CRUD operations for individual vendor posts"""
+
+    serializer_class = VendorPostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        return VendorPost.objects.all().select_related("vendor")
+
+    def perform_update(self, serializer):
+        post = self.get_object()
+        if self.request.user != post.vendor.user:
+            raise permissions.PermissionDenied()
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if self.request.user != instance.vendor.user:
+            raise permissions.PermissionDenied()
+        instance.delete()

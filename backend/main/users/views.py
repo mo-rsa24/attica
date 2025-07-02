@@ -1,27 +1,28 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.views.generic import CreateView
+from django.contrib.auth import logout
 from rest_framework import generics, permissions
-from rest_framework.reverse import reverse, reverse_lazy
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from users.forms import CustomUserCreationForm
 from users.models import CustomUser
-from users.serializers import UserSerializer
+from users.serializers import RegisterSerializer, UserSerializer
 
 
-class CustomUserRegisterView(CreateView):
-    model = CustomUser
-    form_class = CustomUserCreationForm
-    template_name = 'registration/register.html'
-    success_url = reverse_lazy('login')
+class RegisterAPIView(generics.CreateAPIView):
+    """API endpoint for registering a new user."""
 
-@login_required
-def login_required(request):
-    if request.user.user_type == 'organizer':
-        return redirect('event_explore')
-    elif request.user.user_type == 'vendor':
-        return redirect('vendor_explore') # Come back for vendor dashboard
-    return redirect('index')
+    queryset = CustomUser.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class LogoutAPIView(APIView):
+    """Log out the current authenticated user."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response({"detail": "Logged out"})
 
 class CurrentUserAPIView(generics.RetrieveAPIView):
     serializer_class = UserSerializer

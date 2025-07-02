@@ -3,14 +3,9 @@ from django.contrib.auth import views as auth_views
 from .views import CustomUserRegisterView, CurrentUserAPIView
 
 urlpatterns = [
-    path('register/', CustomUserRegisterView.as_view(), name='register'),
-
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-
-    # Built-in logout view
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-
-    path('api/me/', CurrentUserAPIView.as_view(), name='current_user'),
-
-    path('login-redirect/', CustomUserRegisterView.as_view(), name='login_redirect'),
+    path('login/', TokenObtainPairView.as_view(), name='api_login'),
+    path('logout/', LogoutAPIView.as_view(), name='api_logout'),
+    path('register/', RegisterAPIView.as_view(), name='api_register'),
+    path('me/', CurrentUserAPIView.as_view(), name='api_current_user'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Service, Category, Review, ServiceImage, Vendor
+from .models import Service, Category, Review, ServiceImage, Vendor, VendorPost
 
 
 class VendorBriefSerializer(serializers.ModelSerializer):
@@ -94,3 +94,23 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "name", "services"]
+
+class VendorPostSerializer(serializers.ModelSerializer):
+    """Serializer for vendor posts used by the React frontend."""
+
+    class Meta:
+        model = VendorPost
+        fields = ["id", "vendor", "image", "caption", "likes", "created_at"]
+        read_only_fields = ["id", "vendor", "likes", "created_at"]
+
+
+class VendorDetailSerializer(VendorSerializer):
+    posts = VendorPostSerializer(many=True, source="posts", read_only=True)
+
+    class Meta(VendorSerializer.Meta):
+        fields = VendorSerializer.Meta.fields + [
+            "category",
+            "price_range",
+            "testimonial",
+            "posts",
+        ]
