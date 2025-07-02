@@ -57,36 +57,37 @@ export default function NavBar() {
             >
               Become a host
             </a>
-           {user ? (
-              <img
-                src={user.profile_picture || '/static/default_profile.jpg'}
-                alt="profile"
-                className="h-6 w-6 rounded-full"
-                onClick={logout}
-              />
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              {user ? (
+                  <img
+                      src={user.profile_picture || '/static/default_profile.jpg'}
+                      alt="profile"
+                      className="h-5 w-5 rounded-full"
+                  />
+              ) : (
+                  <FiGlobe className="h-5 w-5 text-gray-700"/>
+              )}
+            </button>
+
+            {user ? (
+                <Link
+                    to="/logout"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  Logout
+                </Link>
             ) : (
-              <Link
-                to="/login"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
-                Login
-              </Link>
+                <Link
+                    to="/login"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  Login
+                </Link>
             )}
 
 
             <button className="p-2 rounded-full hover:bg-gray-100">
-              {user ? (
-                <img
-                  src={user.profile_picture || '/static/default_profile.jpg'}
-                  alt="profile"
-                  className="h-5 w-5 rounded-full"
-                />
-              ) : (
-                <FiGlobe className="h-5 w-5 text-gray-700" />
-              )}
-            </button>
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <HiOutlineMenu className="h-5 w-5 text-gray-700" />
+              <HiOutlineMenu className="h-5 w-5 text-gray-700"/>
             </button>
           </div>
 
