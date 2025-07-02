@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Container, Typography, Box, CardMedia } from '@mui/material'
+import {FaCheckCircle, FaStar} from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 export default function VendorProfile() {
   const { username } = useParams()
