@@ -10,6 +10,7 @@ class VendorBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
         fields = ["id", "name", "profile_image", "rating", "username"]
+
 class AmenitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Amenity
@@ -56,6 +57,9 @@ class ServiceSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()
     liked = serializers.SerializerMethodField()
 
+    amenities = AmenitySerializer(many=True, read_only=True)
+    regions = RegionSerializer(many=True, read_only=True)
+
     class Meta:
         model = Service
         fields = [
@@ -67,6 +71,8 @@ class ServiceSerializer(serializers.ModelSerializer):
             "rating",
             "price",
             "location_tags",
+            "amenities",
+            "regions",
             "likes",
             "liked",
         ]
@@ -103,11 +109,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ["id", "comment", "likes", "user"]
+        fields = ["id", "comment", "rating", "likes", "user"]
 
 class ServiceDetailSerializer(ServiceSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
     gallery = ServiceImageSerializer(many=True, source="images", read_only=True)
+    policies = PolicySerializer(many=True, read_only=True)
     description = serializers.CharField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
     number_of_guests = serializers.IntegerField()
@@ -119,6 +126,7 @@ class ServiceDetailSerializer(ServiceSerializer):
             "number_of_guests",
             "reviews",
             "gallery",
+            "policies",
         ]
 class CategorySerializer(serializers.ModelSerializer):
     services = ServiceSerializer(many=True, source="servicecategory", read_only=True)
