@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 /** 1️⃣ Hero Image Gallery **/
 function ImageGallery({images}) {
@@ -216,7 +216,7 @@ function SimilarListings({ listings }) {
 }
 
 /** Reservation Widget (Sticky on Desktop) **/
-function ReservationWidget({ price }) {
+function ReservationWidget({ price, serviceId }) {
  return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 sticky top-24">
       <div className="text-2xl font-semibold">${price} <span className="text-base font-normal">per day</span></div>
@@ -224,7 +224,9 @@ function ReservationWidget({ price }) {
         <input type="date" className="w-full border rounded-lg p-2" />
         <input type="date" className="w-full border rounded-lg p-2" />
         <input type="number" min="1" defaultValue="1" className="w-full border rounded-lg p-2" />
-        <button className="w-full bg-rose-500 text-white py-2 rounded-lg hover:bg-rose-600 transition">Reserve</button>
+        <Link to={`/services/${serviceId}/request`} className="block">
+          <button className="w-full bg-rose-500 text-white py-2 rounded-lg hover:bg-rose-600 transition">Reserve</button>
+        </Link>
         <p className="text-xs text-center text-gray-500 mt-2">You won't be charged yet</p>
       </div>
     </div>
@@ -284,7 +286,7 @@ export default function ListingPage() {
 
        {/* Right/Sticky Column */}
        <div className="md:w-80 mt-8 md:mt-0">
-         <ReservationWidget price={service.price} />
+          <ReservationWidget price={service.price} serviceId={service.id} />
        </div>
      </div>
    </div>

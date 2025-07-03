@@ -8,7 +8,7 @@ from .views import (
     PopularServicesAPIView,
     CategoriesWithServicesAPIView,
     VendorByUsernameAPIView,
-    CurrentVendorAPIView, BookingViewSet, AmenityViewSet, PolicyViewSet, RegionViewSet,
+    CurrentVendorAPIView, BookingViewSet, AmenityViewSet, PolicyViewSet, RegionViewSet, BookingRequestViewSet,
 )
 
 router = DefaultRouter()
@@ -16,6 +16,7 @@ router.register(r"services", ServiceViewSet, basename="service")
 router.register(r"", VendorViewSet, basename="vendor")
 router.register(r"posts", VendorPostViewSet, basename="vendorpost")
 router.register(r"bookings", BookingViewSet, basename="booking")
+router.register(r"booking-requests", BookingRequestViewSet, basename="bookingrequest")
 router.register(r"amenities", AmenityViewSet, basename="amenity")
 router.register(r"policies", PolicyViewSet, basename="policy")
 router.register(r"regions", RegionViewSet, basename="region")

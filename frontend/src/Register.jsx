@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from './AuthProvider.jsx'
+import Footer from './Footer.jsx' // Assuming Footer.jsx is in the same folder
 
 export default function Register() {
   const { register } = useAuth()
@@ -12,42 +13,89 @@ export default function Register() {
 
   const handleSubmit = async e => {
     e.preventDefault()
+    // This backend logic remains unchanged
     const ok = await register(username, email, password)
     if (ok) {
       navigate('/')
     } else {
-      setError('Registration failed')
+      setError('Registration failed. Please try again.')
     }
   }
 
   return (
-    <div className="max-w-sm mx-auto mt-10">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-xl font-bold">Register</h2>
-        {error && <p className="text-red-500">{error}</p>}
-        <input
-          className="border w-full p-2"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-        />
-        <input
-          className="border w-full p-2"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        <input
-          className="border w-full p-2"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" type="submit">
-          Register
-        </button>
-      </form>
+    <div className="min-h-screen flex flex-col bg-gradient-to-r from-pink-50 to-white">
+      {/* Main content area: two-column layout */}
+      <div className="flex flex-1 my-5">
+        {/* Left pane: form (65%) */}
+        <div className="w-full md:w-[65%] flex items-center justify-center p-8">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6">
+            <h2 className="text-3xl font-bold text-gray-800 text-center">Create Your Account</h2>
+            {error && <p className="text-center text-red-500">{error}</p>}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                  Username
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+                  placeholder="Choose a username"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                />
+              </div>
+               <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-2 bg-pink-500 text-white font-semibold rounded-md hover:bg-pink-600 transition-colors"
+              >
+                Sign Up
+              </button>
+            </form>
+            <p className="text-center text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link to="/login" className="text-pink-600 font-medium hover:underline">
+                Login
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Right pane: Image (35%) */}
+        <div className="hidden md:block w-[35%] relative mr-20">
+          <img
+            src="https://images.pexels.com/photos/26989918/pexels-photo-26989918.jpeg"
+            alt="Decorative side"
+            className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+          />
+        </div>
+      </div>
     </div>
   )
 }

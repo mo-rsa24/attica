@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Service, Category, Review, ServiceImage, Vendor, VendorPost, Booking, Region, Policy, Amenity
+from .models import Service, Category, Review, ServiceImage, Vendor, VendorPost, Booking, Region, Policy, Amenity, \
+    BookingRequest
 
 
 class VendorBriefSerializer(serializers.ModelSerializer):
@@ -44,6 +45,21 @@ class BookingSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "user", "status", "created_at"]
+
+class BookingRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookingRequest
+        fields = [
+            "id",
+            "user",
+            "service",
+            "start_date",
+            "end_date",
+            "guests",
+            "payment_option",
+            "created_at",
+        ]
+        read_only_fields = ["id", "user", "created_at"]
 
 class ServiceImageSerializer(serializers.ModelSerializer):
     class Meta:

@@ -153,6 +153,25 @@ class Booking(models.Model):
     def __str__(self):
         return f"Booking for {self.service.name} by {self.user.username}"
 
+class BookingRequest(models.Model):
+    """A pending booking request created from the request-to-book page."""
+
+    PAYMENT_CHOICES = [
+        ("full", "Pay in full"),
+        ("partial", "Pay part now, part later"),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="booking_requests")
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="booking_requests")
+    start_date = models.DateField()
+    end_date = models.DateField()
+    guests = models.PositiveIntegerField(default=1)
+    payment_option = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default="full")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Booking request for {self.service.name} by {self.user.username}"
+
 
 @receiver(post_save, sender=Review)
 def update_service_rating_on_save(sender, instance, **kwargs):

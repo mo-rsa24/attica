@@ -13,28 +13,30 @@ import Register from "./Register.jsx";
 import Profile from "./Profile.jsx";
 import Login from "./Login.jsx";
 import Logout from "./Logout.jsx";
+import RequestToBook from "./RequestToBook.jsx";
 
 function App() {
     const theme = createTheme()
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/services/:id" element={<ListingPage />} />
-        <Route path="/vendor/:username" element={<VendorProfile />} />
-        <Route path="/profile" element={<VendorDashboard />} />
-        <Route path="/profile/update" element={<VendorProfileEdit />} />
-        <Route path="/post/create" element={<PostCreate />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/me" element={<Profile />} />
-          <Route path="/logout" element={<Logout />} />
-      </Routes>
-      <Footer />
-    </ThemeProvider>
-  )
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <NavBar />
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/services/:id" element={<ListingPage />} />
+                <Route path="/vendor/:username" element={<VendorProfile />} />
+                <Route path="/profile" element={<VendorDashboard />} />
+                <Route path="/profile/update" element={<VendorProfileEdit />} />
+                <Route path="/post/create" element={<PostCreate />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/me" element={<Profile />} />
+                <Route path="/services/:id/request" element={<RequestToBook />} />
+                <Route path="/logout" element={<Logout />} />
+            </Routes>
+            <Footer />
+        </ThemeProvider>
+    )
 }
 
 export default App
