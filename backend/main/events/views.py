@@ -1,9 +1,13 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Event
 from .forms import EventForm
+from .permissions import IsOrganizer
+from .serializer import EventSerializer
 
 
 class EventCreateView(LoginRequiredMixin, CreateView):
@@ -43,3 +47,8 @@ class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         event = self.get_object()
         return event.user == self.request.user
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated, IsOrganizer]

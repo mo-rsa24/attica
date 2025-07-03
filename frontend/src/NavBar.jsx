@@ -7,92 +7,99 @@ import { HiOutlineMenu } from 'react-icons/hi';
 import { FaAirbnb } from 'react-icons/fa';
 
 export default function NavBar() {
-  const { user } = useAuth();
+  const { user, currentRole, setCurrentRole } = useAuth();
   return (
-    <nav className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+      <nav className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
 
-          {/* Logo and Nav Links */}
-          <div className="flex items-center space-x-12">
-            <a href="/" className="flex items-center space-x-2">
-              <FaAirbnb className="h-6 w-6 text-pink-600" />
-              <span className="text-xl font-bold lowercase text-gray-800">attica</span>
-            </a>
-
-            <div className="flex items-center space-x-8">
-              {/* Homes (active) */}
-              <a
-                href="#"
-                className="inline-flex items-center space-x-2 text-sm font-medium text-gray-900 border-b-2 border-black pb-2"
-              >
-                <AiOutlineHome className="h-5 w-5" />
-                <span>Homes</span>
+            {/* Logo and Nav Links */}
+            <div className="flex items-center space-x-12">
+              <a href="/" className="flex items-center space-x-2">
+                <FaAirbnb className="h-6 w-6 text-pink-600" />
+                <span className="text-xl font-bold lowercase text-gray-800">attica</span>
               </a>
 
-              {/* Experiences */}
-              <a
-                href="#"
-                className="inline-flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 relative"
-              >
-                <span>Experiences</span>
-              </a>
+              <div className="flex items-center space-x-8">
+                {/* Homes (active) */}
+                <a
+                    href="#"
+                    className="inline-flex items-center space-x-2 text-sm font-medium text-gray-900 border-b-2 border-black pb-2"
+                >
+                  <AiOutlineHome className="h-5 w-5" />
+                  <span>Homes</span>
+                </a>
 
-              {/* Services */}
-              <a
-                href="#"
-                className="inline-flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 relative"
-              >
-                <BiBell className="h-5 w-5" />
-                <span>Services</span>
-              </a>
+                {/* Experiences */}
+                <Link
+                    to="/events" // Add the path to your events page
+                    className="inline-flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 relative"
+                >
+                  <span>Events</span>
+                </Link>
+
+                {/* Services */}
+                <a
+                    href="#"
+                    className="inline-flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 relative"
+                >
+                  <BiBell className="h-5 w-5" />
+                  <span>Services</span>
+                </a>
+              </div>
             </div>
-          </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center space-x-4">
-            <a
-                href="/vendors/profile/update/"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900"
-            >
-              Become a host
-            </a>
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              {user ? (
-                  <img
-                      src={user.profile_picture || '/static/default_profile.jpg'}
-                      alt="profile"
-                      className="h-5 w-5 rounded-full"
-                  />
-              ) : (
-                  <FiGlobe className="h-5 w-5 text-gray-700"/>
+            {/* Right Actions */}
+            <div className="flex items-center space-x-4">
+              {user && user.roles?.length > 1 && (
+                  <select
+                      className="text-sm border rounded px-2 py-1"
+                      value={currentRole || ''}
+                      onChange={e => setCurrentRole(e.target.value)}
+                  >
+                    {user.roles.map(r => (
+                        <option key={r} value={r}>
+                          {r.replace('_', ' ')}
+                        </option>
+                    ))}
+                  </select>
               )}
-            </button>
+              <button className="p-2 rounded-full hover:bg-gray-100">
+                {user ? (
+                    <img
+                        src={user.profile_picture || '/static/default_profile.jpg'}
+                        alt="profile"
+                        className="h-5 w-5 rounded-full"
+                    />
+                ) : (
+                    <FiGlobe className="h-5 w-5 text-gray-700"/>
+                )}
+              </button>
 
-            {user ? (
-                <Link
-                    to="/logout"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-900"
-                >
-                  Logout
-                </Link>
-            ) : (
-                <Link
-                    to="/login"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-900"
-                >
-                  Login
-                </Link>
-            )}
+              {user ? (
+                  <Link
+                      to="/logout"
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  >
+                    Logout
+                  </Link>
+              ) : (
+                  <Link
+                      to="/login"
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  >
+                    Login
+                  </Link>
+              )}
 
 
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <HiOutlineMenu className="h-5 w-5 text-gray-700"/>
-            </button>
+              <button className="p-2 rounded-full hover:bg-gray-100">
+                <HiOutlineMenu className="h-5 w-5 text-gray-700"/>
+              </button>
+            </div>
+
           </div>
-
         </div>
-      </div>
-    </nav>
+      </nav>
   );
 }

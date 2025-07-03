@@ -58,7 +58,8 @@ class VendorPostDashboardView(generic.DetailView): #VendorPostListView
         context = super().get_context_data(**kwargs)
         context['posts'] = self.object.posts.all()
         context['event'] = Event.objects.filter(user=self.request.user).first()  # Replace with your event selection logic
-        context['is_vendor'] = self.request.user.user_type == 'vendor'
+        from users.models import Role
+        context['is_vendor'] = self.request.user.has_role(Role.SERVICE_PROVIDER)
         return context
 
 class VendorPostCreateView(LoginRequiredMixin, CreateView):
@@ -67,7 +68,8 @@ class VendorPostCreateView(LoginRequiredMixin, CreateView):
     template_name = 'post/vendor_post_form.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.user_type != 'vendor':
+        from users.models import Role
+        if not request.user.has_role(Role.SERVICE_PROVIDER):
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
@@ -75,7 +77,8 @@ class VendorPostCreateView(LoginRequiredMixin, CreateView):
         # Check if the logged-in user is the owner of the vendor post
         try:
             post = self.get_object()
-            return self.request.user.user_type == 'vendor' and post.vendor.user == self.request.user
+            from users.models import Role
+            return self.request.user.has_role(Role.SERVICE_PROVIDER) and post.vendor.user == self.request.user
         except VendorPost.DoesNotExist:
             raise Http404("Post does not exist")
 
@@ -93,7 +96,8 @@ class VendorPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         post = self.get_object()
-        if request.user.user_type != 'vendor' or post.vendor.user != request.user:
+        from users.models import Role
+        if not request.user.has_role(Role.SERVICE_PROVIDER) or post.vendor.user != request.user:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
@@ -101,7 +105,8 @@ class VendorPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         # Check if the logged-in user is the owner of the vendor post
         try:
             post = self.get_object()
-            return self.request.user.user_type == 'vendor' and post.vendor.user == self.request.user
+            from users.models import Role
+            return self.request.user.has_role(Role.SERVICE_PROVIDER) and post.vendor.user == self.request.user
         except VendorPost.DoesNotExist:
             raise Http404("Post does not exist")
 
@@ -127,7 +132,8 @@ class VendorPostDeleteView(LoginRequiredMixin, DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         post = self.get_object()
-        if request.user.user_type != 'vendor' or post.vendor.user != request.user:
+        from users.models import Role
+        if not request.user.has_role(Role.SERVICE_PROVIDER) or post.vendor.user != request.user:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
@@ -135,7 +141,8 @@ class VendorPostDeleteView(LoginRequiredMixin, DeleteView):
         # Check if the logged-in user is the owner of the vendor post
         try:
             post = self.get_object()
-            return self.request.user.user_type == 'vendor' and post.vendor.user == self.request.user
+            from users.models import Role
+            return self.request.user.has_role(Role.SERVICE_PROVIDER) and post.vendor.user == self.request.user
         except VendorPost.DoesNotExist:
             raise Http404("Post does not exist")
 
@@ -309,7 +316,8 @@ class VendorViewSet(viewsets.ModelViewSet):
         return VendorDetailSerializer
 
     def perform_update(self, serializer):
-        if self.request.user.user_type != "vendor":
+        from users.models import Role
+        if not self.request.user.has_role(Role.SERVICE_PROVIDER):
             raise permissions.PermissionDenied()
         serializer.save(user=self.request.user)
 

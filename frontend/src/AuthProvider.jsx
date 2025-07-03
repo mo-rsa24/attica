@@ -9,6 +9,16 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null
   })
   const [user, setUser] = useState(null)
+  const [currentRole, setCurrentRole] = useState(() => {
+    const stored = localStorage.getItem('currentRole')
+    return stored || null
+  })
+
+  useEffect(() => {
+    if (currentRole) {
+      localStorage.setItem('currentRole', currentRole)
+    }
+  }, [currentRole])
 
   // Function to refresh access token
   const refreshToken = useCallback(async () => {
@@ -54,7 +64,12 @@ export function AuthProvider({ children }) {
           headers: { Authorization: `Bearer ${tokens.access}` },
         })
           .then(res => (res.ok ? res.json() : null))
-          .then(data => setUser(data))
+          .then(data => {
+            setUser(data)
+            if (data?.roles?.length) {
+              setCurrentRole(prev => prev || data.roles[0])
+            }
+          })
           .catch(() => setUser(null))
       } else {
         setUser(null)
@@ -73,6 +88,32 @@ export function AuthProvider({ children }) {
     if (res.ok) {
       const data = await res.json()
       setTokens({ access: data.access, refresh: data.refresh })
+      if (data.user) {
+        setUser(data.user)
+        if (data.user.roles?.length) {
+          setCurrentRole(data.user.roles[0])
+        }
+      }
+      return true
+    }
+    return false
+  }
+
+  const register = async (username, email, password, roles) => {
+    const res = await fetch('/api/accounts/register/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password, roles }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setTokens({ access: data.access, refresh: data.refresh })
+      if (data.user) {
+        setUser(data.user)
+        if (data.user.roles?.length) {
+          setCurrentRole(data.user.roles[0])
+        }
+      }
       return true
     }
     return false
@@ -80,10 +121,12 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     setTokens(null)
+    setUser(null)
+    setCurrentRole(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, tokens, login, logout }}>
+    <AuthContext.Provider value={{ user, tokens, login, register, logout, currentRole, setCurrentRole }}>
       {children}
     </AuthContext.Provider>
   )

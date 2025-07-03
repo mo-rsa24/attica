@@ -11,4 +11,4 @@ class VenueBookingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VenueBooking
-        fields = ['id', 'venue', 'event', 'status', 'created_at']
+        fields = ['id', 'venue', 'event', 'status', 'created_at', 'updated_at']

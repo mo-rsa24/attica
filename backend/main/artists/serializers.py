@@ -11,4 +11,4 @@ class ArtistBookingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArtistBooking
-        fields = ['id', 'artist', 'event', 'start_time', 'end_time', 'status', 'created_at']
+        fields = ['id', 'artist', 'event', 'start_time', 'end_time', 'status', 'created_at', 'updated_at']
