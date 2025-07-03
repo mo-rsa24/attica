@@ -22,16 +22,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from main.views import GlobalSearchAPIView
 from vendors.views import VendorPostsListView
-from .views import ReactAppView
-from .views import index
 
 def hello_world(request):
     return JsonResponse({"message": "Hello from Django!"})
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/hello/', hello_world),
-    path('', ReactAppView.as_view(), name='index'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('events/', include('events.urls')),
     path('chat/', include('chat.urls')),
@@ -42,6 +40,7 @@ urlpatterns = [
     path('cart/', include('cart.urls')),
     path('checkout/', include('checkout.urls')),
     path('api/artists/', include('artists.urls')),
+    path('api/search/', GlobalSearchAPIView.as_view(), name='global_search'),
     path('api/locations/', include('locations.urls')),
     path('api/tickets/', include('tickets.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
