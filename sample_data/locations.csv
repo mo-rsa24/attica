@@ -1,0 +1,3 @@
+id,name,address,capacity,owner_id,is_approved
+1,Grand Hall,123 Street,300,1,True
+2,Open Air Park,Park Road,500,2,False

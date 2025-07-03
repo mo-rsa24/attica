@@ -29,3 +29,10 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.name} by {self.user.username}"
 
+class EventVendor(models.Model):
+    event = models.ForeignKey('events.Event', on_delete=models.CASCADE, related_name='vendor_links')
+    service = models.ForeignKey('vendors.Service', on_delete=models.CASCADE, related_name='event_links')
+    status = models.CharField(max_length=20, choices=[('pending','Pending'),('confirmed','Confirmed')], default='pending')
+
+    def __str__(self):
+        return f"{self.service.name} for {self.event.name}"

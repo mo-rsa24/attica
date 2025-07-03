@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'users.apps.UsersConfig',
     'checkout.apps.CheckoutConfig',
+    'artists.apps.ArtistsConfig',
+    'locations.apps.LocationsConfig',
+    'tickets.apps.TicketsConfig',
     'rest_framework',
     'corsheaders'
 ]

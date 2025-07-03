@@ -41,6 +41,9 @@ urlpatterns = [
     path('api/vendors/', include('vendors.api_urls')), # This is for React
     path('cart/', include('cart.urls')),
     path('checkout/', include('checkout.urls')),
+    path('api/artists/', include('artists.urls')),
+    path('api/locations/', include('locations.urls')),
+    path('api/tickets/', include('tickets.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
