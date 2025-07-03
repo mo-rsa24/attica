@@ -122,6 +122,57 @@ class ServiceImage(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='service_gallery/')
 
+
+class VendorProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='vendor_profile')
+
+    # Contact & Basic Information
+    company_name = models.CharField(max_length=255, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    website = models.URLField(max_length=200, blank=True)
+    profile_picture = models.ImageField(upload_to='vendor_profile_pics/', null=True, blank=True)
+
+    # Business Details
+    service_description = models.TextField(blank=True, help_text="A short description of the services you offer.")
+    years_in_business = models.PositiveIntegerField(null=True, blank=True)
+
+    # Address Information
+    address_line_1 = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    province = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=10, blank=True)
+
+    # Verification Status for administrative purposes
+    is_verified = models.BooleanField(default=False, help_text="Indicates if the vendor has been verified by an admin.")
+
+    def __str__(self):
+        # Display the company name if available, otherwise fall back to the username.
+        display_name = self.company_name or self.user.username
+        return f"{display_name}'s Vendor Profile"
+
+
+# --- These signal handlers automatically create a VendorProfile for every new user. ---
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_vendor_profile(sender, instance, created, **kwargs):
+    """
+    Signal handler to create a VendorProfile when a new User is created.
+    """
+    if created:
+        # This check ensures we don't try to create a profile if one already exists.
+        if not hasattr(instance, 'profile'):
+            VendorProfile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_vendor_profile(sender, instance, **kwargs):
+    """
+    Signal handler to save the VendorProfile whenever the User object is saved.
+    """
+    # Use hasattr to check if the profile exists to prevent errors during initial creation.
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
+
 class Policy(models.Model):
     POLICY_TYPES = [
         ('cancellation', 'Cancellation'),

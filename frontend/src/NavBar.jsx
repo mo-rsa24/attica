@@ -1,12 +1,12 @@
 import { AiOutlineHome } from 'react-icons/ai';
-import { BiBell } from 'react-icons/bi';
 import { useAuth } from './AuthProvider.jsx';
-import { Link } from 'react-router-dom';
-import { FiGlobe } from 'react-icons/fi';
 import { HiOutlineMenu } from 'react-icons/hi';
 import { FaAirbnb } from 'react-icons/fa';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function NavBar() {
+const Navbar = ({ userProfileImageUrl, onLogout }) => {
+
   const { user, currentRole, setCurrentRole } = useAuth();
   return (
       <nav className="bg-white border-b border-gray-200">
@@ -39,13 +39,12 @@ export default function NavBar() {
                 </Link>
 
                 {/* Services */}
-                <a
-                    href="#"
+                <Link
+                    to="/services" // Add the path to your events page
                     className="inline-flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 relative"
                 >
-                  <BiBell className="h-5 w-5" />
                   <span>Services</span>
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -64,25 +63,22 @@ export default function NavBar() {
                     ))}
                   </select>
               )}
-              <button className="p-2 rounded-full hover:bg-gray-100">
-                {user ? (
+              <Link to="/profile" className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-offset-2 ring-gray-300">
                     <img
-                        src={user.profile_picture || '/static/default_profile.jpg'}
-                        alt="profile"
-                        className="h-5 w-5 rounded-full"
+                        src={userProfileImageUrl || 'https://placehold.co/40x40/EFEFEF/3A3A3A?text=P'}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
                     />
-                ) : (
-                    <FiGlobe className="h-5 w-5 text-gray-700"/>
-                )}
-              </button>
+                </Link>
 
               {user ? (
-                  <Link
-                      to="/logout"
-                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
-                  >
+                 <Link
+                    to="/login"
+                    onClick={onLogout}
+                    className="text-gray-600 hover:text-gray-900"
+                >
                     Logout
-                  </Link>
+                </Link>
               ) : (
                   <Link
                       to="/login"
@@ -103,3 +99,4 @@ export default function NavBar() {
       </nav>
   );
 }
+export default Navbar;
