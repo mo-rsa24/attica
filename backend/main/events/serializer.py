@@ -8,8 +8,12 @@ class EventSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'partner_user',
+            'organizer',
+            'location',
             'name',
             'date',
+            'start_date',
+            'end_date',
             'start_time',
             'end_time',
             'location',
@@ -18,7 +22,8 @@ class EventSerializer(serializers.ModelSerializer):
             'guest_count',
             'theme',
             'notes',
-            'image_url',  # Added field
+            'image_url',
+            'banner_image',
             'category',   # Added field
             'created_at',
             'updated_at'
@@ -29,3 +34,8 @@ class EventSerializer(serializers.ModelSerializer):
         # Set the user from the request context
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+class SimilarEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ('id', 'name', 'banner_image', 'start_date', 'location')

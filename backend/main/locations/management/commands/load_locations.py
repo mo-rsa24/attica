@@ -1,6 +1,6 @@
 import csv
 from django.core.management.base import BaseCommand
-from locations.models import Venue
+from locations.models import Location
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -14,7 +14,7 @@ class Command(BaseCommand):
             reader = csv.DictReader(f)
             for row in reader:
                 owner = User.objects.get(id=row['owner_id'])
-                Venue.objects.update_or_create(
+                Location.objects.update_or_create(
                     id=row['id'],
                     defaults={
                         'name': row['name'],

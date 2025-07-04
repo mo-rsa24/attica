@@ -4,7 +4,14 @@ from .models import Artist, ArtistBooking
 class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
-        fields = ['id', 'name', 'bio', 'owner', 'created_at', 'updated_at']
+        fields = [
+            'id', 'name', 'bio', 'owner', 'profile_image',
+            'genres', 'rating', 'created_at', 'updated_at'
+        ]
+class PopularArtistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Artist
+        fields = ('id', 'name', 'profile_image', 'genres', 'rating')
 
 class ArtistBookingSerializer(serializers.ModelSerializer):
     artist = ArtistSerializer(read_only=True)

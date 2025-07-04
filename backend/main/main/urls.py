@@ -14,6 +14,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from urllib.parse import urlparse
+
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.http import JsonResponse
@@ -29,23 +31,28 @@ def hello_world(request):
     return JsonResponse({"message": "Hello from Django!"})
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/hello/', hello_world),
     path('accounts/', include('django.contrib.auth.urls')),
     path('events/', include('events.urls')),
     path('chat/', include('chat.urls')),
     path('accounts/', include('users.urls')),
-    path('api/accounts/', include('users.api_urls')),
     path('vendors/', include('vendors.urls')), # This is for Django Templates
-    path('api/vendors/', include('vendors.api_urls')), # This is for React
     path('cart/', include('cart.urls')),
     path('checkout/', include('checkout.urls')),
-    path('api/artists/', include('artists.urls')),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+api_patterns = [
+path('api/events/', include('events.api_urls')),
+path('api/accounts/', include('users.api_urls')),
+path('api/locations/', include('locations.api_urls')),
+path('api/vendors/', include('vendors.api_urls')), # This is for React
+path('api/artists/', include('artists.api_urls')),
     path('api/search/', GlobalSearchAPIView.as_view(), name='global_search'),
     path('api/locations/', include('locations.urls')),
     path('api/tickets/', include('tickets.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+urlpatterns += api_patterns
+
 urlpatterns += staticfiles_urlpatterns()     # serves files from STATICFILES_DIRS
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
