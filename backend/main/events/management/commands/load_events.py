@@ -4,14 +4,14 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from events.models import Event
-# from django.contrib.auth.models import User
+from locations.models import Location  # Import the Location model
 
 
 class Command(BaseCommand):
     help = "Load events from a CSV file"
 
     def handle(self, *args, **kwargs):
-        csv_file_path = "sample_data/realistic_events_dummy_data.csv"  # Update this path if needed
+        csv_file_path = "sample_data/realistic_events_dummy_data.csv"
 
         try:
             with open(csv_file_path, "r") as file:
@@ -19,17 +19,21 @@ class Command(BaseCommand):
 
                 for row in reader:
                     try:
-                        # Fetch users
                         User = get_user_model()
                         user = User.objects.get(id=row["user_id"])
-                        partner_user = User.objects.get(id=row["partner_user_id"])
 
-                        # Create event
+                        # Get or create the Location object
+                        location_obj, created = Location.objects.get_or_create(
+                            name=row["location"],
+                            # You can add default values for other fields if needed
+                            defaults={'address': '', 'capacity': 0, 'owner': user}
+                        )
+
                         Event.objects.create(
                             user=user,
                             name=row["event_name"],
                             date=row["date"],
-                            location=row["location"],
+                            location=location_obj,  # Assign the Location object
                             budget=Decimal(row["budget"]),
                             guest_count=row["guest_count"],
                             theme=row["theme"],

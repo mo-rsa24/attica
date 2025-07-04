@@ -1,0 +1,6 @@
+id,user_id,name,date,location_id,budget,guest_count,theme,notes
+1,1,John's Birthday Bash,2025-08-15,1,5000.00,100,Modern Chic,"Need to book a DJ and a photographer."
+2,2,Annual Company Gala,2025-09-20,2,25000.00,200,Black Tie,"Arrange for corporate branding and awards."
+3,3,Peter's Wedding Reception,2025-10-10,3,15000.00,120,Rustic,"Floral arrangements are a top priority."
+4,1,Summer Pool Party,2025-07-30,4,2000.00,50,Tropical,"Ensure there are enough pool floats and towels."
+5,4,Team Building Workshop,2025-11-05,5,7500.00,80,Corporate Casual,"Plan for breakout sessions and a guest speaker."

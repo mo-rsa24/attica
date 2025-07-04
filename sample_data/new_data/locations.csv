@@ -1,0 +1,6 @@
+id,name,address,capacity,owner_id
+1,The Grand Hall,123 Main St, Anytown,500,1
+2,The Garden Pavilion,456 Oak Ave, Sometown,250,2
+3,The City Loft,789 Pine Ln, Yourtown,150,1
+4,The Beach House,101 Ocean Blvd, Beachtown,100,3
+5,The Mountain Lodge,202 Hilltop Rd, Mountaintop,200,4

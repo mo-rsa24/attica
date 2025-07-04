@@ -1,0 +1,11 @@
+id,event_id,name,email,rsvp_status
+1,1,Alice Johnson,alice.j@example.com,Attending
+2,1,Bob Williams,bob.w@example.com,Attending
+3,1,Charlie Davis,charlie.d@example.com,Maybe
+4,2,David Miller,david.m@example.com,Attending
+5,2,Eve Wilson,eve.w@example.com,Declined
+6,3,Frank Moore,frank.m@example.com,Attending
+7,3,Grace Taylor,grace.t@example.com,Attending
+8,4,Heidi Anderson,heidi.a@example.com,Maybe
+9,5,Ivan Thomas,ivan.t@example.com,Attending
+10,5,Judy Jackson,judy.j@example.com,Attending
