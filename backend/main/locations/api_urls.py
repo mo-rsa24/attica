@@ -6,6 +6,6 @@ router = DefaultRouter()
 router.register(r"locations", VenueViewSet, basename="locations")
 
 urlpatterns = [
-    path("locations/popular/", PopularLocationsAPIView.as_view(), name="popular_locations"),
+    path("popular/", PopularLocationsAPIView.as_view(), name="popular_locations"),
     path("", include(router.urls)),
 ]

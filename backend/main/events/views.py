@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Event
 from .serializer import EventSerializer, SimilarEventSerializer
 from rest_framework.decorators import action
@@ -25,13 +25,13 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(detail=False, methods=['get'], url_path='upcoming', permission_classes=[])
+    @action(detail=False, methods=['get'], url_path='upcoming', permission_classes=[AllowAny])
     def upcoming(self, request):
         """
         Returns a list of the next 8 upcoming events.
         This endpoint is public and does not require authentication.
         """
-        now = timezone.now().date()
+        now = timezone.now()
         upcoming_events = Event.objects.filter(date__gte=now).order_by('date')[:8]
         serializer = self.get_serializer(upcoming_events, many=True)
         return Response(serializer.data)

@@ -40,7 +40,7 @@ urlpatterns = [
     path('checkout/', include('checkout.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 api_patterns = [
-path('api/events/', include('events.api_urls')),
+path('api/events', include('events.api_urls')),
 path('api/accounts/', include('users.api_urls')),
 path('api/locations/', include('locations.api_urls')),
 path('api/vendors/', include('vendors.api_urls')), # This is for React
