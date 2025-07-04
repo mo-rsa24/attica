@@ -6,7 +6,6 @@ import VendorProfile from './VendorProfile.jsx'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { Routes, Route } from 'react-router-dom'
-import VendorDashboard from "./VendorDashboard.jsx";
 import VendorProfileEdit from "./VendorProfileEdit.jsx";
 import PostCreate from "./PostCreate.jsx";
 import Register from "./Register.jsx";
@@ -30,19 +29,28 @@ import ListingStep5 from "./ListingStep5.jsx";
 import ListingStep6 from "./ListingStep6.jsx";
 import ListingStep7 from "./ListingStep7.jsx";
 import ListingStep8 from "./ListingStep8.jsx";
+import ProfilePage from "./ProfilePage.jsx";
+import {useAuth} from "./AuthProvider.jsx";
+import Navbar from "./NavBar.jsx";
 
 
 function App() {
     const theme = createTheme()
+    const { user, logout, tokens } = useAuth();
+    const profileImageUrl = user?.profile_picture;
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <NavBar />
+            <Navbar
+                isAuthenticated={!!tokens} // Pass a boolean to indicate if the user is logged in
+                userProfileImageUrl={profileImageUrl}
+                onLogout={logout} // Pass the logout function
+              />
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/services/:id" element={<ListingPage />} />
                 <Route path="/vendor/:username" element={<VendorProfile />} />
-                <Route path="/profile" element={<VendorDashboard />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/dashboard/organizer" element={<EventOrganizerDashboard />} />
                 <Route path="/dashboard/artist" element={<ArtistDashboard />} />
                 <Route path="/dashboard/service" element={<ServiceProviderDashboard />} />

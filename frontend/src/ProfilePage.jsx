@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Or your preferred HTTP client
+import { useAuth } from './AuthProvider.jsx'; // 1. Import useAuth
 
 const ProfilePage = () => {
-    // State to hold profile data and manage loading/error states
+    const { tokens } = useAuth()
     const [profileData, setProfileData] = useState({
         user: {
             first_name: '',
@@ -21,17 +21,26 @@ const ProfilePage = () => {
     // Fetch profile data when the component mounts
     useEffect(() => {
         const fetchProfile = async () => {
+            if (!tokens?.access) {
+                setError('You are not logged in.');
+                setLoading(false);
+                return;
+            }
             try {
-                // IMPORTANT: You need to send the auth token with your request.
-                // This is commonly done via Authorization headers.
-                const token = localStorage.getItem('authToken'); // Example: get token
-                const response = await axios.get('/api/profile/', {
+                const response = await fetch('/api/accounts/profile/', {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        // 4. Use the correct access token
+                        'Authorization': `Bearer ${tokens.access}`
                     }
                 });
-                setProfileData(response.data);
-                setPreviewImage(response.data.profile_picture);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch profile.');
+                }
+
+                const data = await response.json();
+                setProfileData(data);
+                setPreviewImage(data.profile_picture);
             } catch (err) {
                 setError('Failed to fetch profile. Please try again later.');
                 console.error(err);
@@ -41,7 +50,8 @@ const ProfilePage = () => {
         };
 
         fetchProfile();
-    }, []);
+    }, [tokens]);
+
 
     // Handle changes to form inputs
     const handleChange = (e) => {
@@ -78,46 +88,51 @@ const ProfilePage = () => {
         setSuccessMessage('');
         setError('');
 
-        // Use FormData to send both JSON data and the image file
-        const formData = new FormData();
+         if (!tokens?.access) {
+            setError('Authentication token is missing.');
+            return;
+        }
 
-        // Append user data as a JSON string blob
+        const formData = new FormData();
         const profilePayload = {
             user: {
-                first_name: profileData.user.first_name,
-                last_name: profileData.user.last_name,
-                email: profileData.user.email,
+                first_name: profileData.first_name,
+                last_name: profileData.last_name,
+                email: profileData.email,
             },
             bio: profileData.bio,
         };
         formData.append('user', JSON.stringify(profilePayload.user));
         formData.append('bio', profilePayload.bio);
 
-
-        // Append the new profile picture if one was selected
         if (newProfilePicture) {
             formData.append('profile_picture', newProfilePicture);
         }
-
         try {
-            const token = localStorage.getItem('authToken'); // Example: get token
-            const response = await axios.put('/api/profile/', formData, {
+            const response = await fetch('/api/accounts/profile/', {
+                method: 'PUT',
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${tokens.access}`,
                 },
+                body: formData,
             });
-            setProfileData(response.data); // Update state with the saved data
-            setNewProfilePicture(null); // Reset file input
+
+            if (!response.ok) {
+                throw new Error('Failed to update profile.');
+            }
+
+            const data = await response.json();
+            setProfileData(data);
+            setNewProfilePicture(null);
             setSuccessMessage('Profile updated successfully!');
         } catch (err) {
-            setError('Failed to update profile.');
+            setError(err.message);
             console.error(err);
         }
     };
 
     if (loading) return <div className="text-center p-8">Loading profile...</div>;
-    if (error && !profileData.user.email) return <div className="text-center p-8 text-red-500">{error}</div>;
+    if (error && !profileData.email) return <div className="text-center p-8 text-red-500">{error}</div>;
 
     return (
         <div className="bg-gray-50 min-h-screen flex items-center justify-center p-4">
@@ -151,17 +166,17 @@ const ProfilePage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">First Name</label>
-                            <input type="text" name="first_name" id="first_name" value={profileData.user.first_name} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                            <input type="text" name="first_name" id="first_name" value={profileData.first_name} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                         </div>
                         <div>
                             <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">Last Name</label>
-                            <input type="text" name="last_name" id="last_name" value={profileData.user.last_name} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                            <input type="text" name="last_name" id="last_name" value={profileData.last_name} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                         </div>
                     </div>
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input type="email" name="email" id="email" value={profileData.user.email} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                        <input type="email" name="email" id="email" value={profileData.email} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                     </div>
 
                     <div>

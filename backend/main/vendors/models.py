@@ -15,7 +15,7 @@ class Category(models.Model):
         return self.name
 
 class Vendor(models.Model): # Vendor
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='vendor_profile',null=True, blank=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='vendor',null=True, blank=True)
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name='serviceprovider')

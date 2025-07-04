@@ -15,10 +15,12 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
-            "user_type",
+            "first_name",
+            "last_name",
             "profile_picture",
             "roles",
         ]
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer used for user registration from the React app."""
