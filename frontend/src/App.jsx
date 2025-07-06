@@ -30,7 +30,7 @@ import ListingStep6 from "./ListingStep6.jsx";
 import ListingStep7 from "./ListingStep7.jsx";
 import ListingStep8 from "./ListingStep8.jsx";
 import ProfilePage from "./ProfilePage.jsx";
-import {useAuth} from "./AuthProvider.jsx";
+import {AuthProvider, useAuth} from "./AuthProvider.jsx";
 import Navbar from "./NavBar.jsx";
 
 
@@ -45,36 +45,38 @@ function App() {
                 isAuthenticated={!!tokens} // Pass a boolean to indicate if the user is logged in
                 userProfileImageUrl={profileImageUrl}
                 onLogout={logout} // Pass the logout function
-              />
-            <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/services/:id" element={<ListingPage />} />
-                <Route path="/vendor/:username" element={<VendorProfile />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/dashboard/organizer" element={<EventOrganizerDashboard />} />
-                <Route path="/dashboard/artist" element={<ArtistDashboard />} />
-                <Route path="/dashboard/service" element={<ServiceProviderDashboard />} />
-                <Route path="/dashboard/venue" element={<VenueManagerDashboard />} />
-                <Route path="/dashboard/tickets" element={<TicketBuyerDashboard />} />
-                <Route path="/events" element={<EventsPage />} />
-                 {/* Updated listing step routes */}
-                <Route path="/listing/step1" element={<ListingStep1 />} />
-                <Route path="/listing/step2" element={<ListingStep2 />} />
-                <Route path="/listing/step3" element={<ListingStep3 />} />
-                <Route path="/listing/step4" element={<ListingStep4 />} />
-                <Route path="/listing/step5" element={<ListingStep5 />} />
-                <Route path="/listing/step6" element={<ListingStep6 />} />
-                <Route path="/listing/step7" element={<ListingStep7 />} />
-                <Route path="/listing/step8" element={<ListingStep8 />} />
+            />
+            <AuthProvider>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/services/:id" element={<ListingPage />} />
+                    <Route path="/vendor/:username" element={<VendorProfile />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/dashboard/organizer" element={<EventOrganizerDashboard />} />
+                    <Route path="/dashboard/artist" element={<ArtistDashboard />} />
+                    <Route path="/dashboard/service" element={<ServiceProviderDashboard />} />
+                    <Route path="/dashboard/venue" element={<VenueManagerDashboard />} />
+                    <Route path="/dashboard/tickets" element={<TicketBuyerDashboard />} />
+                    <Route path="/events" element={<EventsPage />} />
+                    {/* Updated listing step routes */}
+                    <Route path="/listing/step1" element={<ListingStep1 />} />
+                    <Route path="/listing/step2" element={<ListingStep2 />} />
+                    <Route path="/listing/step3" element={<ListingStep3 />} />
+                    <Route path="/listing/step4" element={<ListingStep4 />} />
+                    <Route path="/listing/step5" element={<ListingStep5 />} />
+                    <Route path="/listing/step6" element={<ListingStep6 />} />
+                    <Route path="/listing/step7" element={<ListingStep7 />} />
+                    <Route path="/listing/step8" element={<ListingStep8 />} />
 
-                <Route path="/profile/update" element={<VendorProfileEdit />} />
-                <Route path="/post/create" element={<PostCreate />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/me" element={<Profile />} />
-                <Route path="/services/:id/request" element={<RequestToBook />} />
-                <Route path="/logout" element={<Logout />} />
-            </Routes>
+                    <Route path="/profile/update" element={<VendorProfileEdit />} />
+                    <Route path="/post/create" element={<PostCreate />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/me" element={<Profile />} />
+                    <Route path="/services/:id/request" element={<RequestToBook />} />
+                    <Route path="/logout" element={<Logout />} />
+                </Routes>
+            </AuthProvider>
             <Footer />
         </ThemeProvider>
     )

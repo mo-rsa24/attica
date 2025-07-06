@@ -1,135 +1,68 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import {jwtDecode} from "jwt-decode";
-const AuthContext = createContext(null)
+// frontend/src/context/AuthProvider.jsx
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import jwt_decode from 'jwt-decode';
+import AuthContext from 'context/AuthContext.js'; // Import the context we just created
 
-export function AuthProvider({ children }) {
-  const [tokens, setTokens] = useState(() => {
-    const stored = localStorage.getItem('tokens')
-    return stored ? JSON.parse(stored) : null
-  })
-  const [user, setUser] = useState(null)
-  const [currentRole, setCurrentRole] = useState(() => {
-    const stored = localStorage.getItem('currentRole')
-    return stored || null
-  })
+export const AuthProvider = ({ children }) => {
+    const baseURL = 'http://127.0.0.1:8000'; // Your backend URL
 
-  useEffect(() => {
-    if (currentRole) {
-      localStorage.setItem('currentRole', currentRole)
-    }
-  }, [currentRole])
+    const [authTokens, setAuthTokens] = useState(() =>
+        localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null
+    );
+    const [user, setUser] = useState(() =>
+        localStorage.getItem('authTokens') ? jwt_decode(localStorage.getItem('authTokens')) : null
+    );
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
-  // Function to refresh access token
-  const refreshToken = useCallback(async () => {
-    if (!tokens?.refresh) return false
+    const loginUser = async (e) => {
+        e.preventDefault();
+        const response = await fetch(`${baseURL}/api/accounts/token/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: e.target.email.value, password: e.target.password.value }),
+        });
+        const data = await response.json();
 
-    const res = await fetch('/api/accounts/token/refresh/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh: tokens.refresh }),
-    })
-
-    if (res.ok) {
-      const data = await res.json()
-      setTokens(prev => ({ ...prev, access: data.access }))
-      return true
-    } else {
-      setTokens(null)
-      return false
-    }
-  }, [tokens])
-
-  useEffect(() => {
-    if (!tokens) {
-      setUser(null)
-      localStorage.removeItem('tokens')
-      return
-    }
-
-    localStorage.setItem('tokens', JSON.stringify(tokens))
-
-    const decoded = jwtDecode(tokens.access)
-    const isExpired = decoded.exp * 1000 < Date.now()
-
-    const fetchUser = async () => {
-      let tokenValid = true
-
-      if (isExpired) {
-        tokenValid = await refreshToken()
-      }
-
-      if (tokenValid) {
-        fetch('/api/accounts/me/', {
-          headers: { Authorization: `Bearer ${tokens.access}` },
-        })
-          .then(res => (res.ok ? res.json() : null))
-          .then(data => {
-            setUser(data)
-            if (data?.roles?.length) {
-              setCurrentRole(prev => prev || data.roles[0])
-            }
-          })
-          .catch(() => setUser(null))
-      } else {
-        setUser(null)
-      }
-    }
-
-    fetchUser()
-  }, [tokens, refreshToken])
-
-  const login = async (username, password) => {
-    const res = await fetch('/api/accounts/login/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    })
-    if (res.ok) {
-      const data = await res.json()
-      setTokens({ access: data.access, refresh: data.refresh })
-      if (data.user) {
-        setUser(data.user)
-        if (data.user.roles?.length) {
-          setCurrentRole(data.user.roles[0])
+        if (response.status === 200) {
+            setAuthTokens(data);
+            setUser(jwt_decode(data.access));
+            localStorage.setItem('authTokens', JSON.stringify(data));
+            navigate('/');
+        } else {
+            alert('Something went wrong!');
         }
-      }
-      return true
-    }
-    return false
-  }
+    };
 
-  const register = async (username, email, password, roles) => {
-    const res = await fetch('/api/accounts/register/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password, roles }),
-    })
-    if (res.ok) {
-      const data = await res.json()
-      setTokens({ access: data.access, refresh: data.refresh })
-      if (data.user) {
-        setUser(data.user)
-        if (data.user.roles?.length) {
-          setCurrentRole(data.user.roles[0])
+    const logoutUser = () => {
+        setAuthTokens(null);
+        setUser(null);
+        localStorage.removeItem('authTokens');
+        navigate('/login');
+    };
+
+    const contextData = {
+        user,
+        setUser,
+        authTokens,
+        setAuthTokens,
+        loginUser,
+        logoutUser,
+        baseURL,
+    };
+
+    useEffect(() => {
+        if(authTokens){
+            setUser(jwt_decode(authTokens.access))
         }
-      }
-      return true
-    }
-    return false
-  }
+        setLoading(false)
+    }, [authTokens, loading])
 
-  const logout = () => {
-    setTokens(null)
-    setUser(null)
-    setCurrentRole(null)
-  }
 
-  return (
-    <AuthContext.Provider value={{ user, tokens, login, register, logout, currentRole, setCurrentRole }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
-
-export const useAuth = () => useContext(AuthContext)
+    return (
+        <AuthContext.Provider value={contextData}>
+            {loading ? null : children}
+        </AuthContext.Provider>
+    );
+};

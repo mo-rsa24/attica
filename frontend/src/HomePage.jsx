@@ -7,6 +7,7 @@ import ArtistCard from './ArtistCard.jsx';
 import LocationCard from './LocationCard.jsx';
 import ServiceCardSkeleton from './ServiceCardSkeleton.jsx';
 import { Link } from 'react-router-dom';
+import useAxios from 'utils/useAxios'; // Make sure you have this import
 
 const PageSection = ({ title, viewAllLink, items, cardType, isLoading }) => {
     const skeletonItems = Array.from({ length: 4 });
@@ -53,6 +54,7 @@ function HomePage() {
         popularArtists: [],
         popularLocations: [],
     });
+    const api = useAxios(); // Call useAxios at the top level
     const [isLoading, setIsLoading] = useState(true);
 
     const isEventOrganizer = user?.roles.includes('EVENT_ORGANIZER');
