@@ -2,13 +2,12 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import dayjs from 'dayjs';
 import { useContext } from 'react';
-// Change this import from '../context/AuthContext'
 import AuthContext from '../AuthContext.js';
 
 const useAxios = () => {
-    // This line will now work correctly
     const { tokens, setUser, setTokens } = useContext(AuthContext);
     const baseURL = 'http://127.0.0.1:8000';
+    let refreshAttempted = false; // Prevent infinite refresh loop
 
     const axiosInstance = axios.create({
         baseURL,
@@ -17,6 +16,7 @@ const useAxios = () => {
 
     axiosInstance.interceptors.request.use(async req => {
         if (!tokens) {
+            console.warn('No tokens. Skipping request.');
             return req;
         }
         const user = jwtDecode(tokens.access);
@@ -24,14 +24,27 @@ const useAxios = () => {
 
         if (!isExpired) return req;
 
-        const response = await axios.post(`${baseURL}/api/accounts/token/refresh/`, {
-            refresh: tokens.refresh
-        });
+        if (refreshAttempted) {
+            console.error('Refresh already attempted. Skipping further retries.');
+            return req;
+        }
+        refreshAttempted = true;
 
-        localStorage.setItem('tokens', JSON.stringify({ ...tokens, access: response.data.access }));
-        setTokens(prev => ({ ...prev, access: response.data.access }));
-        setUser(jwtDecode(response.data.access));
-        req.headers.Authorization = `Bearer ${response.data.access}`;
+        try {
+            console.log('Attempting token refresh in useAxios...');
+            const response = await axios.post(`${baseURL}/api/accounts/token/refresh/`, {
+                refresh: tokens.refresh
+            });
+
+            localStorage.setItem('tokens', JSON.stringify({ ...tokens, access: response.data.access }));
+            setTokens(prev => ({ ...prev, access: response.data.access }));
+            setUser(jwtDecode(response.data.access));
+            req.headers.Authorization = `Bearer ${response.data.access}`;
+            console.log('Token refreshed successfully in useAxios.');
+        } catch (err) {
+            console.error('Failed to refresh token in useAxios:', err);
+        }
+
         return req;
     });
 

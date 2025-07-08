@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import AdvancedSearch from './AdvancedSearch.jsx';
 import ServiceCard from './ServiceCard.jsx';
@@ -23,40 +23,43 @@ const PageSection = ({ title, children, linkTo }) => (
 );
 
 function HomePage() {
-    const { user } = useAuth(); // Use the custom hook to get the user
+    const { user, tokens } = useAuth();
     const [pageData, setPageData] = useState({
         popularServices: [],
         upcomingEvents: [],
         popularArtists: [],
         popularLocations: [],
     });
-    const api = useAxios(); // This returns an authenticated axios instance
     const [isLoading, setIsLoading] = useState(true);
 
-    // Check if the user has the 'EVENT_ORGANIZER' role
+    const api = useMemo(() => useAxios(), []); // 🛠 Memoize Axios instance
+
     const isEventOrganizer = user?.roles?.includes('EVENT_ORGANIZER');
 
     useEffect(() => {
+        if (!user || !tokens) {
+            console.warn('User not authenticated. Skipping homepage API calls.');
+            setIsLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
             setIsLoading(true);
-
-            // The 'api' instance from useAxios already has the base URL and auth headers
-            const fetchPopularServices = api.get('/api/vendors/services/popular/').then(res => res.data);
-            const fetchUpcomingEvents = api.get('/api/events/upcoming/').then(res => res.data);
-            const fetchPopularArtists = api.get('/api/artists/popular/').then(res => res.data);
-            const fetchPopularLocations = api.get('/api/locations/popular/').then(res => res.data);
-            const fetchSimilarEvents = api.get('/api/events/similar/').then(res => res.data);
-
             try {
-                // Conditionally fetch data based on user role
+                const fetchPopularServices = api.get('/api/vendors/services/popular/').then(res => res.data);
+                const fetchUpcomingEvents = api.get('/api/events/upcoming/').then(res => res.data);
+                const fetchPopularArtists = api.get('/api/artists/popular/').then(res => res.data);
+                const fetchPopularLocations = api.get('/api/locations/popular/').then(res => res.data);
+                const fetchSimilarEvents = api.get('/api/events/similar/').then(res => res.data);
+
                 const promises = isEventOrganizer ? [
                     fetchPopularServices,
-                    fetchSimilarEvents, // Show similar events for organizers
+                    fetchSimilarEvents,
                     fetchPopularArtists,
                     fetchPopularLocations
                 ] : [
                     fetchPopularServices,
-                    fetchUpcomingEvents, // Show upcoming events for others
+                    fetchUpcomingEvents,
                 ];
 
                 const [
@@ -73,9 +76,9 @@ function HomePage() {
                     popularLocations: popularLocationsData,
                 });
 
+                console.log('Homepage data fetched successfully.');
             } catch (error) {
                 console.error("Failed to fetch homepage data:", error);
-                // Reset data on error to prevent displaying stale information
                 setPageData({
                     popularServices: [],
                     upcomingEvents: [],
@@ -88,7 +91,7 @@ function HomePage() {
         };
 
         fetchData();
-    }, [isEventOrganizer, api]); // Rerun the effect if the user's role or the api instance changes
+    }, [isEventOrganizer, user, tokens, api]); // ✅ api is memoized now
 
     return (
         <div className="max-w-screen-xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
@@ -103,7 +106,7 @@ function HomePage() {
             </PageSection>
 
             <PageSection title={isEventOrganizer ? "Similar Events" : "Upcoming Events"} linkTo="/events">
-                 {isLoading ? (
+                {isLoading ? (
                     Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
                 ) : (
                     pageData.upcomingEvents.map(event => <EventCard key={event.id} event={event} />)
@@ -114,7 +117,7 @@ function HomePage() {
                 <>
                     <PageSection title="Popular Artists" linkTo="/artists">
                         {isLoading ? (
-                             Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
+                            Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
                         ) : (
                             pageData.popularArtists.map(artist => <ArtistCard key={artist.id} artist={artist} />)
                         )}
@@ -122,7 +125,7 @@ function HomePage() {
 
                     <PageSection title="Popular Locations" linkTo="/locations">
                         {isLoading ? (
-                             Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
+                            Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
                         ) : (
                             pageData.popularLocations.map(location => <LocationCard key={location.id} location={location} />)
                         )}

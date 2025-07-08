@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions, generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from .models import Event
 from .serializer import EventSerializer, SimilarEventSerializer
 from rest_framework.decorators import action
@@ -13,7 +13,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         """
