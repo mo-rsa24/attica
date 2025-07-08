@@ -1,295 +1,352 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { FaStar, FaMapMarkerAlt, FaRegHeart, FaHeart, FaShareSquare, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { useAuth } from './AuthContext';
+import ReservationWidget from './ReservationWidget';
+import RequestToBookModal from './RequestToBook2.jsx'
 
-/** 1️⃣ Hero Image Gallery **/
-function ImageGallery({images}) {
- const [open, setOpen] = useState(false)
- const [index, setIndex] = useState(0)
- const hero = images[0]
- const thumbs = images.slice(1,5)
+// 1. Image Gallery: Now with a modal for viewing all images
+function ImageGallery({ images }) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
- return (
-   <div className="relative">
-     <div className="grid grid-cols-4 grid-rows-2 gap-2 h-80 rounded-xl overflow-hidden">
-       <div className="col-span-2 row-span-2">
-         <img src={hero} alt="" className="h-full w-full object-cover" />
-       </div>
-       {thumbs.map((img, i) => (
-         <button key={i} className="col-span-1" onClick={() => {setIndex(i+1); setOpen(true)}}>
-           <img src={img} alt="" className="h-full w-full object-cover hover:scale-105 transition" />
-         </button>
-       ))}
-       {images.length > 5 && (
-         <button onClick={() => {setIndex(0); setOpen(true)}} className="absolute top-2 right-2 bg-white px-3 py-1 text-sm rounded-md shadow">Show all photos</button>
-       )}
-     </div>
-     {open && (
-       <div className="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-50">
-         <button onClick={() => setOpen(false)} className="text-white absolute top-4 right-4 text-2xl">✕</button>
-         <div className="flex items-center gap-4 w-full max-w-4xl">
-           <button onClick={() => setIndex((index-1+images.length)%images.length)} className="text-white text-3xl">‹</button>
-           <img src={images[index]} alt="" className="max-h-[80vh] object-contain" />
-           <button onClick={() => setIndex((index+1)%images.length)} className="text-white text-3xl">›</button>
-         </div>
-       </div>
-     )}
-   </div>
- )
-}
+    const openModal = (index) => {
+        setSelectedIndex(index);
+        setIsModalOpen(true);
+    };
 
-/** 2️⃣ Title, Host & Metadata **/
-function TitleMetadata({ name, rating, reviewsCount, vendor }) {
- return (
-   <div className="mt-6">
-     <h1 className="text-3xl font-semibold">{name}</h1>
-     <div className="flex flex-wrap items-center text-gray-600 text-sm mt-2 space-x-2">
-       <span>★ {rating}</span>
-       <span>· {reviewsCount} reviews</span>
-       {vendor.isSuperhost && <span className="px-2 py-0.5 bg-gray-100 rounded text-xs font-medium">Superhost</span>}
-       <span>· JGB, RSA</span>
-     </div>
-     <p className="text-gray-600 text-sm mt-1">Hosted by <span className="font-medium">{vendor.name}</span></p>
-   </div>
- );
-}
+    const closeModal = () => setIsModalOpen(false);
 
-/** 3️⃣ Quick Facts **/
-function QuickFacts({ stats }) {
- return (
-    <div className="flex flex-wrap gap-6 text-gray-700 text-sm">
-      {stats.map(({ icon, label }, i) => (
-        <div key={i} className="flex items-center space-x-2">
-          {icon && <img src={icon} alt="" className="w-5 h-5" />}
-          {!icon && <span className="w-5 h-5 bg-gray-300 rounded-full flex-shrink-0" />}
-          <span>{label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
+    if (!images || images.length === 0) {
+        return <div className="h-96 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">No Images Available</div>;
+    }
 
-/** 4️⃣ Description **/
-function Description({ text }) {
- const [expanded, setExpanded] = useState(false);
-  return (
-    <div>
-      <h2 className="text-xl font-semibold mb-2">About this place</h2>
-     <p className={`text-gray-800 leading-relaxed transition-[max-height] duration-300 overflow-hidden ${expanded ? 'max-h-[1000px]' : 'max-h-20'}`}>
-       {text}
-     </p>
-     <button className="mt-1 text-sm text-gray-600 hover:underline" onClick={() => setExpanded(!expanded)}>
-       {expanded ? 'Show less' : 'Show more'}
-     </button>
-   </div>
- );
-}
+    const heroImage = images[0];
+    const thumbnailImages = images.slice(1, 5);
 
-
-/** 6️⃣ Host Profile **/
-function HostProfile({ host }) {
-return (
-    <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-      <div className="flex items-center space-x-4">
-        <img src={host.profile_image} alt={host.name} className="w-16 h-16 rounded-full object-cover" />
-        <div>
-          <h3 className="text-lg font-semibold">{host.name}</h3>
-          <p className="text-sm text-gray-600">{host.service_count} services · ⭐ {host.rating}</p>
-        </div>
-      </div>
-      {host.description && <p className="mt-4 text-gray-700">{host.description}</p>}
-    </div>
-  );
-}
-function Amenities({ items }) {
-    if (!items?.length) return null;
     return (
-        <div>
-            <h2 className="text-xl font-semibold mb-2">Amenities</h2>
-            <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-700">
-                {items.map((a) => (
-                    <li key={a.id} className="flex items-center space-x-2">
-                        {a.icon && <img src={a.icon} alt="" className="w-5 h-5"/>}
-                        <span>{a.name}</span>
-                    </li>
+        <div className="relative">
+            <div className="grid grid-cols-4 grid-rows-2 gap-2 h-96 rounded-2xl overflow-hidden">
+                <div className="col-span-2 row-span-2 cursor-pointer" onClick={() => openModal(0)}>
+                    <img src={heroImage} alt="Main service" className="h-full w-full object-cover hover:opacity-90 transition-opacity" />
+                </div>
+                {thumbnailImages.map((img, i) => (
+                    <div key={i} className="col-span-1 row-span-1 cursor-pointer" onClick={() => openModal(i + 1)}>
+                        <img src={img} alt={`Thumbnail ${i + 1}`} className="h-full w-full object-cover hover:opacity-90 transition-opacity" />
+                    </div>
                 ))}
-            </ul>
+            </div>
+            <button onClick={() => openModal(0)} className="absolute bottom-4 right-4 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md text-sm font-semibold hover:bg-gray-100 transition">
+                Show all photos
+            </button>
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+                    <button onClick={closeModal} className="absolute top-4 right-4 text-white text-3xl font-bold">✕</button>
+                    <img src={images[selectedIndex]} alt="Full view" className="max-h-[90vh] max-w-[90vw] object-contain" />
+                </div>
+            )}
         </div>
     );
 }
 
-/** 7️⃣ Reviews **/
-function Reviews({ reviews }) {
-  const [expanded, setExpanded] = useState(null);
-  return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">What guests are saying</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {reviews.map((r, idx) => (
-          <div key={r.id} className="bg-gray-50 p-4 rounded-lg">
-            <div className="flex items-center space-x-3 mb-2">
-              <img src={r.user_avatar} alt={r.user_name} className="w-10 h-10 rounded-full object-cover" />
-              <div className="flex-1">
-                <p className="font-medium">{r.user_name}</p>
-                {r.rating && (
-                  <div className="text-yellow-500 text-sm">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
-                )}
-              </div>
+// 2. Title & Metadata: More detailed and styled
+function TitleMetadata({ name, rating, reviewsCount, location, vendor }) {
+    return (
+        <div className="py-6">
+            <h1 className="text-4xl font-bold text-gray-900">{name}</h1>
+            <div className="flex items-center text-gray-600 text-md mt-2 space-x-4">
+                <div className="flex items-center">
+                    <FaStar className="text-yellow-500 mr-1" />
+                    <span>{rating} ({reviewsCount} reviews)</span>
+                </div>
+                <span>·</span>
+                <div className="flex items-center">
+                    <FaMapMarkerAlt className="mr-1" />
+                    <span>{location}</span>
+                </div>
             </div>
-            <p className={`text-sm text-gray-700 leading-relaxed ${expanded === idx ? '' : 'line-clamp-3'}`}>{r.comment}</p>
-            {r.comment.length > 100 && (
-              <button onClick={() => setExpanded(expanded === idx ? null : idx)} className="text-sm text-gray-600 mt-1">
-                {expanded === idx ? 'Show less' : 'Read more'}
-              </button>
+        </div>
+    );
+}
+
+// 3. Reusable Feature Grid (previously QuickFacts)
+function FeatureGrid({ title, items }) {
+    if (!items || items.length === 0) return null;
+
+    return (
+        <div className="py-6 border-t">
+            <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+            <div className="grid grid-cols-2 gap-4 text-gray-700">
+                {items.map((item, i) => (
+                    <div key={i} className="flex items-center space-x-3">
+                        {/* You can use a library like react-icons here */}
+                        <span className="text-xl">✓</span>
+                        <span>{item.name || item}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// 4. Enhanced Description
+function Description({ text }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const isLongText = text && text.length > 300;
+
+    return (
+        <div className="py-6 border-t">
+            <h2 className="text-2xl font-semibold mb-4">About this service</h2>
+            <div className={`text-gray-800 leading-relaxed overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-full' : 'max-h-40'}`}>
+                <p>{text}</p>
+            </div>
+            {isLongText && (
+                <button onClick={() => setIsExpanded(!isExpanded)} className="text-blue-600 font-semibold mt-2 hover:underline">
+                    {isExpanded ? 'Show less' : 'Show more'}
+                </button>
             )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        </div>
+    );
 }
 
-/** 8️⃣ Location Map **/
-function LocationMap({ coords }) {
- const { lat, lng } = coords || {};
-  return (
-    <div>
-      <h2 className="text-xl font-semibold mb-2">Location</h2>
-      {lat && lng ? (
-        <iframe
-          title="map"
-          className="w-full h-64 rounded-lg"
-          loading="lazy"
-          src={`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`}
-        />
-      ) : (
-        <div className="h-64 w-full rounded-lg bg-gray-200 flex items-center justify-center text-gray-600">Map unavailable</div>
-      )}
-      <p className="mt-2 text-sm text-gray-500">Exact location provided after booking.</p>
-    </div>
-  );
+// 5. Host Profile Card
+function HostProfile({ host }) {
+    if (!host) return null;
+    return (
+        <div className="py-6 border-t">
+            <h2 className="text-2xl font-semibold mb-4">Meet your host</h2>
+            <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-xl">
+                <img src={host.profile_image} alt={host.name} className="w-20 h-20 rounded-full object-cover" />
+                <div>
+                    <h3 className="text-xl font-bold">{host.name}</h3>
+                    <p className="text-sm text-gray-600">{host.service_count} services · ⭐ {host.rating}</p>
+                    <Link to={`/vendor/${host.username}`} className="text-blue-600 font-semibold mt-1 inline-block">View Profile</Link>
+                </div>
+            </div>
+        </div>
+    );
 }
 
-/** 9️⃣ Policies Accordion **/
+// 6. Styled Reviews Section
+function Reviews({ reviews }) {
+    if (!reviews || reviews.length === 0) {
+        return (
+            <div className="py-6 border-t">
+                <h2 className="text-2xl font-semibold mb-4">No reviews yet</h2>
+                <p className="text-gray-600">Be the first to review this service after you book.</p>
+            </div>
+        );
+    }
+    return (
+        <div className="py-6 border-t">
+            <h2 className="text-2xl font-semibold mb-4">What guests are saying</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {reviews.slice(0, 4).map((r) => (
+                    <div key={r.id}>
+                        <div className="flex items-center mb-2">
+                            <img src={r.user_avatar} alt={r.user_name} className="w-12 h-12 rounded-full object-cover mr-4" />
+                            <div>
+                                <p className="font-semibold">{r.user_name}</p>
+                                <div className="text-sm text-gray-500">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
+                            </div>
+                        </div>
+                        <p className="text-gray-700 line-clamp-3">{r.comment}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// 7. Fixed Location Map
+function LocationMap({ lat, lng, locationName }) {
+    const mapSrc = (lat && lng)
+        ? `https://maps.google.com/maps?q=${lat},${lng}&hl=es&z=14&amp;output=embed`
+        : `https://maps.google.com/maps?q=${encodeURIComponent(locationName)}&hl=es&z=14&amp;output=embed`;
+
+    return (
+        <div className="py-6 border-t">
+            <h2 className="text-2xl font-semibold mb-4">Location</h2>
+            <div className="h-96 w-full rounded-2xl overflow-hidden">
+                <iframe
+                    title="Service Location"
+                    src={mapSrc}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                ></iframe>
+            </div>
+            <p className="mt-4 font-semibold text-gray-800">{locationName}</p>
+            <p className="text-sm text-gray-500">Exact location is provided after booking.</p>
+        </div>
+    );
+}
+
+// 8. Styled Accordion for Policies
 function PoliciesAccordion({ policies }) {
- const [openIndex, setOpenIndex] = useState(null);
- return (
-   <div>
-     <h2 className="text-xl font-semibold mb-4">Policies & Safety</h2>
-     {policies.map((p, i) => (
-       <div key={i} className="border-t border-gray-200">
-         <button
-           className="w-full text-left py-3 flex justify-between items-center text-gray-700"
-           onClick={() => setOpenIndex(openIndex === i ? null : i)}
-         >
-           <span>{p.title}</span>
-           <span>{openIndex === i ? '–' : '+'}</span>
-         </button>
-         {openIndex === i && (
-           <div className="p-4 text-sm text-gray-600">
-             {p.content}
-           </div>
-         )}
-       </div>
-     ))}
-   </div>
- );
+    const [openIndex, setOpenIndex] = useState(null);
+
+    const toggleItem = (index) => {
+        setOpenIndex(openIndex === index ? null : index);
+    };
+
+    if (!policies || policies.length === 0) return null;
+
+    return (
+        <div className="py-6 border-t">
+            <h2 className="text-2xl font-semibold mb-4">Things to know</h2>
+            <div className="space-y-2">
+                {policies.map((p, i) => (
+                    <div key={i} className="border-b">
+                        <button
+                            className="w-full flex justify-between items-center py-4 text-left"
+                            onClick={() => toggleItem(i)}
+                        >
+                            <span className="font-semibold capitalize">{p.type}</span>
+                            <span>{openIndex === i ? <FaChevronUp /> : <FaChevronDown />}</span>
+                        </button>
+                        {openIndex === i && (
+                            <div className="pb-4 text-gray-700">
+                                {p.text}
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
 
-/** 🔟 Similar Listings Carousel **/
-function SimilarListings({ listings }) {
- return (
-   <div>
-     <h2 className="text-xl font-semibold mb-4">Similar services in this area</h2>
-     <div className="flex overflow-x-auto space-x-4 pb-4">
-       {listings.map(l => (
-         <div key={l.id} className="min-w-[200px] bg-white rounded-lg shadow overflow-hidden">
-           <img src={l.image} alt={l.name} className="h-32 w-full object-cover" />
-           <div className="p-3">
-             <p className="font-medium text-sm">{l.name}</p>
-             <p className="text-sm text-gray-600">${l.price}/night</p>
-           </div>
-         </div>
-       ))}
-     </div>
-   </div>
- );
+// 9. Sticky Reservation Widget
+function ReservationWidget2({ price, serviceId, userRole }) {
+    const navigate = useNavigate();
+    const [guests, setGuests] = useState(1);
+
+    const handleBooking = () => {
+        // This would navigate to a detailed booking page or open a modal
+        navigate(`/services/${serviceId}/request`);
+    };
+
+    const isOrganizer = userRole === 'EVENT_ORGANIZER';
+
+    return (
+        <div className="sticky top-24">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border">
+                <p className="text-2xl font-bold">
+                    R {price} <span className="text-base font-normal text-gray-600">/ day</span>
+                </p>
+                <div className="mt-4 space-y-4">
+                    <div>
+                        <label className="block text-xs font-semibold mb-1">DATES</label>
+                        <input type="text" placeholder="Select dates" className="w-full p-2 border rounded-md" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-semibold mb-1">GUESTS</label>
+                        <input type="number" value={guests} onChange={e => setGuests(e.target.value)} min="1" className="w-full p-2 border rounded-md" />
+                    </div>
+                    {isOrganizer ? (
+                        <button onClick={handleBooking} className="w-full bg-pink-600 text-white font-bold py-3 rounded-lg hover:bg-pink-700 transition-all">
+                            Request to Book
+                        </button>
+                    ) : (
+                        <p className="text-center text-sm text-gray-500">Log in as an event organizer to book.</p>
+                    )}
+                    <p className="text-center text-xs text-gray-500">You won't be charged yet</p>
+                </div>
+                <div className="mt-4 pt-4 border-t text-sm">
+                    <div className="flex justify-between">
+                        <span>R {price} x 1 day</span>
+                        <span>R {price}</span>
+                    </div>
+                    <div className="flex justify-between font-bold mt-2">
+                        <span>Total</span>
+                        <span>R {price}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
-/** Reservation Widget (Sticky on Desktop) **/
-function ReservationWidget({ price, serviceId }) {
- return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 sticky top-24">
-      <div className="text-2xl font-semibold">${price} <span className="text-base font-normal">per day</span></div>
-      <div className="mt-4 space-y-3">
-        <input type="date" className="w-full border rounded-lg p-2" />
-        <input type="date" className="w-full border rounded-lg p-2" />
-        <input type="number" min="1" defaultValue="1" className="w-full border rounded-lg p-2" />
-        <Link to={`/services/${serviceId}/request`} className="block">
-          <button className="w-full bg-rose-500 text-white py-2 rounded-lg hover:bg-rose-600 transition">Reserve</button>
-        </Link>
-        <p className="text-xs text-center text-gray-500 mt-2">You won't be charged yet</p>
-      </div>
-    </div>
-  );
-}
 
-/** ✅ Main Listing Page **/
-/* eslint-disable react-refresh/only-export-components */
+// Main Listing Page Component
 export default function ListingPage() {
     const { id } = useParams();
+    const { user } = useAuth();
     const [service, setService] = useState(null);
-    const [similar, setSimilar] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
- useEffect(() => {
-     fetch(`/api/vendors/services/${id}/`)
-    .then(res => res.json())
-    .then(data => setService(data))
-    .catch(() => {});
+    const [isRequestModalOpen, setRequestModalOpen] = useState(false);
 
-  fetch(`/api/vendors/services/${id}/similar/`)
-    .then(res => res.json())
-    .then(data => setSimilar(data))
-    .catch(() => {});
-}, [id]);
+    useEffect(() => {
+        setIsLoading(true);
+        fetch(`/api/vendors/services/${id}/`)
+            .then(res => {
+                if (!res.ok) throw new Error('Service not found');
+                return res.json();
+            })
+            .then(data => {
+                setService(data);
+            })
+            .catch(error => {
+                console.error("Failed to fetch service:", error);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, [id]);
 
- if (!service) return <div className="text-center py-20">Loading…</div>;
+    if (isLoading) {
+        return <div className="text-center py-40 text-2xl font-semibold">Loading...</div>;
+    }
 
- // Prepare data
- const images = [service.image, ...(service.gallery?.map((g) => g.image) || [])];
- const quickStats = service.amenities?.map((a) => ({ label: a.name, icon: a.icon })) || [];
- const policies = service.policies?.map((p) => ({ title: p.type, content: p.text })) || [];
+    if (!service) {
+        return <div className="text-center py-40 text-2xl font-semibold">Service not found.</div>;
+    }
 
- return (
-   <div className="max-w-screen-lg mx-auto px-4 md:px-8 mt-6">
-     <ImageGallery images={images} />
+    // Prepare data for child components
+    const images = [service.image, ...(service.gallery?.map(g => g.image) || [])];
+    const userRole = user?.roles?.includes('EVENT_ORGANIZER') ? 'EVENT_ORGANIZER' : 'GUEST';
 
-     <TitleMetadata
-       name={service.name}
-       rating={service.rating}
-       reviewsCount={service.reviews.length}
-       location={service.location}
-       vendor={service.vendor}
-     />
 
-     <div className="md:flex md:space-x-8 mt-6">
-       {/* Left/Main Column */}
-       <div className="md:flex-1 space-y-10">
-         <QuickFacts stats={quickStats} />
-        <Description text={service.description} />
-        <Amenities items={service.amenities} />
-         <HostProfile host={service.vendor} />
-         <Reviews reviews={service.reviews} />
-        <LocationMap coords={{ lat: service.latitude, lng: service.longitude }} />
-        <PoliciesAccordion policies={policies} />
-        <SimilarListings listings={similar} />
-       </div>
+    const handleOpenRequestModal = () => {
+        setRequestModalOpen(true);
+    };
 
-       {/* Right/Sticky Column */}
-       <div className="md:w-80 mt-8 md:mt-0">
-          <ReservationWidget price={service.price} serviceId={service.id} />
-       </div>
-     </div>
-   </div>
- );
+    return (
+        <div className="max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <ImageGallery images={images} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-8">
+                {/* Main Content Column */}
+                <div className="md:col-span-2">
+                    <TitleMetadata
+                        name={service.name}
+                        rating={service.rating}
+                        reviewsCount={service.reviews.length}
+                        location={service.location_tags}
+                    />
+                    <Description text={service.description} />
+                    <FeatureGrid title="What this service offers" items={service.amenities} />
+                    <Reviews reviews={service.reviews} />
+                    <LocationMap lat={service.latitude} lng={service.longitude} locationName={service.location_tags} />
+                    <PoliciesAccordion policies={service.policies} />
+                    <HostProfile host={service.vendor} />
+                </div>
+
+                {/* Sticky Reservation Column */}
+                <div className="md:col-span-1">
+                     <ReservationWidget
+                        service={service}
+                        userRole={"organizer"} // This would be fetched dynamically
+                        onRequestToBookClick={handleOpenRequestModal}
+                    />
+                </div>
+            <RequestToBookModal
+                            isOpen={isRequestModalOpen}
+                            onClose={() => setRequestModalOpen(false)}
+                            serviceId={service.id}
+                        />
+
+            </div>
+        </div>
+    );
 }
-

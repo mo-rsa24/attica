@@ -1,7 +1,26 @@
 from rest_framework import serializers
 from .models import Service, Category, Review, ServiceImage, Vendor, VendorPost, Booking, Region, Policy, Amenity, \
-    BookingRequest
+    BookingRequest, Reservation
 
+
+
+
+class ReservationSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    service_name = serializers.ReadOnlyField(source='service.name')
+
+    class Meta:
+        model = Reservation
+        fields = [
+            'id', 'user', 'service', 'service_name', 'start_date', 'end_date',
+            'timeslot', 'guests', 'total_price', 'status', 'created_at'
+        ]
+        read_only_fields = ['total_price', 'status']
+
+class AvailabilitySerializer(serializers.Serializer):
+    booked_dates = serializers.ListField(child=serializers.DateField())
+    # You can extend this to return available timeslots per day
+    timeslots = serializers.DictField(child=serializers.ListField(child=serializers.CharField()))
 
 class VendorBriefSerializer(serializers.ModelSerializer):
     """Minimal vendor information for nested use"""

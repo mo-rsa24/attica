@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect
@@ -7,18 +9,18 @@ from django.views import generic
 from django.views.generic import CreateView, DeleteView, UpdateView, ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from rest_framework import generics, viewsets, permissions
+from rest_framework import generics, viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from events.models import Event
-from .models import Vendor, Category, VendorPost, Service, Region, Policy, Amenity, Booking, BookingRequest
+from .models import Vendor, Category, VendorPost, Service, Region, Policy, Amenity, Booking, BookingRequest, Reservation
 import pdb
 
 from .serializers import ServiceSerializer, CategorySerializer, VendorSerializer, ServiceDetailSerializer, \
     VendorPostSerializer, VendorDetailSerializer, RegionSerializer, PolicySerializer, AmenitySerializer, \
-    BookingSerializer, BookingRequestSerializer
+    BookingSerializer, BookingRequestSerializer, ReservationSerializer
 
 
 # Create your views here.
@@ -256,6 +258,75 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         "images", "reviews"
     )
 
+    @action(detail=True, methods=['get'])
+    def availability(self, request, pk=None):
+        service = self.get_object()
+
+        # Get all confirmed reservations for this service
+        confirmed_reservations = Reservation.objects.filter(service=service, status='confirmed')
+
+        booked_dates = []
+        for r in confirmed_reservations:
+            delta = r.end_date - r.start_date
+            for i in range(delta.days + 1):
+                day = r.start_date + timedelta(days=i)
+                booked_dates.append(day.isoformat())
+
+        # For timeslots, you would check reservations for a specific date
+        # This is a simplified example; a real implementation would be more complex
+        timeslots = service.available_timeslots.split(',') if service.available_timeslots else []
+
+        return Response({
+            'booked_dates': list(set(booked_dates)),
+            'available_timeslots': timeslots,
+            'max_capacity': service.max_capacity
+        })
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def book(self, request, pk=None):
+        service = self.get_object()
+        serializer = ReservationSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Simplified price calculation
+            days = (serializer.validated_data['end_date'] - serializer.validated_data['start_date']).days + 1
+            total_price = service.price * days * serializer.validated_data['guests']
+
+            # Here you would integrate with Stripe/Paystack to create a payment intent
+            # For now, we'll just create the reservation as pending
+
+            reservation = serializer.save(
+                user=request.user,
+                service=service,
+                total_price=total_price,
+                status='pending'  # Status becomes 'confirmed' after successful payment
+            )
+
+            # This would be the place to create and return a payment intent client_secret
+            # For example:
+            # payment_intent = stripe.PaymentIntent.create(...)
+            # return Response({'client_secret': payment_intent.client_secret, 'reservation_id': reservation.id})
+
+            return Response(ReservationSerializer(reservation).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def request_book(self, request, pk=None):
+        """
+        Sends a booking request to the provider without immediate payment.
+        """
+        service = self.get_object()
+        serializer = ReservationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(
+                user=request.user,
+                service=service,
+                status='pending_approval',  # Key difference here
+                message_to_provider=request.data.get('message', '')
+            )
+            # Here you would trigger a notification/DM to the provider
+            return Response({'message': 'Request sent successfully!'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["request"] = self.request

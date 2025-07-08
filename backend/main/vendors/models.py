@@ -78,6 +78,9 @@ class Service(models.Model):
         ('CPT', 'CPT'),
         ('PTA', 'PTA'),
     ],default='JHB' )
+    available_timeslots = models.CharField(max_length=255, blank=True,
+                                           help_text="Comma-separated timeslots, e.g., 10:00-12:00,13:00-15:00")
+    max_capacity = models.PositiveIntegerField(default=100)
     # service = Service(name="Catering", category=catering, image="service/catering.jpg", vendor=toni, number_of_guests=100, rating=4.9, location_tags='JHB')
 
     def __str__(self):
@@ -95,6 +98,41 @@ class Service(models.Model):
         self.rating = round(avg, 2)
         self.save(update_fields=["rating"])
         self.vendor.update_rating()
+
+
+class Reservation(models.Model):
+    """
+    Represents a booking for a service, including its status and details.
+    """
+    STATUS_CHOICES = [
+        ('pending_approval', 'Pending Approval'), # For "Request to Book" flow
+        ('pending_payment', 'Pending Payment'),   # For "Book Now" flow
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+        ('denied', 'Denied'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reservations', on_delete=models.CASCADE)
+    service = models.ForeignKey('Service', related_name='reservations', on_delete=models.CASCADE)
+
+    start_date = models.DateField()
+    end_date = models.DateField()
+    timeslot = models.CharField(max_length=50, blank=True, null=True) # e.g., "10:00-12:00"
+    guests = models.PositiveIntegerField(default=1)
+
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending_payment')
+    message_to_provider = models.TextField(blank=True, null=True) # For "Request to Book"
+
+    # Payment specific fields
+    payment_intent_id = models.CharField(max_length=255, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Reservation for {self.service.name} by {self.user.email} - {self.status}"
+
 
 class Review(models.Model):
     comment = models.TextField(null=True, blank=True)
