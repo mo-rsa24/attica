@@ -1,5 +1,5 @@
 import { AiOutlineHome } from 'react-icons/ai';
-import { useAuth } from './AuthProvider.jsx';
+import { useAuth } from './AuthContext';
 import { HiOutlineMenu } from 'react-icons/hi';
 import { FaAirbnb } from 'react-icons/fa';
 import React from 'react';

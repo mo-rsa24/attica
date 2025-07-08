@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Container, TextField, Button, Stack } from '@mui/material'
-import {useAuth} from "./AuthProvider.jsx";
+import { useAuth } from './AuthContext';
 
 export default function PostCreate() {
   const { tokens } = useAuth()

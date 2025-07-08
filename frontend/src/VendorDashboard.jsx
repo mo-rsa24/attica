@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Container, Typography, Box, Card, CardMedia, CardContent } from '@mui/material'
-import { useAuth } from './AuthProvider.jsx'
+import { useAuth } from './AuthContext';
 
 export default function VendorDashboard() {
   const { tokens } = useAuth()

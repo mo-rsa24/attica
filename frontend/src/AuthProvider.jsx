@@ -1,147 +1,134 @@
-// frontend/src/AuthProvider.jsx
+import { useState, useEffect, useCallback } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import AuthContext from './AuthContext';
 
-import { createContext, useState, useEffect, useContext } from 'react';
-import { jwtDecode } from "jwt-decode"; // Correctly imported as a named import
-import { useNavigate } from 'react-router-dom';
+export function AuthProvider({ children }) {
+    const [tokens, setTokens] = useState(() => {
+        const stored = localStorage.getItem('tokens');
+        return stored ? JSON.parse(stored) : null;
+    });
+    const [user, setUser] = useState(null);
+    const [currentRole, setCurrentRole] = useState(() => localStorage.getItem('currentRole') || null);
 
-// 1. Create the Context
-const AuthContext = createContext();
-
-// This is a custom hook that simplifies accessing the context
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
-
-// 2. Create the AuthProvider Component
-export const AuthProvider = ({ children }) => {
-    // 3. State Management: Initialize state from localStorage
-    const [authTokens, setAuthTokens] = useState(() =>
-        localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null
-    );
-    const [user, setUser] = useState(() =>
-        localStorage.getItem('authTokens') ? jwtDecode(JSON.parse(localStorage.getItem('authTokens')).access) : null
-    );
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
-
-    // 4. Login Function
-    const loginUser = async (email, password) => {
-        try {
-            const response = await fetch('/api/accounts/token/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-
-            if (response.ok) { // Use response.ok for better status checking
-                setAuthTokens(data);
-                const decodedUser = jwtDecode(data.access);
-                setUser(decodedUser);
-                localStorage.setItem('authTokens', JSON.stringify(data));
-                navigate('/'); // Redirect to homepage on successful login
-            } else {
-                // Provide more specific error feedback
-                alert(data.detail || 'Login failed. Please check your credentials.');
-            }
-        } catch (error) {
-            console.error("Login error:", error);
-            alert("An error occurred during login. Please try again.");
-        }
-    };
-
-    // 5. Register Function (Example implementation)
-    const registerUser = async (userData) => {
-        try {
-            const response = await fetch('/api/accounts/register/', { // Assuming this is your registration endpoint
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            });
-
-            if (response.ok) {
-                // Directly log the user in after successful registration
-                await loginUser(userData.email, userData.password);
-            } else {
-                const errorData = await response.json();
-                // Extract and show specific error messages from the backend
-                const errorMessage = Object.values(errorData).flat().join(' ');
-                alert(errorMessage || 'Registration failed.');
-            }
-        } catch (error) {
-            console.error("Registration error:", error);
-            alert("An error occurred during registration. Please try again.");
-        }
-    };
-
-
-    // 6. Logout Function
-    const logoutUser = () => {
-        setAuthTokens(null);
-        setUser(null);
-        localStorage.removeItem('authTokens');
-        navigate('/login'); // Redirect to login page on logout
-    };
-
-    // 7. useEffect for Token Refresh Logic
     useEffect(() => {
-        if (!authTokens) {
-            setLoading(false);
+        if (currentRole) {
+            localStorage.setItem('currentRole', currentRole);
+        }
+    }, [currentRole]);
+
+    const refreshToken = useCallback(async () => {
+        if (!tokens?.refresh) return false;
+        const res = await fetch('/api/accounts/token/refresh/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: tokens.refresh })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setTokens(prev => ({ ...prev, access: data.access }));
+            localStorage.setItem('tokens', JSON.stringify({ ...tokens, access: data.access }));
+            return true;
+        }
+        setTokens(null);
+        return false;
+    }, [tokens]);
+
+    useEffect(() => {
+        if (!tokens) {
+            setUser(null);
+            localStorage.removeItem('tokens');
             return;
         }
 
-        const refreshToken = async () => {
-            try {
-                const response = await fetch('/api/accounts/token/refresh/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 'refresh': authTokens.refresh })
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    setAuthTokens(data);
-                    setUser(jwtDecode(data.access));
-                    localStorage.setItem('authTokens', JSON.stringify(data));
-                } else {
-                    // If refresh fails, log the user out
-                    logoutUser();
-                }
-            } catch (error) {
-                console.error("Token refresh error:", error);
-                logoutUser();
+        localStorage.setItem('tokens', JSON.stringify(tokens));
+        const decoded = jwtDecode(tokens.access);
+        const isExpired = decoded.exp * 1000 < Date.now();
+
+        const fetchUser = async () => {
+            let tokenValid = true;
+            if (isExpired) {
+                tokenValid = await refreshToken();
+            }
+            if (tokenValid) {
+                fetch('/api/accounts/me/', {
+                    headers: { Authorization: `Bearer ${tokens.access}` }
+                })
+                    .then(res => (res.ok ? res.json() : null))
+                    .then(data => {
+                        setUser(data);
+                        if (data?.roles?.length) {
+                            setCurrentRole(prev => prev || data.roles[0]);
+                        }
+                    })
+                    .catch(() => setUser(null));
+            } else {
+                setUser(null);
             }
         };
+        fetchUser();
+    }, [tokens, refreshToken]);
 
-        // Set an interval to refresh the token before it expires
-        // JWT access tokens typically last 5-15 minutes. Refreshing every 4 minutes is a safe bet.
-        const fourMinutes = 1000 * 60 * 4;
-        const interval = setInterval(refreshToken, fourMinutes);
-
-        // Clean up the interval when the component unmounts
-        return () => clearInterval(interval);
-
-    }, [authTokens]);
-
-
-    // 8. Context Data
-    const contextData = {
-        user,
-        authTokens,
-        loginUser,
-        registerUser,
-        logoutUser,
+    const login = async (username, password) => {
+        const res = await fetch('/api/accounts/login/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setTokens({ access: data.access, refresh: data.refresh });
+            if (data.user) {
+                setUser(data.user);
+                if (data.user.roles?.length) {
+                    setCurrentRole(data.user.roles[0]);
+                }
+            }
+            return true;
+        }
+        return false;
     };
 
-    // 9. Render the Provider with Children
+    const register = async (username, email, password, roles) => {
+        const res = await fetch('/api/accounts/register/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password, roles })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setTokens({ access: data.access, refresh: data.refresh });
+            if (data.user) {
+                setUser(data.user);
+                if (data.user.roles?.length) {
+                    setCurrentRole(data.user.roles[0]);
+                }
+            }
+            return true;
+        }
+        return false;
+    };
+
+    const logout = () => {
+        setTokens(null);
+        setUser(null);
+        setCurrentRole(null);
+    };
+
+    const contextValue = {
+        user,
+        tokens,
+        login,
+        register,
+        logout,
+        currentRole,
+        setCurrentRole,
+        setTokens,
+        setUser
+    };
+
     return (
-        <AuthContext.Provider value={contextData}>
-            {loading ? null : children}
+        <AuthContext.Provider value={contextValue}>
+            {children}
         </AuthContext.Provider>
     );
-};
+}

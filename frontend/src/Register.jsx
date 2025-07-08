@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from './AuthProvider.jsx'
+import { useAuth } from './AuthContext';
 import Footer from './Footer.jsx' // Assuming Footer.jsx is in the same folder
 
 export default function Register() {

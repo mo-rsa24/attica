@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaStar, FaTag } from 'react-icons/fa';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { useAuth } from './AuthProvider'; // Corrected to use the hook
+import { useAuth } from './AuthContext';
+
 
 const StarRating = ({ rating }) => {
     const totalStars = 5;

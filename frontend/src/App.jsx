@@ -30,7 +30,7 @@ import ListingStep6 from "./ListingStep6.jsx";
 import ListingStep7 from "./ListingStep7.jsx";
 import ListingStep8 from "./ListingStep8.jsx";
 import ProfilePage from "./ProfilePage.jsx";
-import {AuthProvider, useAuth} from "./AuthProvider.jsx";
+import { useAuth } from './AuthContext';
 import Navbar from "./NavBar.jsx";
 
 
@@ -46,7 +46,6 @@ function App() {
                 userProfileImageUrl={profileImageUrl}
                 onLogout={logout} // Pass the logout function
             />
-            <AuthProvider>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/services/:id" element={<ListingPage />} />
@@ -76,7 +75,6 @@ function App() {
                     <Route path="/services/:id/request" element={<RequestToBook />} />
                     <Route path="/logout" element={<Logout />} />
                 </Routes>
-            </AuthProvider>
             <Footer />
         </ThemeProvider>
     )

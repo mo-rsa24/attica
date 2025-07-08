@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from './AuthProvider.jsx';
+import { useAuth } from './AuthContext';
 import AdvancedSearch from './AdvancedSearch.jsx';
 import ServiceCard from './ServiceCard.jsx';
 import EventCard from './EventCard.jsx';
