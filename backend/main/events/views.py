@@ -44,7 +44,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
 class SimilarEventsAPIView(generics.ListAPIView):
     serializer_class = SimilarEventSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         user = self.request.user
