@@ -7,90 +7,57 @@ import ArtistCard from './ArtistCard.jsx';
 import LocationCard from './LocationCard.jsx';
 import ServiceCardSkeleton from './ServiceCardSkeleton.jsx';
 import { Link } from 'react-router-dom';
-import useAxios from 'utils/useAxios'; // Make sure you have this import
+import useAxios from './utils/useAxios';
 
-const PageSection = ({ title, viewAllLink, items, cardType, isLoading }) => {
-    const skeletonItems = Array.from({ length: 4 });
-
-    const renderCard = (item) => {
-        switch (cardType) {
-            case 'service':
-                return <ServiceCard key={item.id} service={item} />;
-            case 'event':
-                return <EventCard key={item.id} event={item} />;
-            case 'artist':
-                return <ArtistCard key={item.id} artist={item} />;
-            case 'location':
-                return <LocationCard key={item.id} location={item} />;
-            default:
-                return null;
-        }
-    };
-
-    return (
-        <div className="my-16">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="text-3xl font-bold text-gray-800">{title}</h3>
-                <Link to={viewAllLink} className="text-sm font-semibold text-pink-600 hover:underline transition-colors">
-                    View All
-                </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {isLoading ? (
-                    skeletonItems.map((_, idx) => <ServiceCardSkeleton key={idx} />)
-                ) : (
-                    items.map(renderCard)
-                )}
-            </div>
+// A reusable component for sectioning content
+const PageSection = ({ title, children, linkTo }) => (
+    <div className="my-12">
+        <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold">{title}</h2>
+            {linkTo && <Link to={linkTo} className="text-blue-500 hover:underline">View All</Link>}
         </div>
-    );
-};
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {children}
+        </div>
+    </div>
+);
 
 function HomePage() {
-    const { user, tokens } = useAuth();
+    const { user } = useAuth(); // Use the custom hook to get the user
     const [pageData, setPageData] = useState({
         popularServices: [],
         upcomingEvents: [],
         popularArtists: [],
         popularLocations: [],
     });
-    const api = useAxios(); // Call useAxios at the top level
+    const api = useAxios(); // This returns an authenticated axios instance
     const [isLoading, setIsLoading] = useState(true);
 
-    const isEventOrganizer = user?.roles.includes('EVENT_ORGANIZER');
+    // Check if the user has the 'EVENT_ORGANIZER' role
+    const isEventOrganizer = user?.roles?.includes('EVENT_ORGANIZER');
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
 
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            if (tokens) {
-                headers['Authorization'] = `Bearer ${tokens.access}`;
-            }
-
-            const fetchPopularServices = fetch('/api/vendors/services/popular/', { headers }).then(res => res.json());
-            const fetchUpcomingEvents = fetch('/api/events/upcoming/', { headers }).then(res => res.json());
-            const fetchPopularArtists = fetch('/api/artists/popular/', { headers }).then(res => res.json());
-            const fetchPopularLocations = fetch('/api/locations/popular/', { headers }).then(res => res.json());
-            const fetchSimilarEvents = fetch('/api/events/similar/', { headers }).then(res => res.json());
+            // The 'api' instance from useAxios already has the base URL and auth headers
+            const fetchPopularServices = api.get('/api/vendors/services/popular/').then(res => res.data);
+            const fetchUpcomingEvents = api.get('/api/events/upcoming/').then(res => res.data);
+            const fetchPopularArtists = api.get('/api/artists/popular/').then(res => res.data);
+            const fetchPopularLocations = api.get('/api/locations/popular/').then(res => res.data);
+            const fetchSimilarEvents = api.get('/api/events/similar/').then(res => res.data);
 
             try {
-                let promises = [];
-                if (isEventOrganizer) {
-                    promises = [
-                        fetchPopularServices,
-                        fetchSimilarEvents,
-                        fetchPopularArtists,
-                        fetchPopularLocations
-                    ];
-                } else {
-                    promises = [
-                        fetchPopularServices,
-                        fetchUpcomingEvents,
-                    ];
-                }
+                // Conditionally fetch data based on user role
+                const promises = isEventOrganizer ? [
+                    fetchPopularServices,
+                    fetchSimilarEvents, // Show similar events for organizers
+                    fetchPopularArtists,
+                    fetchPopularLocations
+                ] : [
+                    fetchPopularServices,
+                    fetchUpcomingEvents, // Show upcoming events for others
+                ];
 
                 const [
                     popularServicesData,
@@ -108,6 +75,7 @@ function HomePage() {
 
             } catch (error) {
                 console.error("Failed to fetch homepage data:", error);
+                // Reset data on error to prevent displaying stale information
                 setPageData({
                     popularServices: [],
                     upcomingEvents: [],
@@ -119,32 +87,46 @@ function HomePage() {
             }
         };
 
-        if (user || !isEventOrganizer) {
-            fetchData();
-        }
-    }, [isEventOrganizer, user, tokens]);
+        fetchData();
+    }, [isEventOrganizer, api]); // Rerun the effect if the user's role or the api instance changes
 
     return (
         <div className="max-w-screen-xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
-            <div className="mb-16">
-                <h2 className="text-4xl font-extrabold mb-4 text-center text-gray-800 tracking-tight">Find your next experience</h2>
-                <p className="text-center text-gray-600 mb-8">Discover events and services to make your next event unforgettable.</p>
-                <AdvancedSearch />
-            </div>
+            <AdvancedSearch />
 
-            <hr className="my-16 border-t-2 border-gray-100" />
+            <PageSection title="Popular Services" linkTo="/services">
+                {isLoading ? (
+                    Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
+                ) : (
+                    pageData.popularServices.map(service => <ServiceCard key={service.id} service={service} />)
+                )}
+            </PageSection>
 
-            {isEventOrganizer ? (
+            <PageSection title={isEventOrganizer ? "Similar Events" : "Upcoming Events"} linkTo="/events">
+                 {isLoading ? (
+                    Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
+                ) : (
+                    pageData.upcomingEvents.map(event => <EventCard key={event.id} event={event} />)
+                )}
+            </PageSection>
+
+            {isEventOrganizer && (
                 <>
-                    <PageSection title="Events You Might Like" viewAllLink="/events" items={pageData.upcomingEvents} cardType="event" isLoading={isLoading} />
-                    <PageSection title="Popular Service Providers" viewAllLink="/services" items={pageData.popularServices} cardType="service" isLoading={isLoading} />
-                    <PageSection title="Trending Locations" viewAllLink="/locations" items={pageData.popularLocations} cardType="location" isLoading={isLoading} />
-                    <PageSection title="Top Artists" viewAllLink="/artists" items={pageData.popularArtists} cardType="artist" isLoading={isLoading} />
-                </>
-            ) : (
-                <>
-                    <PageSection title="Upcoming Events" viewAllLink="/events" items={pageData.upcomingEvents} cardType="event" isLoading={isLoading} />
-                    <PageSection title="Popular Service Providers" viewAllLink="/services" items={pageData.popularServices} cardType="service" isLoading={isLoading} />
+                    <PageSection title="Popular Artists" linkTo="/artists">
+                        {isLoading ? (
+                             Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
+                        ) : (
+                            pageData.popularArtists.map(artist => <ArtistCard key={artist.id} artist={artist} />)
+                        )}
+                    </PageSection>
+
+                    <PageSection title="Popular Locations" linkTo="/locations">
+                        {isLoading ? (
+                             Array.from({ length: 4 }).map((_, index) => <ServiceCardSkeleton key={index} />)
+                        ) : (
+                            pageData.popularLocations.map(location => <LocationCard key={location.id} location={location} />)
+                        )}
+                    </PageSection>
                 </>
             )}
         </div>
