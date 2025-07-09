@@ -32,6 +32,7 @@ import ListingStep8 from "./ListingStep8.jsx";
 import ProfilePage from "./ProfilePage.jsx";
 import { useAuth } from './AuthContext';
 import Navbar from "./NavBar.jsx";
+import ArtistProfilePage from "./ArtistProfilePage.jsx";
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/services/:id" element={<ListingPage />} />
+                    <Route path="/artists/:id" element={<ArtistProfilePage />} />
                     <Route path="/vendor/:username" element={<VendorProfile />} />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/dashboard/organizer" element={<EventOrganizerDashboard />} />

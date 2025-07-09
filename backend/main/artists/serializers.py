@@ -1,13 +1,38 @@
 from rest_framework import serializers
-from .models import Artist, ArtistBooking
+from .models import Artist, ArtistBooking, ArtistPortfolioItem, Follow
+
+
+class ArtistPortfolioItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArtistPortfolioItem
+        fields = ['id', 'image', 'caption', 'created_at']
 
 class ArtistSerializer(serializers.ModelSerializer):
+    follower_count = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
+    # Dummy stats for demonstration
+    bookings_completed = serializers.IntegerField(default=24)
+    rating = serializers.FloatField(default=4.8)
+    events_participated = serializers.IntegerField(default=12)
+
     class Meta:
         model = Artist
         fields = [
             'id', 'name', 'bio', 'owner', 'profile_image',
-            'genres', 'rating', 'created_at', 'updated_at'
+            'genres', 'rating', 'created_at', 'updated_at',
+            'follower_count', 'is_following', 'bookings_completed',
+            'rating', 'events_participated'
         ]
+
+    def get_follower_count(self, obj):
+        return obj.followers.count()
+
+    def get_is_following(self, obj):
+        user = self.context.get('request').user
+        if user and user.is_authenticated:
+            return Follow.objects.filter(user=user, artist=obj).exists()
+        return False
+
 class PopularArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist

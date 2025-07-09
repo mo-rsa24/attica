@@ -30,21 +30,21 @@ from vendors.views import VendorPostsListView
 def hello_world(request):
     return JsonResponse({"message": "Hello from Django!"})
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('events/', include('events.urls')),
-    path('chat/', include('chat.urls')),
-    path('accounts/', include('users.urls')),
-    path('vendors/', include('vendors.urls')), # This is for Django Templates
-    path('cart/', include('cart.urls')),
-    path('checkout/', include('checkout.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+                  path('admin/', admin.site.urls),
+                  path('accounts/', include('django.contrib.auth.urls')),
+                  path('events/', include('events.urls')),
+                  path('chat/', include('chat.urls')),
+                  path('accounts/', include('users.urls')),
+                  path('vendors/', include('vendors.urls')), # This is for Django Templates
+                  path('cart/', include('cart.urls')),
+                  path('checkout/', include('checkout.urls')),
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 api_patterns = [
-path('api/events', include('events.api_urls')),
-path('api/accounts/', include('users.api_urls')),
-path('api/locations/', include('locations.api_urls')),
-path('api/vendors/', include('vendors.api_urls')), # This is for React
-path('api/artists/', include('artists.api_urls')),
+    path('api/events', include('events.api_urls')),
+    path('api/accounts/', include('users.api_urls')),
+    path('api/locations/', include('locations.api_urls')),
+    path('api/vendors/', include('vendors.api_urls')), # This is for React
+    path('api/artists', include('artists.api_urls')),
     path('api/search/', GlobalSearchAPIView.as_view(), name='global_search'),
     path('api/locations/', include('locations.urls')),
     path('api/tickets/', include('tickets.urls')),

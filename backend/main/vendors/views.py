@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect
@@ -13,6 +13,7 @@ from rest_framework import generics, viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from events.models import Event
 from .models import Vendor, Category, VendorPost, Service, Region, Policy, Amenity, Booking, BookingRequest, Reservation
@@ -238,6 +239,78 @@ class PopularServicesAPIView(generics.ListAPIView):
             .prefetch_related("images")
             .order_by("-rating")[:10]
         )
+
+
+class BookServiceAPIView(APIView):
+    """
+    API view for creating a reservation (booking).
+    This would typically also create a payment intent with Stripe/Paystack.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk, format=None):
+        # Here you would handle the full booking logic:
+        # 1. Validate data (dates, guests, timeslot)
+        # 2. Calculate total price
+        # 3. Create a Payment Intent with Stripe/Paystack
+        # 4. Create a Reservation object with status 'pending_payment'
+        # 5. Return the client_secret for the payment intent
+
+        # Placeholder success response
+        return Response({
+            "message": "Booking initiated, proceed to payment.",
+            "client_secret": "pi_123_secret_456",  # Dummy client secret
+            "reservation_id": 1
+        }, status=status.HTTP_201_CREATED)
+
+
+class RequestToBookAPIView(APIView):
+    """
+    API view for sending a booking request to the provider.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk, format=None):
+        # Create a reservation with 'pending_approval' status
+        # ... (validation logic) ...
+
+        # Placeholder success response
+        return Response({
+            "message": "Your request has been sent to the provider. You will be notified upon approval."
+        }, status=status.HTTP_201_CREATED)
+
+class ServiceAvailabilityAPIView(APIView):
+    """
+    API view to fetch unavailable dates and available timeslots for a service.
+    """
+
+    def get(self, request, pk, format=None):
+        try:
+            service = Service.objects.get(pk=pk)
+        except Service.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Find all confirmed reservations for this service from today onwards
+        reservations = Reservation.objects.filter(
+            service=service,
+            status='confirmed',
+            end_date__gte=timezone.now().date()
+        )
+
+        unavailable_dates = set()
+        for r in reservations:
+            current_date = r.start_date
+            while current_date <= r.end_date:
+                unavailable_dates.add(current_date.strftime('%Y-%m-%d'))
+                current_date += timedelta(days=1)
+
+        # In a real app, timeslots could be a separate model related to the service
+        timeslots = ["09:00-11:00", "13:00-15:00", "17:00-19:00"]
+
+        return Response({
+            'unavailable_dates': list(unavailable_dates),
+            'timeslots': timeslots
+        })
 
 class CategoriesWithServicesAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]

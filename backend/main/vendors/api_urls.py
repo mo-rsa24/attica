@@ -9,6 +9,7 @@ from .views import (
     CategoriesWithServicesAPIView,
     VendorByUsernameAPIView,
     CurrentVendorAPIView, BookingViewSet, AmenityViewSet, PolicyViewSet, RegionViewSet, BookingRequestViewSet,
+    ServiceAvailabilityAPIView, BookServiceAPIView, RequestToBookAPIView,
 )
 
 router = DefaultRouter()
@@ -22,9 +23,16 @@ router.register(r"policies", PolicyViewSet, basename="policy")
 router.register(r"regions", RegionViewSet, basename="region")
 
 urlpatterns = [
+    *router.urls,
     path("services/popular/", PopularServicesAPIView.as_view(), name="popular_services"),
     path("categories-with-services/", CategoriesWithServicesAPIView.as_view(), name="categories_with_services"),
     path("profile/", CurrentVendorAPIView.as_view(), name="current_vendor"),
+
+    path('services/<int:pk>/availability/', ServiceAvailabilityAPIView.as_view(), name='service-availability'),
+    path('services/<int:pk>/book/', BookServiceAPIView.as_view(), name='service-book'),
+
+    path('services/<int:pk>/request-book/', RequestToBookAPIView.as_view(), name='service-request-book'),
+
     path(
         "by-username/<str:username>/",
         VendorByUsernameAPIView.as_view(),
