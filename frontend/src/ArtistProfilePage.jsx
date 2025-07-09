@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import ArtistPostsSidebar from "./ArtistPostSidebar.jsx";
 
 // --- Helper & Sub-Components ---
 
@@ -130,24 +131,29 @@ export default function ArtistProfilePage() {
     const [events, setEvents] = useState([]);
     const [activeTab, setActiveTab] = useState('Portfolio');
     const [isLoading, setIsLoading] = useState(true);
+    const [posts, setPosts] = useState([]); // <-- NEW: State for post
+    // const [isMyProfile, setIsMyProfile] = useState(false); // <-- NEW: To check if it's the logged-in user's profile
 
     useEffect(() => {
         const fetchArtistData = async () => {
             setIsLoading(true);
             try {
                 // Fetch all data in parallel
-                const [artistRes, portfolioRes, reviewsRes, eventsRes] = await Promise.all([
+                const [artistRes, portfolioRes, reviewsRes, eventsRes, postsRes] = await Promise.all([
                     fetch(`/api/artists/artists/${id}/`),
                     fetch(`/api/artists/artists/${id}/portfolio/`),
                     fetch(`/api/artists/artists/${id}/reviews/`),
                     fetch(`/api/artists/artists/${id}/events/`),
+                    fetch(`/api/artists/artists/${id}/posts/`), // <-- NEW: Fetch posts
                 ]);
 
                 setArtist(await artistRes.json());
                 setPortfolio(await portfolioRes.json());
                 setReviews(await reviewsRes.json());
-                setEvents(await eventsRes.json());
+                setEvents(await eventsRes.json());4
+                setPosts(await postsRes.json());
 
+                // setIsMyProfile(artistData.user.id === loggedInUserId);
             } catch (error) {
                 console.error("Failed to fetch artist data:", error);
             } finally {
@@ -195,15 +201,38 @@ export default function ArtistProfilePage() {
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen">
-            <div className="max-w-4xl mx-auto py-8">
-                <ProfileHeader artist={artist} onFollow={handleFollow} isFollowing={artist.is_following} />
-                <StatsBar stats={artist} />
-                <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        // <div className="bg-gray-50 min-h-screen">
+        //     <div className="max-w-4xl mx-auto py-8">
+        //         <ProfileHeader artist={artist} onFollow={handleFollow} isFollowing={artist.is_following}/>
+        //         <StatsBar stats={artist}/>
+        //         <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab}/>
+        //         <div className="mt-8">
+        //             {renderTabContent()}
+        //         </div>
+        //     </div>
+        // </div>
+
+    <div className="bg-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* --- Main Profile Section (LHS) --- */}
+            <div className="lg:col-span-2">
+                <ProfileHeader artist={artist} onFollow={handleFollow} isFollowing={artist.is_following}/>
+                <StatsBar stats={artist}/>
+                <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab}/>
                 <div className="mt-8">
                     {renderTabContent()}
                 </div>
             </div>
+
+            {/* --- Posts Sidebar (RHS) --- */}
+            <div className="lg:col-span-1">
+                <ArtistPostsSidebar
+                    artist={artist}
+                    posts={posts}
+                    isMyProfile={true}
+                />
+            </div>
+        </div>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Artist, ArtistBooking, ArtistPortfolioItem, Follow
+from .models import Artist, ArtistBooking, ArtistPortfolioItem, Follow, ArtistPost
 
 
 class ArtistPortfolioItemSerializer(serializers.ModelSerializer):
@@ -32,6 +32,12 @@ class ArtistSerializer(serializers.ModelSerializer):
         if user and user.is_authenticated:
             return Follow.objects.filter(user=user, artist=obj).exists()
         return False
+
+class ArtistPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArtistPost
+        fields = ['id', 'artist', 'content', 'image', 'created_at']
+        read_only_fields = ['id', 'artist', 'created_at']
 
 class PopularArtistSerializer(serializers.ModelSerializer):
     class Meta:

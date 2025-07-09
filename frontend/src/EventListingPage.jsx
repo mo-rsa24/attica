@@ -5,19 +5,31 @@ import { useParams } from 'react-router-dom';
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTicketAlt, FaUsers } from 'react-icons/fa';
 
 export default function EventListingPage() {
-    const { id } = useParams();
-    const [event, setEvent] = useState(null);
+   const { id } = useParams();
+    const [event, setEvents] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setIsLoading(true);
-        fetch(`/api/events/events/${id}/`)
-            .then(res => res.ok ? res.json() : Promise.reject('Event not found'))
-            .then(setEvent)
-            .catch(error => console.error("Failed to fetch event:", error))
-            .finally(() => setIsLoading(false));
-    }, [id]);
+        const fetchEventData = async () => {
+            setIsLoading(true);
+            try {
+                // Fetch all data in parallel
+                const [eventRes,] = await Promise.all([
+                    fetch(`/api/events/events/${id}/`),
+                ]);
 
+                setEvents(await eventRes.json());
+
+                // setIsMyProfile(artistData.user.id === loggedInUserId);
+            } catch (error) {
+                console.error("Failed to fetch artist data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchEventData();
+    }, [id]);
     if (isLoading) {
         return <div className="text-center py-40 text-2xl font-semibold">Loading Event...</div>;
     }
