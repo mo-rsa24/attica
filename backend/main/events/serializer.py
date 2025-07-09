@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from locations.serializers import VenueSerializer
+from tickets.serializers import TicketSerializer
 from .models import Event
 
 class EventSerializer(serializers.ModelSerializer):
@@ -34,6 +37,17 @@ class EventSerializer(serializers.ModelSerializer):
         # Set the user from the request context
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+class EventDetailSerializer(EventSerializer):
+    """
+    A more detailed serializer for a single event page, including related
+    location and ticket information.
+    """
+    location = VenueSerializer(read_only=True)
+    tickets = TicketSerializer(many=True, read_only=True)
+
+    class Meta(EventSerializer.Meta):
+        fields = EventSerializer.Meta.fields + ['location', 'tickets']
 
 class SimilarEventSerializer(serializers.ModelSerializer):
     class Meta:

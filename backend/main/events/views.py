@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from .models import Event
-from .serializer import EventSerializer, SimilarEventSerializer
+from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
@@ -13,7 +13,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         """
@@ -21,6 +21,11 @@ class EventViewSet(viewsets.ModelViewSet):
         for the currently authenticated user.
         """
         return self.request.user.events_created.all()
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return EventDetailSerializer
+        return EventSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
