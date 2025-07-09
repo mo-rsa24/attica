@@ -44,7 +44,7 @@ api_patterns = [
     path('api/accounts/', include('users.api_urls')),
     path('api/locations/', include('locations.api_urls')),
     path('api/vendors/', include('vendors.api_urls')), # This is for React
-    path('api/artists', include('artists.api_urls')),
+    path('api/artists/', include('artists.api_urls')),
     path('api/search/', GlobalSearchAPIView.as_view(), name='global_search'),
     path('api/locations/', include('locations.urls')),
     path('api/tickets/', include('tickets.urls')),

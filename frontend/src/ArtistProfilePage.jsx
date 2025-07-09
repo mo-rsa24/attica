@@ -7,7 +7,7 @@ import { useParams, Link } from 'react-router-dom';
 const ProfileHeader = ({ artist, onFollow, isFollowing }) => (
     <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 px-4">
         <img
-            src={artist.image || 'https://placehold.co/150x150/e2e8f0/e2e8f0'}
+            src={artist.profile_image || 'https://placehold.co/150x150/e2e8f0/e2e8f0'}
             alt={artist.name}
             className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-lg"
         />
@@ -137,10 +137,10 @@ export default function ArtistProfilePage() {
             try {
                 // Fetch all data in parallel
                 const [artistRes, portfolioRes, reviewsRes, eventsRes] = await Promise.all([
-                    fetch(`/api/artists/${id}/`),
-                    fetch(`/api/artists/${id}/portfolio/`),
-                    fetch(`/api/artists/${id}/reviews/`),
-                    fetch(`/api/artists/${id}/events/`),
+                    fetch(`/api/artists/artists/${id}/`),
+                    fetch(`/api/artists/artists/${id}/portfolio/`),
+                    fetch(`/api/artists/artists/${id}/reviews/`),
+                    fetch(`/api/artists/artists/${id}/events/`),
                 ]);
 
                 setArtist(await artistRes.json());
