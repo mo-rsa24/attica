@@ -160,23 +160,40 @@ function Reviews({ reviews }) {
 
 // 7. Fixed Location Map
 function LocationMap({ lat, lng, locationName }) {
-    const mapSrc = (lat && lng)
-        ? `https://maps.google.com/maps?q=${lat},${lng}&hl=es&z=14&amp;output=embed`
-        : `https://maps.google.com/maps?q=${encodeURIComponent(locationName)}&hl=es&z=14&amp;output=embed`;
+    // Check for valid, non-zero coordinates
+    const hasValidCoords = typeof lat === 'number' && typeof lng === 'number' && lat !== 0 && lng !== 0;
+    // Check for a valid, non-empty location name as a fallback
+    const hasValidName = typeof locationName === 'string' && locationName.trim() !== '';
+
+    let mapSrc = '';
+    if (hasValidCoords) {
+        mapSrc = `https://maps.google.com/maps?q=${lat},${lng}&hl=es&z=14&amp;output=embed`;
+    } else if (hasValidName) {
+        mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(locationName)}&output=embed`;
+    }
+
 
     return (
         <div className="py-6 border-t">
             <h2 className="text-2xl font-semibold mb-4">Location</h2>
-            <div className="h-96 w-full rounded-2xl overflow-hidden">
-                <iframe
-                    title="Service Location"
-                    src={mapSrc}
-                    className="w-full h-full border-0"
-                    loading="lazy"
-                ></iframe>
-            </div>
-            <p className="mt-4 font-semibold text-gray-800">{locationName}</p>
-            <p className="text-sm text-gray-500">Exact location is provided after booking.</p>
+            {mapSrc ? (
+                <>
+                    <div className="h-96 w-full rounded-2xl overflow-hidden bg-gray-200">
+                        <iframe
+                            title="Service Location"
+                            src={mapSrc}
+                            className="w-full h-full border-0"
+                            loading="lazy"
+                        ></iframe>
+                    </div>
+                    <p className="mt-4 font-semibold text-gray-800">{locationName}</p>
+                    <p className="text-sm text-gray-500">Exact location is provided after booking.</p>
+                </>
+            ) : (
+                <div className="h-96 w-full rounded-2xl bg-gray-100 flex items-center justify-center">
+                    <p className="text-gray-500">Location information is not available.</p>
+                </div>
+            )}
         </div>
     );
 }

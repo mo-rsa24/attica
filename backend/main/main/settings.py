@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'locations.apps.LocationsConfig',
     'tickets.apps.TicketsConfig',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'django_filters'
 ]
 
 REST_FRAMEWORK = {
@@ -64,6 +65,16 @@ REST_FRAMEWORK = {
     ],
 }
 
+ASGI_APPLICATION = 'backend.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
