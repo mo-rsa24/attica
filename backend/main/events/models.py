@@ -2,7 +2,6 @@ from django.conf import settings
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
-
 from locations.models import Location
 
 User = get_user_model()
@@ -13,7 +12,7 @@ class Event(models.Model):
     partner_user = models.ForeignKey(User, related_name='events_partnered', on_delete=models.SET_NULL, null=True,
                                      blank=True)
     organizer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='organized_events', blank=True, null=True)
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+    location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=255)
     date = models.DateField()
     start_date = models.DateTimeField(null=True, blank=True)
@@ -32,7 +31,7 @@ class Event(models.Model):
     banner_image = models.URLField(max_length=255, blank=True, null=True)
     category = models.CharField(max_length=100, blank=True, null=True,
                                 help_text="The category of the event, e.g., 'Music', 'Food & Drink'.")
-
+    is_draft = models.BooleanField(default=True, help_text="If true, this event is a draft and not yet published.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

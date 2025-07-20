@@ -29,7 +29,8 @@ class EventSerializer(serializers.ModelSerializer):
             'banner_image',
             'category',   # Added field
             'created_at',
-            'updated_at'
+            'updated_at',
+            'is_draft'
         ]
         read_only_fields = ['user']
 

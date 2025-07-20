@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
 
 class Role(models.Model):
     """Simple role model so that a user can have multiple roles."""
@@ -66,3 +68,12 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     """Signal handler to save the UserProfile whenever the User object is saved."""
     instance.profile.save()
+
+@receiver(m2m_changed, sender=CustomUser.roles.through)
+def user_roles_changed_handler(sender, instance, action, **kwargs):
+    """
+    Clear user permissions cache when roles are changed.
+    """
+    if action in ["post_add", "post_remove", "post_clear"]:
+        from .utils import clear_user_permissions_cache
+        clear_user_permissions_cache(instance.id)

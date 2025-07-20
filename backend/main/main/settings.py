@@ -55,6 +55,24 @@ INSTALLED_APPS = [
     'django_filters'
 ]
 
+JAZZMIN_SETTINGS = {
+    "site_title": "Attica Admin",
+    "site_header": "Attica",
+    "site_brand": "Attica Administration",
+    "site_logo": "path/to/your/logo.png", # Should be in a static folder
+    "login_logo": "path/to/your/login_logo.png",
+    "welcome_sign": "Welcome to the Attica Admin",
+    "copyright": "Attica Ltd.",
+    "topmenu_links": [
+        {"name": "Home",  "url": "admin:index"},
+        {"name": "View Live Site", "url": "/", "new_window": True},
+        {"model": "users.CustomUser"},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+}
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -86,6 +104,19 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # Use a different DB for caching
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+USER_PERMISSIONS_CACHE_TIMEOUT = 60 * 15
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

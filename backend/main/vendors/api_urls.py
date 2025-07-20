@@ -1,4 +1,5 @@
 from django.urls import path, include
+from rest_framework_nested import routers
 from rest_framework.routers import DefaultRouter
 
 from .views import (
@@ -9,23 +10,26 @@ from .views import (
     CategoriesWithServicesAPIView,
     VendorByUsernameAPIView,
     CurrentVendorAPIView, BookingViewSet, AmenityViewSet, PolicyViewSet, RegionViewSet, BookingRequestViewSet,
-    ServiceAvailabilityAPIView, BookServiceAPIView, RequestToBookAPIView,
+    ServiceAvailabilityAPIView, BookServiceAPIView, RequestToBookAPIView, CategoryListView,
 )
 
 router = DefaultRouter()
+router.register(r"vendors", VendorViewSet, basename="vendor")
 router.register(r"services", ServiceViewSet, basename="service")
-router.register(r"", VendorViewSet, basename="vendor")
-router.register(r"posts", VendorPostViewSet, basename="vendorpost")
-router.register(r"bookings", BookingViewSet, basename="booking")
-router.register(r"booking-requests", BookingRequestViewSet, basename="bookingrequest")
-router.register(r"amenities", AmenityViewSet, basename="amenity")
-router.register(r"policies", PolicyViewSet, basename="policy")
-router.register(r"regions", RegionViewSet, basename="region")
+vendors_router = routers.NestedSimpleRouter(router, r'vendors', lookup='vendor')
+vendors_router.register(r"posts", VendorPostViewSet, basename="vendorpost")
+vendors_router.register(r"bookings", BookingViewSet, basename="booking")
+vendors_router.register(r"booking-requests", BookingRequestViewSet, basename="bookingrequest")
+vendors_router.register(r"amenities", AmenityViewSet, basename="amenity")
+vendors_router.register(r"policies", PolicyViewSet, basename="policy")
+vendors_router.register(r"regions", RegionViewSet, basename="region")
 
 urlpatterns = [
-    *router.urls,
+    path("", include(router.urls)),
+    path("", include(vendors_router.urls)),
     path("services/popular/", PopularServicesAPIView.as_view(), name="popular_services"),
     path("categories-with-services/", CategoriesWithServicesAPIView.as_view(), name="categories_with_services"),
+    path("categories/", CategoryListView.as_view(), name="categories_with_services"),
     path("profile/", CurrentVendorAPIView.as_view(), name="current_vendor"),
 
     path('services/<int:pk>/availability/', ServiceAvailabilityAPIView.as_view(), name='service-availability'),

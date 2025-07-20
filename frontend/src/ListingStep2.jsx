@@ -1,109 +1,129 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// A placeholder for SVG icons. In a real app, you would import actual icons.
-const Icon = ({ name, className = "h-8 w-8 mb-2" }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-    {/* This is a generic placeholder path. Replace with actual SVG paths for each icon. */}
-    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z"></path>
-    <title>{name}</title>
-  </svg>
+import { motion } from 'framer-motion';
+import { FaChevronRight, FaQuestionCircle } from 'react-icons/fa';
+import { FiSave } from 'react-icons/fi';
+
+// Reusable EventTypeCard Component
+const EventTypeCard = ({ type, icon, selected, onClick }) => (
+    <motion.button
+        whileHover={{ scale: 1.05, y: -5, boxShadow: '0px 15px 25px -10px rgba(0,0,0,0.1)' }}
+        onClick={onClick}
+        className={`p-6 rounded-2xl text-left transition-all duration-300 w-full h-full flex flex-col justify-between
+            ${selected
+                ? 'bg-pink-600 text-white shadow-lg ring-2 ring-offset-2 ring-pink-600'
+                : 'bg-white text-gray-800 shadow-md hover:shadow-lg border border-gray-200'
+            }`}
+    >
+        <span className="text-4xl" role="img" aria-label={type}>{icon}</span>
+        <p className="text-xl font-bold mt-4">{type}</p>
+    </motion.button>
 );
 
-// Array of place types from the screenshot
-const placeTypes = [
-  { name: 'Concert', icon: 'House' },
-  { name: 'Festival', icon: 'Apartment' },
-  { name: 'Carnival', icon: 'Barn' },
-  { name: 'Birthday Party', icon: 'Bed & breakfast' },
-  { name: 'Wedding Reception', icon: 'Boat' },
-  { name: 'Club Night', icon: 'Cabin' },
-  { name: 'Beach Party', icon: 'Camper/RV' },
-  { name: 'Block Party', icon: 'Casa particular' },
-  { name: 'House Party', icon: 'Castle' },
-  { name: 'Pool Party', icon: 'Cave' },
-  { name: 'New Year\'s Eve Party', icon: 'Container' },
-  { name: 'Music Festival', icon: 'Cycladic home' },
-  { name: 'Food & Wine', icon: 'Dammuso' },
-  { name: 'Fun Day', icon: 'Dome' },
-  { name: 'Jazz Festival', icon: 'Earth home' },
-];
 
-// Main component for selecting the place type
 export default function ListingStep2() {
-  const [selected, setSelected] = useState(null);
-  const navigate = useNavigate();
-  return (
-      <div className="bg-white min-h-screen font-sans flex flex-col">
-          {/* Header */}
-          <header className="fixed top-0 left-0 right-0 bg-white z-20">
-              <div className="flex items-center justify-between p-6">
-                  {/* Logo */}
-                  <a href="/">
-                      <svg
-                          viewBox="0 0 1000 1000"
-                          role="presentation"
-                          aria-hidden="true"
-                          focusable="false"
-                          className="h-8 w-8 text-pink-600"
-                          style={{display: 'block', fill: 'currentColor'}}
-                      >
-                          <path
-                              d="m499.3 736.7c-51-64-81-120.1-91-168.1-10-39-6-70 11-93 18-21 41-32 72-32 31 0 54 11 72 32 17 23 21 54 11 93-11 49-41 105-91 168.1zm362.2 43.2c-11-12.9-25-23.9-40-31.9-50-23.9-92-42.9-123-58.9-32-16-56-28.9-73-38.9-17-9-29-15-37-19-21-10.9-35-18.9-44-24.9-7-5-13-9-20-13-102.1-59-183.1-131-242.1-215-30-42-52-84-65-127.1-14-44-19-87-19-129.1 0-78.1 21-148.1 63-210.1 42-62 101-111 176-147 24-12 50-21 77-28 10-2 19-5 28-7 8-2 17-4 25-6 2-1 3-1 4-2 11-4 22-7 33-9 12-2 24-4 36-4s24 2 36 4c11 2 22 5 33 9 1 1 2 1 4 2 8 2 17 4 25 6 10 2 19 5 28 7 27 7 53 16 77 28 75 36 134 85 176 147 42 62 63 132 63 210.1 0 42-5 85-19 129.1-13 43-35 85-65 127.1-59 84-140 156-242.1 215-7 4-13 8-20 13-9 6-23 14-44 25-8 4-20 10-37 19-17 10-41 23-73 39-31 16-73 35-123 59-15 8-29 19-40 32z"></path>
-                      </svg>
-                  </a>
-                  {/* Action Buttons */}
-                  <div className="flex items-center space-x-4">
-                      <button
-                          className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">
-                          Questions?
-                      </button>
-                      <button
-                          className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">
-                          Save & exit
-                      </button>
-                  </div>
-              </div>
-          </header>
+    const navigate = useNavigate();
+    const [selectedEventType, setSelectedEventType] = useState(null);
 
-          {/* Main Content */}
-          <main className="flex-grow flex items-center justify-center pt-24 pb-28">
-              <div className="w-full max-w-2xl mx-auto px-4">
-                  <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-                      Which of these best describes your event ?
-                  </h1>
-                  <div className="grid grid-cols-3 gap-4">
-                      {placeTypes.map((place) => (
-                          <button
-                              key={place.name}
-                              onClick={() => setSelected(place.name)}
-                              className={`p-4 border rounded-lg flex flex-col items-start text-left transition-colors duration-200 ${
-                                  selected === place.name
-                                      ? 'border-black bg-gray-50 border-2'
-                                      : 'border-gray-300 hover:border-black'
-                              }`}
-                          >
-                              <Icon name={place.icon}/>
-                              <span className="font-semibold text-gray-800">{place.name}</span>
-                          </button>
-                      ))}
-                  </div>
-              </div>
-          </main>
+    // Adapted from the original file's placeTypes with added icons
+    const eventTypes = [
+        { name: 'Concert', icon: '🎤' },
+        { name: 'Festival', icon: '🎪' },
+        { name: 'Wedding', icon: '💍' },
+        { name: 'Birthday Party', icon: '🎂' },
+        { name: 'Conference', icon: '💼' },
+        { name: 'Club Night', icon: '🪩' },
+        { name: 'Gala / Formal', icon: '🥂' },
+        { name: 'Food & Wine', icon: '🍷' },
+        { name: 'Workshop', icon: '🛠️' },
+    ];
 
-          {/* Footer with Progress Bar */}
-          <footer className="fixed bottom-0 left-0 right-0 bg-white z-20">
-              <div className="w-full bg-gray-200 h-1.5">
-                  <div className="bg-black h-1.5" style={{width: '20%'}}></div>
-              </div>
-              <div className="flex items-center justify-between p-4">
-                  <button onClick={() => navigate('/listing/step1')}
-                          className="font-semibold text-gray-800 underline hover:text-black">Back
-                  </button>
-                  <button onClick={() => navigate('/listing/step3')}
-                          className="px-8 py-3 text-white bg-gray-800 rounded-lg font-semibold hover:bg-black">Next
-                  </button>
-              </div>
-          </footer>
-      </div>
-  );
+    return (
+        <div className="min-h-screen bg-gray-50 font-sans">
+            {/* Header and Progress Bar */}
+            <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-20">
+                 <div className="max-w-screen-2xl mx-auto px-6">
+                    <div className="flex items-center justify-between h-20">
+                         <a href="/">
+                            <div className="h-8 w-8 text-pink-600 flex items-center justify-center font-bold text-2xl" style={{ color: '#FF5A5F' }}>A</div>
+                        </a>
+                        <div className="flex items-center space-x-2">
+                             <button className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full">
+                                Questions?
+                            </button>
+                             <button className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full">
+                                Save & exit
+                            </button>
+                        </div>
+                    </div>
+                    <div className="w-full bg-gray-200 h-1">
+                        <motion.div
+                            className="bg-pink-600 h-1"
+                            style={{ background: '#FF5A5F' }}
+                            initial={{ width: '10%' }}
+                            animate={{ width: '20%' }}
+                            transition={{ duration: 1, ease: 'easeInOut' }}
+                        />
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="pt-24 pb-32 flex items-center justify-center">
+                <div className="max-w-4xl mx-auto text-center px-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7 }}
+                    >
+                        <h1 className="text-4xl lg:text-5xl font-bold text-gray-900">
+                            Which of these best describes your event?
+                        </h1>
+                    </motion.div>
+
+                    <motion.div
+                        className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-12"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            visible: {
+                                transition: {
+                                    staggerChildren: 0.05,
+                                },
+                            },
+                        }}
+                    >
+                        {eventTypes.map(type => (
+                             <motion.div key={type.name} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                                <EventTypeCard
+                                    type={type.name}
+                                    icon={type.icon}
+                                    selected={selectedEventType === type.name}
+                                    onClick={() => setSelectedEventType(type.name)}
+                                />
+                             </motion.div>
+                        ))}
+                    </motion.div>
+                </div>
+            </main>
+
+             {/* Navigation Footer */}
+            <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
+                 <div className="max-w-screen-2xl mx-auto flex justify-between items-center px-2">
+                    <button onClick={() => navigate('/listing/step1')} className="font-bold text-gray-800 underline hover:text-black transition">
+                        Back
+                    </button>
+                    <motion.button
+                        onClick={() => navigate('/listing/step3')}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center space-x-3 px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg hover:shadow-xl"
+                    >
+                        <span>Next</span>
+                        <FaChevronRight />
+                    </motion.button>
+                </div>
+            </footer>
+        </div>
+    );
 }

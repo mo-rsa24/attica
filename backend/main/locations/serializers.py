@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
 from events.models import Event
+from vendors.models import Region
 from .models import Location, VenueBooking, LocationImage, Feature, FloorPlan, LocationReview, WaitlistEntry, Question, \
-    Wish
+    Wish, Quote
 
 
 class LocationImageSerializer(serializers.ModelSerializer):
@@ -25,16 +26,35 @@ class LocationReviewSerializer(serializers.ModelSerializer):
         model = LocationReview
         fields = ['id', 'user', 'rating', 'comment', 'created_at']
 
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = ['id', 'name']
+
+class LocationMapSerializer(serializers.ModelSerializer):
+    """
+    Serializer for providing lightweight location data for the interactive map.
+    """
+    class Meta:
+        model = Location
+        fields = ['id', 'name', 'latitude', 'longitude']
+
+
 class VenueSerializer(serializers.ModelSerializer):
     images = LocationImageSerializer(many=True, read_only=True)
     features = FeatureSerializer(many=True, read_only=True)
     floor_plans = FloorPlanSerializer(many=True, read_only=True)
     reviews = LocationReviewSerializer(many=True, read_only=True)
+    region = RegionSerializer(read_only=True)
     class Meta:
         model = Location
-        fields = ['id', 'name','address','capacity','is_approved',
-                  'venue_count', 'image', 'image_url', 'created_at', 'updated_at', 'rating', 'listed_date', 'price', 'images', 'features', 'floor_plans',
-                  'reviews']
+        fields = [
+            'id', 'name', 'address', 'capacity', 'is_approved',
+            'venue_count', 'image', 'image_url', 'created_at',
+            'updated_at', 'rating', 'listed_date', 'price',
+            'images', 'features', 'floor_plans', 'reviews',
+            'region', 'is_featured', 'has_variable_pricing',
+        ]
 
 class PopularVenueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -67,6 +87,11 @@ class WaitlistEntrySerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
+        fields = '__all__'
+
+class QuoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quote
         fields = '__all__'
 
 class WishSerializer(serializers.ModelSerializer):

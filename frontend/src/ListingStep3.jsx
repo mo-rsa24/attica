@@ -1,80 +1,155 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-// A placeholder for SVG icons.
-const Icon = ({ className = "h-8 w-8" }) => (
-  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="presentation" focusable="false" className={className} style={{ display: 'block', fill: 'none', stroke: 'currentcolor', strokeWidth: 2, overflow: 'visible' }}>
-    <path d="m2 16h28m-14-14v28"></path>
-    <title>Icon</title>
-  </svg>
-);
+import { motion } from 'framer-motion';
+import { FaChevronRight, FaMapMarkerAlt, FaUsers, FaTools, FaCheckCircle } from 'react-icons/fa';
+import {useEventCreation} from "./context/reactContext.jsx";
 
-const placeOptions = [
-    {
-        title: "Location: Venue",
-        description: "Book a venue via a location stakeholder & trustee",
-        icon: <Icon />
-    },
-    {
-        title: "Talent: Artist/Management",
-        description: "Talent can be booked for your event easily.",
-        icon: <Icon />
-    },
-    {
-        title: "Vendor: Service Provider",
-        description: "Select relevant service providers to ensure your event is a success",
-        icon: <Icon />
-    }
-];
+// --- Reusable Summary Components ---
 
-export default function ListingStep3() {
-    const [selected, setSelected] = useState("An entire place");
-    const navigate = useNavigate();
+const SummaryRow = ({ title, items, imageKey, priceKey }) => {
+    const totalCost = items.reduce((sum, item) => sum + parseFloat(item[priceKey] || 0), 0);
+    const firstImage = items[0]?.[imageKey] || 'https://placehold.co/100x100/e2e8f0/4a5568?text=?';
 
     return (
-        <div className="bg-white min-h-screen font-sans flex flex-col">
-            {/* Header */}
-            <header className="fixed top-0 left-0 right-0 bg-white z-20">
-                <div className="flex items-center justify-between p-6">
-                    <a href="/"><svg viewBox="0 0 1000 1000" role="presentation" aria-hidden="true" focusable="false" className="h-8 w-8 text-pink-600" style={{ display: 'block', fill: 'currentColor' }}><path d="m499.3 736.7c-51-64-81-120.1-91-168.1-10-39-6-70 11-93 18-21 41-32 72-32 31 0 54 11 72 32 17 23 21 54 11 93-11 49-41 105-91 168.1zm362.2 43.2c-11-12.9-25-23.9-40-31.9-50-23.9-92-42.9-123-58.9-32-16-56-28.9-73-38.9-17-9-29-15-37-19-21-10.9-35-18.9-44-24.9-7-5-13-9-20-13-102.1-59-183.1-131-242.1-215-30-42-52-84-65-127.1-14-44-19-87-19-129.1 0-78.1 21-148.1 63-210.1 42-62 101-111 176-147 24-12 50-21 77-28 10-2 19-5 28-7 8-2 17-4 25-6 2-1 3-1 4-2 11-4 22-7 33-9 12-2 24-4 36-4s24 2 36 4c11 2 22 5 33 9 1 1 2 1 4 2 8 2 17 4 25 6 10 2 19 5 28 7 27 7 53 16 77 28 75 36 134 85 176 147 42 62 63 132 63 210.1 0 42-5 85-19 129.1-13 43-35 85-65 127.1-59 84-140 156-242.1 215-7 4-13 8-20 13-9 6-23 14-44 25-8 4-20 10-37 19-17 10-41 23-73 39-31 16-73 35-123 59-15 8-29 19-40 32z"></path></svg></a>
-                    <div className="flex items-center space-x-4">
-                        <button className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">Questions?</button>
-                        <button className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">Save & exit</button>
+        <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+                <img src={firstImage} alt={title} className="w-12 h-12 object-cover rounded-full bg-gray-200" />
+                <div>
+                    <p className="font-bold text-gray-800">{title}</p>
+                    <p className="text-sm text-gray-500">{items.length} Selected</p>
+                </div>
+            </div>
+            <p className="font-semibold text-gray-700">R {totalCost.toLocaleString()}</p>
+        </div>
+    );
+};
+
+const SummaryCard = () => {
+    const { selectedLocations, selectedArtists, selectedVendors } = useEventCreation();
+
+    const locationCost = selectedLocations.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+    const artistCost = selectedArtists.reduce((sum, item) => sum + parseFloat(item.booking_fee || 0), 0);
+    const vendorCost = selectedVendors.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+    const grandTotal = locationCost + artistCost + vendorCost;
+
+    return (
+        <div className="bg-white p-6 rounded-2xl shadow-lg w-full">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Event Summary</h3>
+            <div className="space-y-5">
+                <SummaryRow title="Venues" items={selectedLocations} imageKey="image_url" priceKey="price" />
+                <SummaryRow title="Artists" items={selectedArtists} imageKey="profile_image" priceKey="booking_fee" />
+                <SummaryRow title="Vendors" items={selectedVendors} imageKey="image" priceKey="price" />
+            </div>
+            <div className="border-t border-gray-200 mt-6 pt-5">
+                <div className="flex justify-between items-center">
+                    <p className="text-lg font-semibold text-gray-600">Grand Total (Est.)</p>
+                    <p className="text-3xl font-extrabold text-pink-600">R {grandTotal.toLocaleString()}</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+// --- Main Component for the Step 3 Hub (Updated) ---
+export default function ListingStep3() {
+    const navigate = useNavigate();
+    const { selectedLocations, selectedArtists, selectedVendors } = useEventCreation();
+
+    const locationSelected = selectedLocations.length > 0;
+    const artistsSelected = selectedArtists.length > 0;
+    const vendorsSelected = selectedVendors.length > 0;
+
+    const sections = [
+        { name: 'Location: Venue', icon: <FaMapMarkerAlt />, isComplete: locationSelected, path: '/listing/step3/location' },
+        { name: 'Talent: Artist/Management', icon: <FaUsers />, isComplete: artistsSelected, path: '/listing/step3/artists' },
+        { name: 'Vendor: Service Providers', icon: <FaTools />, isComplete: vendorsSelected, path: '/listing/step3/vendors' },
+    ];
+
+    return (
+        <div className="min-h-screen bg-gray-50 font-sans">
+            <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-20">
+                 <div className="max-w-screen-2xl mx-auto px-6">
+                    <div className="flex items-center justify-between h-20">
+                        <a href="/"><div className="text-2xl font-bold text-pink-600">A</div></a>
+                        <div className="flex items-center space-x-2">
+                            <button className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full">Questions?</button>
+                            <button className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full">Save & exit</button>
+                        </div>
+                    </div>
+                    <div className="w-full bg-gray-200 h-1">
+                        <motion.div className="bg-pink-600 h-1" initial={{ width: '20%' }} animate={{ width: '40%' }} transition={{ duration: 1, ease: 'easeInOut' }} />
                     </div>
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="flex-grow flex items-center justify-center pt-24 pb-28">
-                <div className="w-full max-w-xl mx-auto px-4">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">What type of engagement would you like to procure?</h1>
-                    <div className="space-y-4">
-                        {placeOptions.map((option) => (
-                            <button
-                                key={option.title}
-                                onClick={() => setSelected(option.title)}
-                                className={`w-full p-6 border rounded-lg flex items-center justify-between text-left transition-colors duration-200 ${selected === option.title ? 'border-black bg-gray-50 border-2' : 'border-gray-300 hover:border-black'}`}
-                            >
-                                <div>
-                                    <h2 className="font-semibold text-lg text-gray-800">{option.title}</h2>
-                                    <p className="text-gray-600">{option.description}</p>
-                                </div>
-                                {option.icon}
-                            </button>
-                        ))}
+            {/* CORRECTED: Reduced vertical padding (pt-24 pb-24) */}
+            <main className="pt-24 pb-24">
+                <div className="max-w-screen-xl mx-auto px-6">
+                     {/* CORRECTED: Reduced bottom margin (mb-12) */}
+                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center mb-12">
+                        <p className="font-semibold text-pink-600">Step 3 of 5</p>
+                        {/* CORRECTED: Reduced font size on larger screens (text-4xl) */}
+                        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mt-2">Curate your event</h1>
+                        <p className="mt-4 text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                            Select your venue, artists, and service providers to bring your event to life.
+                        </p>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        {/* Left Column: Selection Buttons */}
+                        <motion.div
+                            className="space-y-6 lg:col-span-7"
+                            initial="hidden"
+                            animate="visible"
+                            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+                        >
+                            {sections.map((section, index) => (
+                                <motion.div
+                                    key={index}
+                                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                                >
+                                    {/* CORRECTED: Reduced padding and font sizes */}
+                                    <button
+                                        onClick={() => navigate(section.path)}
+                                        className="w-full p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-between text-left"
+                                    >
+                                        <div className="flex items-center">
+                                            <div className="text-2xl lg:text-3xl text-pink-500 mr-5">{section.icon}</div>
+                                            <span className="text-xl lg:text-2xl font-bold text-gray-800">{section.name}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            {section.isComplete ? (
+                                                <FaCheckCircle className="text-green-500 text-2xl lg:text-3xl" />
+                                            ) : (
+                                                <div className="w-9 h-9 lg:w-10 lg:h-10 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-xl lg:text-2xl">+</div>
+                                            )}
+                                        </div>
+                                    </button>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+
+                        {/* Right Column: Summary Card */}
+                        <div className="lg:sticky lg:top-24 lg:col-span-5">
+                            <SummaryCard />
+                        </div>
                     </div>
                 </div>
             </main>
 
-            {/* Footer with Progress Bar */}
-            <footer className="fixed bottom-0 left-0 right-0 bg-white z-20">
-                <div className="w-full bg-gray-200 h-1.5"><div className="bg-black h-1.5" style={{ width: '30%' }}></div></div>
-                <div className="flex items-center justify-between p-4">
-                    <button onClick={() => navigate('/listing/step2')}
-                            className="font-semibold text-gray-800 underline hover:text-black">Back
-                    </button>
-                    <button onClick={() => navigate('/listing/step4')}
-                            className="px-8 py-3 text-white bg-gray-800 rounded-lg font-semibold hover:bg-black">Next
-                    </button>
+            <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
+                <div className="max-w-screen-2xl mx-auto flex justify-between items-center px-2">
+                    <button onClick={() => navigate('/listing/step2')} className="font-bold text-gray-800 underline">Back</button>
+                    <motion.button
+                        onClick={() => navigate('/listing/step4')}
+                        whileHover={{ scale: 1.05 }}
+                        className="flex items-center space-x-3 px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg disabled:bg-gray-400"
+                        disabled={!locationSelected || !artistsSelected || !vendorsSelected}
+                    >
+                        <span>Review and Finalize</span>
+                        <FaChevronRight />
+                    </motion.button>
                 </div>
             </footer>
         </div>

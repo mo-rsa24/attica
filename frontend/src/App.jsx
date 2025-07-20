@@ -35,6 +35,10 @@ import Navbar from "./NavBar.jsx";
 import ArtistProfilePage from "./ArtistProfilePage.jsx";
 import EventListingPage from "./EventListingPage.jsx";
 import LocationDetailPage from "./LocationDetailPage.jsx";
+import SelectLocation from "./pages/SelectLocation.jsx";
+import SelectArtists from "./pages/SelectArtists.jsx";
+import SelectVendors from "./pages/SelectVendors.jsx";
+import {EventCreationProvider} from "./context/reactContext.jsx";
 
 
 function App() {
@@ -49,6 +53,7 @@ function App() {
                 userProfileImageUrl={profileImageUrl}
                 onLogout={logout} // Pass the logout function
             />
+            <EventCreationProvider>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/services/:id" element={<ListingPage />} />
@@ -67,6 +72,9 @@ function App() {
                     <Route path="/listing/step1" element={<ListingStep1 />} />
                     <Route path="/listing/step2" element={<ListingStep2 />} />
                     <Route path="/listing/step3" element={<ListingStep3 />} />
+                    <Route path="/listing/step3/location" element={<SelectLocation />} />
+                    <Route path="/listing/step3/artists" element={<SelectArtists />} />
+                    <Route path="/listing/step3/vendors" element={<SelectVendors />} />
                     <Route path="/listing/step4" element={<ListingStep4 />} />
                     <Route path="/listing/step5" element={<ListingStep5 />} />
                     <Route path="/listing/step6" element={<ListingStep6 />} />
@@ -81,6 +89,7 @@ function App() {
                     <Route path="/services/:id/request" element={<RequestToBook />} />
                     <Route path="/logout" element={<Logout />} />
                 </Routes>
+            </EventCreationProvider>
             <Footer />
         </ThemeProvider>
     )

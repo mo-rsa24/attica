@@ -9,8 +9,9 @@ from django.views import generic
 from django.views.generic import CreateView, DeleteView, UpdateView, ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets, permissions, status
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -315,22 +316,37 @@ class ServiceAvailabilityAPIView(APIView):
 class CategoriesWithServicesAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = CategorySerializer
-    queryset = (
+    def get_queryset(self):
+        return (
         Category.objects.prefetch_related(
             Prefetch(
                 "servicecategory",
                 queryset=Service.objects.select_related("vendor", "category"),
             )
-        ).all()
-    )
+        ).all())
+
+class CategoryListView(generics.ListAPIView):
+    """
+    Provides a simple list of all available service categories for filter buttons.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.AllowAny]
+
 
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
-    """API endpoint for listing and retrieving services"""
-
-    queryset = Service.objects.select_related("vendor", "category").prefetch_related(
-        "images", "reviews"
-    )
-
+    """
+    API endpoint that allows services to be viewed.
+    Supports filtering by category name for the frontend UI.
+    """
+    queryset = Service.objects.select_related('category', 'vendor').all()
+    serializer_class = ServiceSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    # This allows filtering like: /api/vendors/services/?category__name=Catering
+    filterset_fields = {
+        'category__name': ['exact'],
+    }
     @action(detail=True, methods=['get'])
     def availability(self, request, pk=None):
         service = self.get_object()

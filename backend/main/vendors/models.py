@@ -6,7 +6,6 @@ from django.urls import reverse
 from django.conf import settings
 from users.models import CustomUser
 
-
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -231,6 +230,7 @@ class Booking(models.Model):
         ('confirmed', 'Confirmed'),
         ('cancelled', 'Cancelled'),
     ]
+    event = models.ForeignKey('events.Event', on_delete=models.CASCADE, related_name='vendor_bookings', null=True, blank=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='bookings')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='bookings')
     start_date = models.DateField()

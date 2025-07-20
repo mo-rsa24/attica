@@ -14,12 +14,14 @@ class ArtistSerializer(serializers.ModelSerializer):
     bookings_completed = serializers.IntegerField(default=24)
     rating = serializers.FloatField(default=4.8)
     events_participated = serializers.IntegerField(default=12)
+    portfolio_items = ArtistPortfolioItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Artist
         fields = [
             'id', 'name', 'bio', 'owner', 'profile_image',
-            'genres', 'rating', 'created_at', 'updated_at',
+            'genres', 'rating', 'booking_fee', 'contact_email', 'phone_number', 'instagram_handle',
+            'availability', 'is_popular', 'portfolio_items','created_at', 'updated_at',
             'follower_count', 'is_following', 'bookings_completed',
             'rating', 'events_participated'
         ]
