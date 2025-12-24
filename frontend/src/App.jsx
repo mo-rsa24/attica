@@ -28,6 +28,7 @@ import ListingStep5 from "./ListingStep5.jsx";
 import ListingStep6 from "./ListingStep6.jsx";
 import ListingStep7 from "./ListingStep7.jsx";
 import ListingStep8 from "./ListingStep8.jsx";
+import ListingReview from "./ListingReview.jsx";
 import ProfilePage from "./ProfilePage.jsx";
 import { useAuth } from './AuthContext';
 import Navbar from "./NavBar.jsx";
@@ -78,6 +79,7 @@ function App() {
                     <Route path="/listing/step6" element={<ListingStep6 />} />
                     <Route path="/listing/step7" element={<ListingStep7 />} />
                     <Route path="/listing/step8" element={<ListingStep8 />} />
+                    <Route path="/listing/review" element={<ListingReview />} />
 
                     <Route path="/profile/update" element={<VendorProfileEdit />} />
                     <Route path="/post/create" element={<PostCreate />} />

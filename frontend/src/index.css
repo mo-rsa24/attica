@@ -1,3 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.listing-step7 {
+  font-family: "Outfit", "Segoe UI", "Trebuchet MS", sans-serif;
+}
+
+.listing-step7-title,
+.listing-step7-subtitle {
+  font-family: "Space Grotesk", "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.feature-glow {
+  background-size: 200% 200%;
+}
+
+.feature-glow--active {
+  animation: gradient-shift 4s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-glow--active {
+    animation: none;
+  }
+}

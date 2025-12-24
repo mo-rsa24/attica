@@ -1,98 +1,183 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Truck,
+  Martini,
+  ShoppingBag,
+  Accessibility,
+  Armchair,
+  CreditCard,
+  Sparkles,
+  Crown,
+  Handshake,
+  Mic2,
+  Camera,
+  CheckCircle2
+} from 'lucide-react';
 
-// A placeholder for SVG icons.
-const Icon = ({ name, className = "h-8 w-8 mb-2" }) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z"></path>
-        <title>{name}</title>
-    </svg>
-);
+// Icon mapping for features
+const ICONS = {
+    'Food Trucks': Truck,
+    'Bar Available': Martini,
+    'Merch Stall': ShoppingBag,
+    'Wheelchair Accessible': Accessibility,
+    'Outdoor Seating': Armchair,
+    'Accepts Cards': CreditCard,
+    'Special Guest Appearance': Sparkles,
+    'VIP Area': Crown,
+    'Meet & Greet': Handshake,
+    'Live Q&A': Mic2,
+    'Photo Booth': Camera
+};
 
-// Arrays for event-specific features and perks
-const commonFeatures = [
-    { name: 'Food Trucks', icon: 'Food' },
-    { name: 'Bar Available', icon: 'Drinks' },
-    { name: 'Merch Stall', icon: 'Merch' },
-    { name: 'Wheelchair Accessible', icon: 'Accessibility' },
-    { name: 'Outdoor Seating', icon: 'Seating' },
-    { name: 'Accepts Cards', icon: 'Card' }
-];
-
-const standoutPerks = [
-    { name: 'Special Guest Appearance', icon: 'Guest' },
-    { name: 'VIP Area', icon: 'VIP' },
-    { name: 'Meet & Greet', icon: 'Meet' },
-    { name: 'Live Q&A', icon: 'QA' },
-    { name: 'Photo Booth', icon: 'Photo' },
-    { name: 'Free Giveaways', icon: 'Gift' }
-];
-
-export default function ListingStep7_Event() {
-    const [selectedFeatures, setSelectedFeatures] = useState([]);
+const ListingStep7 = () => {
     const navigate = useNavigate();
+    const [selectedFeatures, setSelectedFeatures] = useState([]);
+
+    // Scroll to top on mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     const toggleFeature = (name) => {
-        setSelectedFeatures(prev =>
-            prev.includes(name) ? prev.filter(item => item !== name) : [...prev, name]
+        if (selectedFeatures.includes(name)) {
+            setSelectedFeatures(selectedFeatures.filter(f => f !== name));
+        } else {
+            setSelectedFeatures([...selectedFeatures, name]);
+        }
+    };
+
+    const commonFeatures = [
+        { name: 'Food Trucks', desc: 'Gourmet street food options' },
+        { name: 'Bar Available', desc: 'Alcoholic & non-alcoholic drinks' },
+        { name: 'Merch Stall', desc: 'Space for selling merchandise' },
+        { name: 'Wheelchair Accessible', desc: 'Ramps and accessible facilities' },
+        { name: 'Outdoor Seating', desc: 'Comfortable open-air spots' },
+        { name: 'Accepts Cards', desc: 'Cashless payment options' }
+    ];
+
+    const standoutPerks = [
+        { name: 'Special Guest Appearance', desc: 'Celebrity or industry expert' },
+        { name: 'VIP Area', desc: 'Exclusive lounge access' },
+        { name: 'Meet & Greet', desc: 'Photo ops with talent' },
+        { name: 'Live Q&A', desc: 'Interactive audience sessions' },
+        { name: 'Photo Booth', desc: 'Fun props and instant prints' }
+    ];
+
+    const FeatureCard = ({ item }) => {
+        const isSelected = selectedFeatures.includes(item.name);
+        const IconComponent = ICONS[item.name] || Sparkles;
+
+        return (
+            <button
+                onClick={() => toggleFeature(item.name)}
+                className={`relative group p-5 rounded-2xl border-2 text-left transition-all duration-300 ease-out h-full flex flex-col gap-3
+                ${isSelected 
+                    ? 'border-violet-500 bg-violet-50 shadow-[0_8px_30px_rgb(139,92,246,0.15)] scale-[1.02]' 
+                    : 'border-gray-100 bg-white hover:border-violet-200 hover:shadow-lg hover:-translate-y-1'
+                }`}
+            >
+                {/* Checkmark Badge */}
+                <div className={`absolute top-4 right-4 transition-all duration-300 ${isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+                    <CheckCircle2 className="text-violet-500 fill-violet-100" size={24} />
+                </div>
+
+                {/* Icon */}
+                <div className={`p-3 rounded-xl w-fit transition-colors duration-300 ${
+                    isSelected ? 'bg-violet-500 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-violet-100 group-hover:text-violet-600'
+                }`}>
+                    <IconComponent size={28} strokeWidth={1.5} />
+                </div>
+
+                {/* Text */}
+                <div>
+                    <h3 className={`font-bold text-lg mb-1 transition-colors ${isSelected ? 'text-violet-900' : 'text-gray-900'}`}>
+                        {item.name}
+                    </h3>
+                    <p className={`text-sm leading-relaxed transition-colors ${isSelected ? 'text-violet-700' : 'text-gray-500'}`}>
+                        {item.desc}
+                    </p>
+                </div>
+            </button>
         );
     };
 
     return (
-        <div className="bg-white min-h-screen font-sans flex flex-col">
+        <div className="min-h-screen bg-white pb-24">
             {/* Header */}
-            <header className="fixed top-0 left-0 right-0 bg-white z-20">
-                 <div className="flex items-center justify-between p-6">
-                    <a href="/"><svg viewBox="0 0 1000 1000" role="presentation" aria-hidden="true" focusable="false" className="h-8 w-8 text-pink-600" style={{ display: 'block', fill: 'currentColor' }}><path d="m499.3 736.7c-51-64-81-120.1-91-168.1-10-39-6-70 11-93 18-21 41-32 72-32 31 0 54 11 72 32 17 23 21 54 11 93-11 49-41 105-91 168.1zm362.2 43.2c-11-12.9-25-23.9-40-31.9-50-23.9-92-42.9-123-58.9-32-16-56-28.9-73-38.9-17-9-29-15-37-19-21-10.9-35-18.9-44-24.9-7-5-13-9-20-13-102.1-59-183.1-131-242.1-215-30-42-52-84-65-127.1-14-44-19-87-19-129.1 0-78.1 21-148.1 63-210.1 42-62 101-111 176-147 24-12 50-21 77-28 10-2 19-5 28-7 8-2 17-4 25-6 2-1 3-1 4-2 11-4 22-7 33-9 12-2 24-4 36-4s24 2 36 4c11 2 22 5 33 9 1 1 2 1 4 2 8 2 17 4 25 6 10 2 19 5 28 7 27 7 53 16 77 28 75 36 134 85 176 147 42 62 63 132 63 210.1 0 42-5 85-19 129.1-13 43-35 85-65 127.1-59 84-140 156-242.1 215-7 4-13 8-20 13-9 6-23 14-44 25-8 4-20 10-37 19-17 10-41 23-73 39-31 16-73 35-123 59-15 8-29 19-40 32z"></path></svg></a>
-                    <div className="flex items-center space-x-4">
-                        <button className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">Questions?</button>
-                        <button className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">Save & exit</button>
-                    </div>
-                </div>
+            <header className="max-w-4xl mx-auto pt-12 pb-8 px-6">
+                <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-600 mb-3">
+                    What does your event offer?
+                </h1>
+                <p className="text-xl text-gray-500 font-medium">
+                    Select all the amenities and perks available to your guests.
+                </p>
             </header>
 
-            {/* Main Content */}
-            <main className="flex-grow flex items-center justify-center pt-24 pb-28">
-                <div className="w-full max-w-3xl mx-auto px-4">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Tell attendees what your event has to offer</h1>
-                    <p className="text-gray-600 mb-6">You can add more features and perks after you publish your listing.</p>
+            <main className="max-w-4xl mx-auto px-6 space-y-12 mb-12">
 
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">What about these common features?</h2>
-                    <div className="grid grid-cols-3 gap-4 mb-8">
+                {/* Common Features Section */}
+                <section>
+                    <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <span className="w-8 h-1 bg-gray-200 rounded-full"></span>
+                        Event Amenities
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                         {commonFeatures.map((item) => (
-                            <button key={item.name} onClick={() => toggleFeature(item.name)}
-                                className={`p-4 border rounded-lg flex flex-col items-start text-left transition-colors duration-200 ${selectedFeatures.includes(item.name) ? 'border-black bg-gray-50 border-2' : 'border-gray-300 hover:border-black'}`}>
-                                <Icon name={item.icon} />
-                                <span className="font-semibold text-gray-800">{item.name}</span>
-                            </button>
+                            <FeatureCard key={item.name} item={item} />
                         ))}
                     </div>
+                </section>
 
-                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Do you have any standout perks?</h2>
-                     <div className="grid grid-cols-3 gap-4">
+                {/* Standout Perks Section */}
+                <section>
+                    <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <span className="w-8 h-1 bg-gradient-to-r from-violet-500 to-pink-500 rounded-full"></span>
+                        Exclusive Perks
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                         {standoutPerks.map((item) => (
-                            <button key={item.name} onClick={() => toggleFeature(item.name)}
-                                className={`p-4 border rounded-lg flex flex-col items-start text-left transition-colors duration-200 ${selectedFeatures.includes(item.name) ? 'border-black bg-gray-50 border-2' : 'border-gray-300 hover:border-black'}`}>
-                                <Icon name={item.icon} />
-                                <span className="font-semibold text-gray-800">{item.name}</span>
-                            </button>
+                            <FeatureCard key={item.name} item={item} />
                         ))}
-                     </div>
-                </div>
+                    </div>
+                </section>
+
             </main>
 
-            {/* Footer with Progress Bar */}
-            <footer className="fixed bottom-0 left-0 right-0 bg-white z-20">
-                <div className="w-full bg-gray-200 h-1.5"><div className="bg-black h-1.5" style={{ width: '70%' }}></div></div>
-                <div className="flex items-center justify-between p-4">
-                    <button onClick={() => navigate('/listing/step6')}
-                            className="font-semibold text-gray-800 underline hover:text-black">Back
+            {/* Sticky Footer */}
+            <footer className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50">
+                {/* Progress Bar */}
+                <div className="w-full h-1.5 bg-gray-100">
+                    <div
+                        className="h-full bg-gradient-to-r from-violet-600 to-pink-600 transition-all duration-500 ease-out"
+                        style={{ width: '87.5%' }} // Step 7 of 8 approx
+                    />
+                </div>
+
+                <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <button
+                        onClick={() => navigate('/listing/step6')}
+                        className="px-6 py-2.5 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition-colors"
+                    >
+                        Back
                     </button>
-                    <button onClick={() => navigate('/listing/step8')}
-                            className="px-8 py-3 text-white bg-gray-800 rounded-lg font-semibold hover:bg-black">Next
-                    </button>
+
+                    <div className="flex items-center gap-4">
+                        <span className="hidden sm:block text-sm font-medium text-gray-500">
+                            {selectedFeatures.length} items selected
+                        </span>
+                        <button
+                            onClick={() => navigate('/listing/step8')}
+                            className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
+                        >
+                            Next Step
+                            <CheckCircle2 size={18} />
+                        </button>
+                    </div>
                 </div>
             </footer>
         </div>
     );
-}
+};
+
+export default ListingStep7;
