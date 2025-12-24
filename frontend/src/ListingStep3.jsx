@@ -140,9 +140,9 @@ export default function ListingStep3() {
 
             <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
                 <div className="max-w-screen-2xl mx-auto flex justify-between items-center px-2">
-                    <button onClick={() => navigate('/listing/step2')} className="font-bold text-gray-800 underline">Back</button>
+                    <button onClick={() => navigate('/listing/step1')} className="font-bold text-gray-800 underline">Back</button>
                     <motion.button
-                        onClick={() => navigate('/listing/step4')}
+                        onClick={() => navigate('/listing/step5')}
                         whileHover={{ scale: 1.05 }}
                         className="flex items-center space-x-3 px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg disabled:bg-gray-400"
                         disabled={!locationSelected || !artistsSelected || !vendorsSelected}

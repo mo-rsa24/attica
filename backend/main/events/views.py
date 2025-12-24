@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
-from .models import Event
-from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSerializer
+from .models import Event, PromoCode
+from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSerializer, PromoCodeSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
@@ -20,7 +20,7 @@ class EventViewSet(viewsets.ModelViewSet):
         This view should return a list of all the events
         for the currently authenticated user.
         """
-        return self.request.user.events_created.all()
+        return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -47,6 +47,26 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(events, many=True)
         return Response(serializer.data)
 
+
+class PromoCodeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing promo codes for events.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = PromoCode.objects.all()
+    serializer_class = PromoCodeSerializer
+
+    def get_queryset(self):
+        # Users can only manage promo codes for events they own
+        return self.queryset.filter(event__user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Add validation to ensure user owns the event they are adding a code to
+        event = serializer.validated_data.get('event')
+        if event.user != self.request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only add promo codes to your own events.")
+        serializer.save()
 class SimilarEventsAPIView(generics.ListAPIView):
     serializer_class = SimilarEventSerializer
     permission_classes = [AllowAny]

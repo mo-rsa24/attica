@@ -13,6 +13,7 @@ export const EventCreationProvider = ({ children }) => {
     const [selectedLocations, setSelectedLocations] = useState([]);
     const [selectedArtists, setSelectedArtists] = useState([]);
     const [selectedVendors, setSelectedVendors] = useState([]);
+    const [eventDetails, setEventDetails] = useState([]);
 
     const value = {
         selectedLocations,
@@ -21,6 +22,8 @@ export const EventCreationProvider = ({ children }) => {
         setSelectedArtists,
         selectedVendors,
         setSelectedVendors,
+        eventDetails,
+        setEventDetails,
     };
 
     return (

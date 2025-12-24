@@ -22,7 +22,6 @@ import EventsPage from "./EventsPage.jsx";
 import React from "react";
 // Import all the listing step components
 import ListingStep1 from "./ListingStep1.jsx";
-import ListingStep2 from "./ListingStep2.jsx";
 import ListingStep3 from "./ListingStep3.jsx";
 import ListingStep4 from "./ListingStep4.jsx";
 import ListingStep5 from "./ListingStep5.jsx";
@@ -70,7 +69,6 @@ function App() {
                     <Route path="/events" element={<EventsPage />} />
                     {/* Updated listing step routes */}
                     <Route path="/listing/step1" element={<ListingStep1 />} />
-                    <Route path="/listing/step2" element={<ListingStep2 />} />
                     <Route path="/listing/step3" element={<ListingStep3 />} />
                     <Route path="/listing/step3/location" element={<SelectLocation />} />
                     <Route path="/listing/step3/artists" element={<SelectArtists />} />

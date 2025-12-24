@@ -3,8 +3,13 @@ from rest_framework import serializers
 from events.models import Event
 from vendors.models import Region
 from .models import Location, VenueBooking, LocationImage, Feature, FloorPlan, LocationReview, WaitlistEntry, Question, \
-    Wish, Quote
+    Wish, Quote, Amenity
 
+
+class AmenitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Amenity
+        fields = ['id', 'name', 'icon']
 
 class LocationImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,6 +51,8 @@ class VenueSerializer(serializers.ModelSerializer):
     floor_plans = FloorPlanSerializer(many=True, read_only=True)
     reviews = LocationReviewSerializer(many=True, read_only=True)
     region = RegionSerializer(read_only=True)
+    amenities = AmenitySerializer(many=True, read_only=True)
+
     class Meta:
         model = Location
         fields = [
@@ -53,7 +60,10 @@ class VenueSerializer(serializers.ModelSerializer):
             'venue_count', 'image', 'image_url', 'created_at',
             'updated_at', 'rating', 'listed_date', 'price',
             'images', 'features', 'floor_plans', 'reviews',
-            'region', 'is_featured', 'has_variable_pricing',
+            'region','amenities', 'is_featured', 'has_variable_pricing',
+            'parking_info', 'is_wheelchair_accessible',
+                                                    'budget_estimate_min', 'budget_estimate_max', 'amenities',
+            'organizer_notes', 'preferred_dates', 'is_indoor', 'is_outdoor'
         ]
 
 class PopularVenueSerializer(serializers.ModelSerializer):
