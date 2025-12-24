@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from './AuthContext';
+import React from 'react';
+import FloatingCreateEventButton from './FloatingCreateEventButton.jsx';
 import AdvancedSearch from './AdvancedSearch.jsx';
 import ServiceCard from './ServiceCard.jsx';
 import EventCard from './EventCard.jsx';
@@ -132,6 +134,7 @@ function HomePage() {
                     </PageSection>
                 </>
             )}
+            <FloatingCreateEventButton label="Start a new event" />
         </div>
     );
 }

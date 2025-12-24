@@ -1,17 +1,19 @@
 from rest_framework import viewsets, permissions, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from .models import Event, PromoCode
-from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSerializer, PromoCodeSerializer
+from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSerializer, PromoCodeSerializer, \
+    EventListSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
-
+from django.db.models.functions import Cos, Sin, Radians
+from django.db.models import F
 
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows events to be viewed or edited.
     """
-    queryset = Event.objects.all()
+    queryset = Event.objects.select_related("location")
     serializer_class = EventSerializer
     permission_classes = [AllowAny]
 
@@ -20,15 +22,52 @@ class EventViewSet(viewsets.ModelViewSet):
         This view should return a list of all the events
         for the currently authenticated user.
         """
+        if self.action in ['list', 'retrieve', 'upcoming', 'popular']:
+            return self.queryset
         return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return EventDetailSerializer
+        if self.action == 'list':
+            return EventListSerializer
         return EventSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        lat = request.query_params.get('lat')
+        lng = request.query_params.get('lng')
+
+        if lat and lng:
+            try:
+                lat_val = float(lat)
+                lng_val = float(lng)
+                queryset = queryset.filter(
+                    location__latitude__isnull=False,
+                    location__longitude__isnull=False
+                ).annotate(
+                    distance_km=(
+                            6371 * Cos(Radians(lat_val)) * Cos(Radians(F('location__latitude'))) *
+                            Cos(Radians(F('location__longitude')) - Radians(lng_val)) +
+                            Sin(Radians(lat_val)) * Sin(Radians(F('location__latitude')))
+                    )
+                ).order_by('-date', 'distance_km')
+            except ValueError:
+                queryset = queryset.order_by('-date', '-created_at')
+        else:
+            queryset = queryset.order_by('-date', '-created_at')
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='upcoming', permission_classes=[AllowAny])
     def upcoming(self, request):

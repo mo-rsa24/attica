@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from locations.serializers import VenueSerializer
+from locations.models import Location
 from tickets.serializers import TicketSerializer
 from .models import Event, PromoCode
 
@@ -22,7 +23,6 @@ class EventSerializer(serializers.ModelSerializer):
             'user',
             'partner_user',
             'organizer',
-            'location',
             'name',
             'date',
             'start_date',
@@ -87,3 +87,19 @@ class SimilarEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'banner_image', 'start_date', 'location')
+        fields = ('id', 'name', 'banner_image', 'start_date', 'location')
+
+# Lightweight serializer to expose basic location details without creating
+# a circular dependency on the full location serializers (which import
+# events).
+class LocationSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ['id', 'name', 'address', 'latitude', 'longitude', 'image_url']
+
+class EventListSerializer(EventSerializer):
+    location_detail = LocationSummarySerializer(source="location", read_only=True)
+    distance_km = serializers.FloatField(read_only=True, allow_null=True, required=False)
+
+    class Meta(EventSerializer.Meta):
+        fields = EventSerializer.Meta.fields + ['location_detail', 'distance_km']

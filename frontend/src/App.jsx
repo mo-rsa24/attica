@@ -68,6 +68,7 @@ function App() {
                     <Route path="/dashboard/venue" element={<VenueManagerDashboard />} />
                     <Route path="/dashboard/tickets" element={<TicketBuyerDashboard />} />
                     <Route path="/events" element={<EventsPage />} />
+                    <Route path="/createEvent" element={<EventsPage />} />
                     {/* Updated listing step routes */}
                     <Route path="/listing/step1" element={<ListingStep1 />} />
                     <Route path="/listing/step3" element={<ListingStep3 />} />
