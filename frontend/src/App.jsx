@@ -18,7 +18,8 @@ import ServiceProviderDashboard from "./ServiceProviderDashboard.jsx";
 import VenueManagerDashboard from "./VenueManagerDashboard.jsx";
 import TicketBuyerDashboard from "./TicketBuyerDashboard.jsx";
 import EventOrganizerDashboard from "./EventOrganizerDashboard.jsx";
-import EventsPage from "./EventsPage.jsx";
+import CreateEventPage from "./CreateEventPage.jsx";
+import Events from "./Events.jsx";
 import React from "react";
 // Import all the listing step components
 import ListingStep1 from "./ListingStep1.jsx";
@@ -67,8 +68,8 @@ function App() {
                     <Route path="/dashboard/service" element={<ServiceProviderDashboard />} />
                     <Route path="/dashboard/venue" element={<VenueManagerDashboard />} />
                     <Route path="/dashboard/tickets" element={<TicketBuyerDashboard />} />
-                    <Route path="/events" element={<EventsPage />} />
-                    <Route path="/createEvent" element={<EventsPage />} />
+                    <Route path="/events" element={<Events />} />
+                    <Route path="/createEvent" element={<CreateEventPage />} />
                     {/* Updated listing step routes */}
                     <Route path="/listing/step1" element={<ListingStep1 />} />
                     <Route path="/listing/step3" element={<ListingStep3 />} />
