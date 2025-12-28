@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 // --- Reusable Components ---
 
@@ -16,7 +16,7 @@ const StepCard = ({ number, title, description, delay }) => {
     };
 
     return (
-        <motion.div
+        <Motion.div
             variants={cardVariants}
             whileHover={{
                 scale: 1.03,
@@ -34,7 +34,7 @@ const StepCard = ({ number, title, description, delay }) => {
                 <h3 className="text-2xl font-semibold text-gray-900">{title}</h3>
                 <p className="mt-2 text-lg text-gray-500 leading-relaxed">{description}</p>
             </div>
-        </motion.div>
+        </Motion.div>
     );
 };
 
@@ -87,7 +87,7 @@ export default function EventsPage() {
                  <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-80px)]">
                     {/* Left Side: Hero Image and Title */}
                     <div className="relative flex items-center justify-center bg-gray-800 text-white p-8 lg:p-12">
-                         <motion.div
+                         <Motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 0.5 }}
                             transition={{ duration: 1.5 }}
@@ -99,8 +99,8 @@ export default function EventsPage() {
                                 className="w-full h-full object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        </motion.div>
-                        <motion.h1
+                        </Motion.div>
+                        <Motion.h1
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -108,11 +108,11 @@ export default function EventsPage() {
                             style={{ textShadow: '2px 3px 10px rgba(0,0,0,0.5)' }}
                         >
                            It's easy to get<br />started on Attica
-                        </motion.h1>
+                        </Motion.h1>
                     </div>
 
                     {/* Right Side: Steps */}
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
@@ -123,30 +123,30 @@ export default function EventsPage() {
                                 <StepCard key={step.number} {...step} delay={0.5 + index * 0.3} />
                             ))}
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             </main>
 
             {/* Footer */}
             <footer className="fixed bottom-0 left-0 right-0 bg-white z-20">
                 <div className="w-full bg-gray-200 h-1.5">
-                    <motion.div
+                    <Motion.div
                         className="bg-pink-600 h-1.5"
                         initial={{ width: '0%' }}
                         animate={{ width: '0%' }}
                         transition={{ duration: 1, ease: "easeInOut" }}
                     >
-                    </motion.div>
+                    </Motion.div>
                 </div>
                 <div className="flex justify-end p-6 border-t border-gray-200">
                     <Link to="/listing/step1">
-                        <motion.button
+                        <Motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="px-8 py-4 text-white bg-pink-600 rounded-lg font-semibold hover:bg-pink-700"
                         >
                             Get started
-                        </motion.button>
+                        </Motion.button>
                     </Link>
                 </div>
             </footer>

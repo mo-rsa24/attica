@@ -147,7 +147,7 @@ export default function ListingStep3() {
                         className="flex items-center space-x-3 px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg disabled:bg-gray-400"
                         disabled={!locationSelected || !artistsSelected || !vendorsSelected}
                     >
-                        <span>Review and Finalize</span>
+                        <span>Next</span>
                         <FaChevronRight />
                     </motion.button>
                 </div>

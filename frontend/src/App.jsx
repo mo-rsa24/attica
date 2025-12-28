@@ -40,7 +40,7 @@ import SelectLocation from "./pages/SelectLocation.jsx";
 import SelectArtists from "./pages/SelectArtists.jsx";
 import SelectVendors from "./pages/SelectVendors.jsx";
 import {EventCreationProvider} from "./context/reactContext.jsx";
-
+import Services from "./Services.jsx";
 
 function App() {
     const theme = createTheme()
@@ -58,6 +58,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/services/:id" element={<ListingPage />} />
+                    <Route path="/services" element={<Services />} />
                     <Route path="/artists/:id" element={<ArtistProfilePage />} />
                     <Route path="/locations/:id" element={<LocationDetailPage />} />
                     <Route path="/events/:id" element={<EventListingPage />} />
