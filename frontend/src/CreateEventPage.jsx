@@ -57,11 +57,9 @@ export default function CreateEventPage() {
         setIsCreating(true);
         setError(null);
         try {
-            const today = new Date().toISOString().split('T')[0];
-            const response = await api.post('/api/events/events/', {
-                name: 'Untitled Event',
-                date: today,
-                is_draft: true
+            const response = await api.post('/api/events/event-drafts/', {
+                data: { steps: {} },
+                current_step: 'step1',
             });
             const newEventId = response.data?.id;
             if (newEventId) {

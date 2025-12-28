@@ -21,7 +21,7 @@ import EventOrganizerDashboard from "./EventOrganizerDashboard.jsx";
 import CreateEventPage from "./CreateEventPage.jsx";
 import Events from "./Events.jsx";
 import React from "react";
-// Import all the listing step components
+import DirectMessagePage from "./pages/DirectMessagePage.jsx";
 import ListingStep1 from "./ListingStep1.jsx";
 import ListingStep2 from "./ListingStep2.jsx";
 import ListingStep3 from "./ListingStep3.jsx";
@@ -90,7 +90,6 @@ function App() {
                         <Route path="step6" element={<ListingStep6/>}/>
                         <Route path="step7" element={<ListingStep7/>}/>
                         <Route path="step8" element={<ListingStep8/>}/>
-                        <Route path="/listing/:eventId/review" element={<ListingReview />} />
                         <Route path="review" element={<ListingReview/>}/>
                     </Route>
                     <Route path="/listing/*" element={<Navigate to="/createEvent" replace/>}/>
@@ -101,6 +100,7 @@ function App() {
                     <Route path="/me" element={<Profile/>}/>
                     <Route path="/services/:id/request" element={<RequestToBook/>}/>
                     <Route path="/logout" element={<Logout/>}/>
+                    <Route path="/dm/:roomId" element={<DirectMessagePage/>}/>
                 </Routes>
             </EventCreationProvider>
             {/*<Footer />*/}

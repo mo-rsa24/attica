@@ -94,8 +94,8 @@ export default function ListingStep3() {
         const payload = {
             location: selectedLocations[0]?.id || selectedLocations[0]?.location_id || selectedLocations[0]?.location,
         };
-        await saveStep(event?.id, 'step3', payload, nextStep);
-        navigate(nextStep === 'review' ? '/listing/review' : `/listing/${nextStep}`);
+        await saveStep(eventId || event?.id, 'step3', payload, nextStep);
+        navigate(nextStep === 'review' ? `${basePath}/review` : `${basePath}/${nextStep}`);
     };
 
     const basePath = eventId ? `/listing/${eventId}` : '/createEvent';
@@ -116,7 +116,7 @@ export default function ListingStep3() {
                             <button className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-full border border-slate-200">Questions?</button>
                              <button
                                 className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-full border border-slate-200"
-                                onClick={() => saveAndExit(event?.id)}
+                                onClick={() => saveAndExit(eventId || event?.id)}
                             >
                                 Save & exit
                             </button>

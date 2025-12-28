@@ -4,7 +4,7 @@ import React, {
     useContext,
     useEffect,
     useMemo,
-    useReducer, useState,
+    useReducer
 } from 'react';
 import { useAuth } from '../AuthContext';
 const LOCAL_STORAGE_KEY = 'eventCreationStore';
@@ -55,47 +55,6 @@ const mergeStepMaps = (...maps) => maps.reduce((acc, map) => {
     });
     return acc;
 }, {});
-
-const mapEventToSteps = (event) => {
-    if (!event) return {};
-    return {
-        step1: {
-            eventName: event.name || '',
-            description: event.notes || '',
-            selectedEventType: event.category || '',
-            theme: event.theme || '',
-            startDate: event.start_date || event.date || '',
-            endDate: event.end_date || '',
-        },
-        step3: {
-            selectedLocations: event.location_detail
-                ? [event.location_detail]
-                : event.location
-                    ? [{ id: event.location }]
-                    : [],
-        },
-        step4: {
-            location: event.location_detail || event.location || null,
-        },
-        step5: {
-            budget: event.budget,
-            guest_count: event.guest_count,
-        },
-        step6: {
-            base_price: event.base_price,
-            tiered_prices: event.tiered_prices || [],
-        },
-        step7: {
-            refund_policy: event.refund_policy,
-            access_type: event.access_type,
-            is_age_restricted: event.is_age_restricted,
-        },
-        step8: {
-            banner_image: event.banner_image,
-            image_url: event.image_url,
-        },
-    };
-};
 
 const deriveDataFromStepPayload = (data, step, payload) => {
     const nextData = { ...data };
@@ -151,10 +110,7 @@ const filterPayloadForStep = (step, payload) => {
     }, {});
 };
 
-// 2. Create a custom hook for easy consumption
-export const useEventCreation = () => {
-    return useContext(EventCreationContext);
-};
+
 
 const loadPersistedState = () => {
     try {
@@ -210,8 +166,6 @@ export const useEventCreation = () => useContext(EventCreationContext);
 export const EventCreationProvider = ({ children }) => {
     const { tokens } = useAuth();
     const [state, dispatch] = useReducer(eventCreationReducer, initialState, loadPersistedState);
-    const [eventDetails, setEventDetails] = useState({});
-    const [eventStatus, setEventStatus] = useState(null);
 
     useEffect(() => {
         const toCache = sanitizePayload({
@@ -251,7 +205,7 @@ export const EventCreationProvider = ({ children }) => {
     }, [state.current_step]);
 
     const getStepData = useCallback((step, defaults = {}) => {
-        const backendSteps = mapEventToSteps(state.event);
+        const backendSteps = state.event?.data?.steps || {};
         return {
             ...defaults,
             ...(backendSteps[step] || {}),
@@ -264,20 +218,36 @@ export const EventCreationProvider = ({ children }) => {
     }, []);
 
     const selectedLocations = useMemo(
-        () => state.data.selectedLocations || state.data.steps?.step3?.selectedLocations || [],
-        [state.data.selectedLocations, state.data.steps],
+        () => state.data.selectedLocations
+            || state.data.steps?.step3?.selectedLocations
+            || state.event?.data?.selectedLocations
+            || state.event?.data?.steps?.step3?.selectedLocations
+            || [],
+        [state.data.selectedLocations, state.data.steps, state.event],
     );
     const selectedArtists = useMemo(
-        () => state.data.selectedArtists || state.data.steps?.step3?.selectedArtists || [],
-        [state.data.selectedArtists, state.data.steps],
+        () => state.data.selectedArtists
+            || state.data.steps?.step3?.selectedArtists
+            || state.event?.data?.selectedArtists
+            || state.event?.data?.steps?.step3?.selectedArtists
+            || [],
+        [state.data.selectedArtists, state.data.steps, state.event],
     );
     const selectedVendors = useMemo(
-        () => state.data.selectedVendors || state.data.steps?.step3?.selectedVendors || [],
-        [state.data.selectedVendors, state.data.steps],
+        () => state.data.selectedVendors
+            || state.data.steps?.step3?.selectedVendors
+            || state.event?.data?.selectedVendors
+            || state.event?.data?.steps?.step3?.selectedVendors
+            || [],
+        [state.data.selectedVendors, state.data.steps, state.event],
     );
     const eventDetails = useMemo(
-        () => state.data.eventDetails || state.data.steps?.step4?.eventDetails || {},
-        [state.data.eventDetails, state.data.steps],
+        () => state.data.eventDetails
+            || state.data.steps?.step4?.eventDetails
+            || state.event?.data?.eventDetails
+            || state.event?.data?.steps?.step4?.eventDetails
+            || {},
+        [state.data.eventDetails, state.data.steps, state.event],
     );
 
     const setSelectedLocations = useCallback(
@@ -298,30 +268,37 @@ export const EventCreationProvider = ({ children }) => {
     );
 
     const loadEvent = useCallback(async (id) => {
-        if (!id) return;
+        if (!id) return null;
         dispatch({ type: 'setLoading', payload: true });
         try {
-            const response = await authFetch(`/api/events/events/${id}/`);
+            const response = await authFetch(`/api/events/event-drafts/${id}/`);
             if (!response.ok) {
                 throw new Error('Failed to load event from the server.');
             }
             const payload = await response.json();
+            const backendSteps = payload?.data?.steps || {};
             const mergedSteps = mergeStepMaps(
-                mapEventToSteps(payload),
+                backendSteps(payload),
                 state.data.steps,
+            );
+            const mergedData = applyStepsToData(
+                { ...state.data, ...(payload.data || {}), steps: mergedSteps },
+                mergedSteps,
             );
             dispatch({
                 type: 'hydrate',
                 payload: {
                     event: payload,
-                    data: applyStepsToData(state.data, mergedSteps),
-                    status: payload.is_draft ? 'draft' : 'published',
-                    current_step: state.current_step,
+                    data: mergedData,
+                    status: payload.status || 'draft',
+                    current_step: payload.current_step || state.current_step,
                 },
             });
+            return payload;
         } catch (error) {
             console.error(error);
             dispatch({ type: 'setError', payload: 'Unable to reach the server. Using cached data instead.' });
+            return null
         } finally {
             dispatch({ type: 'setLoading', payload: false });
         }
@@ -333,54 +310,64 @@ export const EventCreationProvider = ({ children }) => {
         const filteredPayload = filterPayloadForStep(normalizedStep, sanitizedPayload);
         const eventId = id || state.event?.id;
 
+        const mergedSteps = mergeStepMaps(state.data.steps, { [normalizedStep]: sanitizedPayload });
+        const mergedData = applyStepsToData({ ...state.data, steps: mergedSteps }, mergedSteps);
+
         dispatch({ type: 'setSaving', payload: true });
         dispatch({ type: 'mergeStepData', step: normalizedStep, payload: sanitizedPayload });
 
-        const requestBody = JSON.stringify(filteredPayload || {});
-        const endpoint = eventId ? `/api/events/events/${eventId}/` : '/api/events/events/';
+        const body = {
+            data: { ...mergedData, ...((filteredPayload && Object.keys(filteredPayload).length) ? { steps: mergedSteps } : { steps: mergedSteps }) },
+            current_step: nextStep || normalizedStep,
+        };
+
+        const endpoint = eventId ? `/api/events/event-drafts/${eventId}/` : '/api/events/event-drafts/';
         const method = eventId ? 'PATCH' : 'POST';
 
         try {
             const response = await authFetch(endpoint, {
                 method,
-                body: requestBody,
+                body: JSON.stringify(body),
             });
             if (!response.ok) {
                 throw new Error('Failed to save step to the server.');
             }
-            const savedEvent = await response.json();
-            const mergedSteps = mergeStepMaps(
-                state.data.steps,
-                { [normalizedStep]: sanitizedPayload },
-                mapEventToSteps(savedEvent),
+            const savedDraft = await response.json();
+            const savedSteps = savedDraft?.data?.steps || mergedSteps;
+            const updatedData = applyStepsToData(
+                { ...mergedData, ...(savedDraft.data || {}), steps: savedSteps },
+                savedSteps,
             );
             dispatch({
                 type: 'hydrate',
                 payload: {
-                    event: savedEvent,
-                    data: applyStepsToData(state.data, mergedSteps),
-                    status: savedEvent.is_draft ? 'draft' : 'published',
-                    current_step: nextStep || normalizedStep,
+                    event: savedDraft,
+                    data: updatedData,
+                    status: savedDraft.status || state.status,
+                    current_step: savedDraft.current_step || nextStep || normalizedStep,
                 },
             });
+            if (nextStep) {
+                dispatch({ type: 'setCurrentStep', payload: nextStep });
+            }
+            return { ok: true, data: savedDraft };
         } catch (error) {
             console.error(error);
             dispatch({ type: 'setError', payload: 'Save failed, stored locally until you are back online.' });
             dispatch({ type: 'setStatus', payload: 'offline-draft' });
+            return { ok: false, error: error.message };
         } finally {
             dispatch({ type: 'setSaving', payload: false });
-            if (nextStep) {
-                dispatch({ type: 'setCurrentStep', payload: nextStep });
-            }
         }
-    }, [authFetch, state.current_step, state.data, state.event]);
+    }, [authFetch, state.current_step, state.data, state.event, state.status]);
 
     const saveAndExit = useCallback(async (id) => {
         const activeStep = state.current_step;
         const cachedStepPayload = state.data.steps?.[activeStep] || {};
-        await saveStep(id, activeStep, cachedStepPayload);
-        dispatch({ type: 'setStatus', payload: 'saved' });
-    }, [saveStep, state.current_step, state.data.steps]);
+        const result = await saveStep(id, activeStep, cachedStepPayload);
+        dispatch({ type: 'setStatus', payload: result.ok ? 'saved' : state.status });
+        return result;
+    }, [saveStep, state.current_step, state.data.steps, state.status]);
 
     const publish = useCallback(async (id) => {
         const eventId = id || state.event?.id;
@@ -390,22 +377,25 @@ export const EventCreationProvider = ({ children }) => {
         }
         dispatch({ type: 'setSaving', payload: true });
         try {
-            const response = await authFetch(`/api/events/events/${eventId}/`, {
-                method: 'PATCH',
-                body: JSON.stringify({ is_draft: false }),
+            const response = await authFetch(`/api/events/event-drafts/${eventId}/publish/`, {
+                method: 'POST',
             });
             if (!response.ok) {
                 throw new Error('Failed to publish the event.');
             }
-            const savedEvent = await response.json();
-            const mergedSteps = mergeStepMaps(state.data.steps, mapEventToSteps(savedEvent));
+            const savedDraft = await response.json();
+            const savedSteps = savedDraft?.data?.steps || state.data.steps;
+            const updatedData = applyStepsToData(
+                { ...state.data, ...(savedDraft.data || {}), steps: savedSteps },
+                savedSteps,
+            );
             dispatch({
                 type: 'hydrate',
                 payload: {
-                    event: savedEvent,
-                    data: applyStepsToData(state.data, mergedSteps),
-                    status: 'published',
-                    current_step: state.current_step,
+                    event: savedDraft,
+                    data: updatedData,
+                    status: savedDraft.status || 'published',
+                    current_step: savedDraft.current_step || state.current_step,
                 },
             });
             return true;
@@ -422,7 +412,7 @@ export const EventCreationProvider = ({ children }) => {
     const isStepValid = useCallback((step = state.current_step) => {
         const validator = STEP_VALIDATORS[step];
         if (!validator) return true;
-        return validator({ ...state.data, event: state.event });
+        return validator({ ...state.data, ...(state.event?.data || {}), event: state.event });
     }, [state.data, state.current_step, state.event]);
 
 

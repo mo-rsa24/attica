@@ -5,12 +5,14 @@ from .views import (
     ChatBidView,
     ChatMessageListCreateView,
     ChatRoomCreateView,
+    ChatRoomDetailView,
     ChatRoomListView,
 )
 
 urlpatterns = [
     path('rooms/', ChatRoomCreateView.as_view(), name='chatroom_create'),
     path('rooms/list/', ChatRoomListView.as_view(), name='chatroom_list'),
+    path('rooms/<int:room_id>/', ChatRoomDetailView.as_view(), name='chatroom_detail'),
     path('rooms/<int:room_id>/messages/', ChatMessageListCreateView.as_view(), name='chatroom_messages'),
     path('rooms/<int:room_id>/attachments/', ChatAttachmentUploadView.as_view(), name='chatroom_attachment'),
     path('rooms/<int:room_id>/bids/', ChatBidView.as_view(), name='chatroom_bid'),

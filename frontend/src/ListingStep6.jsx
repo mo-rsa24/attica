@@ -4,13 +4,23 @@ import { useEventCreation } from './context/reactContext.jsx';
 
 export default function ListingStep6_Event() {
     const navigate = useNavigate();
-    const { setCurrentStep, saveAndExit, event } = useEventCreation();
+    const { setCurrentStep, saveAndExit, event, saveStep, getNextStep, getPreviousStep } = useEventCreation();
 
     useEffect(() => {
         setCurrentStep('step6');
     }, [setCurrentStep]);
     const { eventId } = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
+    const handleNext = async () => {
+        const nextStep = getNextStep('step6');
+        await saveStep(eventId || event?.id, 'step6', {}, nextStep);
+        navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
+    };
+
+    const handleBack = () => {
+        const prevStep = getPreviousStep('step6');
+        navigate(`${listingBase}/${prevStep}`);
+    };
   return (
     <div className="bg-white min-h-screen font-sans flex flex-col">
       {/* Header */}
@@ -21,7 +31,7 @@ export default function ListingStep6_Event() {
             <button className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">Questions?</button>
             <button
               className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200"
-              onClick={() => saveAndExit(event?.id)}
+              onClick={() => saveAndExit(eventId || event?.id)}
             >
               Save & exit
             </button>
@@ -56,10 +66,10 @@ export default function ListingStep6_Event() {
       <footer className="fixed bottom-0 left-0 right-0 bg-white z-20">
         <div className="w-full bg-gray-200 h-1.5"><div className="bg-black h-1.5" style={{ width: '60%' }}></div></div>
         <div className="flex items-center justify-between p-4">
-            <button onClick={() => navigate(`${listingBase}/step5`)}
+            <button onClick={handleBack}
                     className="font-semibold text-gray-800 underline hover:text-black">Back
             </button>
-             <button onClick={() => navigate(`${listingBase}/step7`)}
+             <button onClick={handleNext}
                     className="px-8 py-3 text-white bg-gray-800 rounded-lg font-semibold hover:bg-black">Next
             </button>
         </div>

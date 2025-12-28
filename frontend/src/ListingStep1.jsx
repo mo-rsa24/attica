@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback, useMemo} from 'react';
-import {useNavigate, Link, useSearchParams} from 'react-router-dom';
+import {useNavigate, Link, useParams} from 'react-router-dom';
 import {motion, AnimatePresence} from 'framer-motion';
 import {FaChevronRight, FaTimes, FaTrash} from 'react-icons/fa';
 import {FiImage, FiUploadCloud, FiVideo} from 'react-icons/fi';
@@ -196,8 +196,8 @@ const defaultFormState = {
 
 export default function ListingStep1() {
     const navigate = useNavigate();
-    const { data: eventData, saveStep, setEventDetails } = useEventCreation();
-    const [searchParams] = useSearchParams();
+    const { eventId } = useParams();
+    const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const {
         event,
         saving,
@@ -209,6 +209,7 @@ export default function ListingStep1() {
         saveAndExit,
         loadEvent,
         isStepValid,
+        setEventDetails,
     } = useEventCreation();
     const [formData, setFormData] = useState(() => getStepData('step1', defaultFormState));
     const [formErrors, setFormErrors] = useState({});
@@ -221,43 +222,25 @@ export default function ListingStep1() {
 
     // Load and Auto-save logic
     useEffect(() => {
-        const eventId = searchParams.get('eventId');
         if (eventId) {
             loadEvent(eventId);
         }
-    }, [loadEvent, searchParams]);
+     }, [eventId, loadEvent]);
 
     useEffect(() => {
         setFormData(prev => ({...prev, ...getStepData('step1', defaultFormState)}));
     }, [getStepData]);
 
     useEffect(() => {
-        const {mainImage, thumbnailImage, heroImage, gallery, ...persistable} = formData;
+        const {
+            mainImage: _MAIN_IMAGE,
+            thumbnailImage: _THUMBNAIL_IMAGE,
+            heroImage: _HERO_IMAGE,
+            gallery: _GALLERY,
+            ...persistable
+        } = formData;
         setStepData('step1', persistable);
     }, [formData, setStepData]);
-
-    useEffect(() => {
-        if (!eventData || Object.keys(eventData).length === 0) return;
-        const parsedStartDate = eventData.start_date || eventData.start_time;
-        const parsedEndDate = eventData.end_date;
-        setFormData(prev => ({
-            ...prev,
-            eventName: eventData.name ?? prev.eventName,
-            description: eventData.description ?? eventData.notes ?? prev.description,
-            selectedEventType: eventData.category ?? prev.selectedEventType,
-            region: eventData.region ?? prev.region,
-            theme: eventData.theme ?? prev.theme,
-            capacity: eventData.guest_count?.toString() ?? prev.capacity,
-            startDate: parsedStartDate ? parsedStartDate.slice(0, 10) : prev.startDate,
-            startTime: parsedStartDate && parsedStartDate.includes('T') ? parsedStartDate.slice(11, 16) : prev.startTime,
-            endDate: parsedEndDate ? parsedEndDate.slice(0, 10) : prev.endDate,
-            endTime: eventData.end_time ?? prev.endTime,
-            genres: eventData.genres ?? prev.genres,
-            tags: eventData.tags ?? prev.tags,
-            videoUrl: eventData.videoUrl ?? prev.videoUrl,
-            additionalNotes: eventData.additionalNotes ?? prev.additionalNotes,
-        }));
-    }, [eventData]);
 
     const validationErrors = useMemo(() => {
         const errors = {};
@@ -333,7 +316,7 @@ export default function ListingStep1() {
             notes: [formData.description, formData.additionalNotes].filter(Boolean).join('\n\n'),
         };
 
-        const result = await saveStep('step1', payload);
+        const result = await saveStep(eventId, 'step1', payload);
         setIsSaving(false);
 
         if (!result.ok) {
@@ -344,7 +327,7 @@ export default function ListingStep1() {
         syncStoreWithForm(result.data || {});
 
         if (destination === 'continue') {
-            navigate('/listing/step3');
+            navigate(`${listingBase}/step3`);
         } else if (destination === 'exit') {
             navigate('/my-events');
         }
@@ -365,8 +348,8 @@ export default function ListingStep1() {
             date: formData.startDate,
             guest_count: formData.capacity ? Number(formData.capacity) : undefined,
         };
-        await saveStep(event?.id, 'step1', payload, nextStep);
-        navigate(nextStep === 'review' ? '/listing/review' : `/listing/${nextStep}`);
+        await saveStep(eventId || event?.id, 'step1', payload, nextStep);
+        navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
     };
     return (
         <div className="min-h-screen bg-gray-50 font-sans">
@@ -392,7 +375,7 @@ export default function ListingStep1() {
                             {/*</button>*/}
                             <button
                                 className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full"
-                                onClick={() => saveAndExit(event?.id)}
+                                onClick={() => saveAndExit(eventId || event?.id)}
                             >
                                 Save & exit
                             </button>

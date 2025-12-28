@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {motion} from 'framer-motion';
 import {FiPlus, FiTrash2, FiChevronDown, FiUpload, FiPaperclip} from 'react-icons/fi';
@@ -43,26 +43,72 @@ const AccordionItem = ({title, children, isOpen, onClick}) => (
 
 export default function ListingStep5() {
     const navigate = useNavigate();
-    const {setCurrentStep, saveAndExit, event} = useEventCreation();
+    const {setCurrentStep, saveAndExit, event, getStepData, setStepData, saveStep, getNextStep} = useEventCreation();
     const {eventId} = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
-    // States for each section
-    const [basePrice, setBasePrice] = useState(150.00);
-    const [currency, setCurrency] = useState('ZAR');
-    const [maxTickets, setMaxTickets] = useState(10);
-    const [refundPolicy, setRefundPolicy] = useState('full');
-    const [customPolicy, setCustomPolicy] = useState('');
+    const initialStepData = useMemo(() => getStepData('step5', {}), [getStepData]);
+    const [basePrice, setBasePrice] = useState(initialStepData.base_price ?? 150.00);
+    const [currency, setCurrency] = useState(initialStepData.currency ?? 'ZAR');
+    const [maxTickets, setMaxTickets] = useState(initialStepData.max_tickets_per_buyer ?? 10);
+    const [refundPolicy, setRefundPolicy] = useState(initialStepData.refund_policy ?? 'full');
+    const [customPolicy, setCustomPolicy] = useState(initialStepData.custom_policy ?? '');
     const [openTier, setOpenTier] = useState(null);
 
-    const [isSeated, setIsSeated] = useState(false);
-    const [seatingChart, setSeatingChart] = useState(null);
+    const [isSeated, setIsSeated] = useState(initialStepData.is_seated ?? false);
+    const [seatingChart, setSeatingChart] = useState(initialStepData.seating_chart ?? null);
 
-    const [isAgeRestricted, setIsAgeRestricted] = useState(false);
-    const [isInviteOnly, setIsInviteOnly] = useState(false);
+    const [isAgeRestricted, setIsAgeRestricted] = useState(initialStepData.is_age_restricted ?? false);
+    const [isInviteOnly, setIsInviteOnly] = useState(initialStepData.access_type === 'private');
 
     useEffect(() => {
         setCurrentStep('step5');
     }, [setCurrentStep]);
+
+    useEffect(() => {
+        const next = getStepData('step5', {});
+        if (Object.keys(next || {}).length) {
+            setBasePrice(next.base_price ?? 150.0);
+            setCurrency(next.currency ?? 'ZAR');
+            setMaxTickets(next.max_tickets_per_buyer ?? 10);
+            setRefundPolicy(next.refund_policy ?? 'full');
+            setCustomPolicy(next.custom_policy ?? '');
+            setIsSeated(next.is_seated ?? false);
+            setSeatingChart(next.seating_chart ?? null);
+            setIsAgeRestricted(next.is_age_restricted ?? false);
+            setIsInviteOnly((next.access_type || '') === 'private');
+        }
+    }, [getStepData]);
+
+    useEffect(() => {
+        setStepData('step5', {
+            base_price: basePrice,
+            currency,
+            max_tickets_per_buyer: maxTickets,
+            refund_policy: refundPolicy === 'custom' ? customPolicy : refundPolicy,
+            custom_policy: refundPolicy === 'custom' ? customPolicy : null,
+            is_seated: isSeated,
+            seating_chart: seatingChart,
+            is_age_restricted: isAgeRestricted,
+            access_type: isInviteOnly ? 'private' : 'public',
+        });
+    }, [basePrice, currency, maxTickets, refundPolicy, customPolicy, isSeated, seatingChart, isAgeRestricted, isInviteOnly, setStepData]);
+
+    const handleNext = async () => {
+        const payload = {
+            base_price: basePrice,
+            currency,
+            max_tickets_per_buyer: maxTickets,
+            refund_policy: refundPolicy === 'custom' ? customPolicy : refundPolicy,
+            custom_policy: refundPolicy === 'custom' ? customPolicy : null,
+            is_seated: isSeated,
+            seating_chart: seatingChart,
+            is_age_restricted: isAgeRestricted,
+            access_type: isInviteOnly ? 'private' : 'public',
+        };
+        const nextStep = getNextStep('step5');
+        await saveStep(eventId || event?.id, 'step5', payload, nextStep);
+        navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
+    };
 
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
@@ -81,7 +127,7 @@ export default function ListingStep5() {
                         </a>
                         <button
                             className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full"
-                            onClick={() => saveAndExit(event?.id)}
+                            onClick={() => saveAndExit(eventId || event?.id)}
                         >
                             Save & exit
                         </button>
@@ -232,7 +278,7 @@ export default function ListingStep5() {
                     <button onClick={() => navigate(`${listingBase}/step4`)}
                             className="font-bold text-gray-800 underline">Back
                     </button>
-                    <button onClick={() => navigate(`${listingBase}/step6`)}
+                    <button onClick={handleNext}
                             className="px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg">Next
                     </button>
                 </div>

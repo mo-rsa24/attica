@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.db.models.functions import Cos, Sin, Radians
 from django.db.models import F
 from rest_framework.generics import get_object_or_404
+from rest_framework.exceptions import PermissionDenied
 
 def _enforce_published_guard(instance, validated_data):
     """Ensure published events stay published and keep their publish timestamp."""
@@ -152,7 +153,7 @@ class EventDraftViewSet(viewsets.ModelViewSet):
     serializer_class = EventDraftSerializer
     permission_classes = [IsAuthenticated]
     queryset = EventDraft.objects.all()
-    FIRST_STEP = "details"
+    FIRST_STEP = "step1"
 
     def get_queryset(self):
         return self.queryset.filter(organizer=self.request.user)
@@ -160,7 +161,7 @@ class EventDraftViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(
             organizer=self.request.user,
-            current_step=self.FIRST_STEP,
+            current_step=serializer.validated_data.get("current_step") or self.FIRST_STEP,
         )
 
     def get_object(self):
@@ -208,7 +209,8 @@ class EventDraftViewSet(viewsets.ModelViewSet):
         incoming_data = serializer.validated_data.get("data")
         if incoming_data is not None:
             serializer.validated_data["data"] = {**(instance.data or {}), **incoming_data}
-
+        if not serializer.validated_data.get("current_step"):
+            serializer.validated_data["current_step"] = instance.current_step
         serializer.save()
         return Response(serializer.data)
 

@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from './AuthContext';
-import useAxios from './utils/useAxios';
+import React, {useEffect, useState} from 'react';
+import {Navigate, Outlet, useLocation, useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from './AuthContext';
+import {useEventCreation} from './context/reactContext.jsx';
 
 const stepPathLookup = {
     '1': 'step1',
@@ -32,17 +32,16 @@ const resolveStepPath = (currentStep) => {
 };
 
 export default function ListingWizardLayout() {
-    const { eventId } = useParams();
+    const {eventId} = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const api = useMemo(() => useAxios(), []);
-    const { tokens } = useAuth();
-    const [event, setEvent] = useState(null);
+    const {tokens} = useAuth();
+    const {event, loadEvent} = useEventCreation();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (!eventId) {
-            navigate('/createEvent', { replace: true });
+            navigate('/createEvent', {replace: true});
             return;
         }
 
@@ -54,40 +53,31 @@ export default function ListingWizardLayout() {
         let isMounted = true;
         const fetchEvent = async () => {
             setIsLoading(true);
-            try {
-                const response = await api.get(`/api/events/events/${eventId}/`);
-                if (!isMounted) return;
-                setEvent(response.data);
-                const stepPath = resolveStepPath(response.data.current_step);
-                if (stepPath) {
-                    const targetPath = `/listing/${eventId}/${stepPath}`;
-                    if (!location.pathname.startsWith(targetPath)) {
-                        navigate(targetPath, { replace: true });
-                        return;
-                    }
-                }
-            } catch (error) {
-                if (!isMounted) return;
-                const status = error.response?.status;
-                if (status === 401 || status === 403) {
-                    navigate('/my-events', { replace: true });
+            const draft = await loadEvent(eventId);
+            if (!isMounted) return;
+            if (!draft) {
+                navigate('/createEvent', {replace: true});
+                return;
+            }
+            const stepPath = resolveStepPath(draft.current_step);
+            if (stepPath) {
+                const targetPath = `/listing/${eventId}/${stepPath}`;
+                if (!location.pathname.startsWith(targetPath)) {
+                    navigate(targetPath, {replace: true});
                     return;
                 }
-                if (status === 404) {
-                    navigate('/createEvent', { replace: true });
-                    return;
-                }
-            } finally {
-                if (isMounted) setIsLoading(false);
+                setIsLoading(false);
             }
         };
 
         fetchEvent();
-        return () => { isMounted = false; };
-    }, [api, eventId, location.pathname, navigate, tokens]);
+        return () => {
+            isMounted = false;
+        };
+    }, [eventId, loadEvent, location.pathname, navigate, tokens]);
 
     if (!eventId) {
-        return <Navigate to="/createEvent" replace />;
+        return <Navigate to="/createEvent" replace/>;
     }
 
     if (isLoading) {
@@ -98,5 +88,5 @@ export default function ListingWizardLayout() {
         );
     }
 
-    return <Outlet context={{ event, eventId }} />;
+    return <Outlet context={{event, eventId}}/>;
 }

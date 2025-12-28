@@ -1,13 +1,13 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
-import {Link, useParams} from "react-router-dom";
+import React, {useEffect, useMemo, useState} from "react";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {FaCheckCircle, FaPaperPlane, FaStar} from "react-icons/fa";
 import {useAuth} from "./AuthContext";
-import ChatRoom from "./components/chat/ChatRoom";
-import BidModal from "./components/chat/BidModal";
+
 
 export default function VendorProfile() {
     const {username} = useParams();
     const {user, tokens} = useAuth();
+    const navigate = useNavigate();
 
     const [vendor, setVendor] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -15,11 +15,8 @@ export default function VendorProfile() {
 
     const [showFullBio, setShowFullBio] = useState(false);
 
-    const [room, setRoom] = useState(null);
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [chatError, setChatError] = useState(null);
-    const chatRef = useRef(null);
-    const [showBidModal, setShowBidModal] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -53,8 +50,6 @@ export default function VendorProfile() {
 
     const ensureRoom = async () => {
         setChatError(null);
-        // If we already have a room, reuse it
-        if (room) return room;
 
         // Must have auth + vendor + user
         if (!tokens?.access) {
@@ -100,28 +95,25 @@ export default function VendorProfile() {
                 return null;
             }
 
-            const data = await res.json();
-            setRoom(data);
-            return data;
+            return await res.json();
         } finally {
             setCreatingRoom(false);
         }
     };
 
     const handleStartChat = async () => {
-        await ensureRoom();
+        const created = await ensureRoom();
+        if (created?.id) {
+            navigate(`/dm/${created.id}`);
+        }
     };
 
     const handlePlaceBid = async () => {
         const r = await ensureRoom();
-        if (r) setShowBidModal(true);
-    };
-    useEffect(() => {
-        if (room && chatRef.current) {
-            chatRef.current.scrollIntoView({behavior: "smooth", block: "start"});
+        if (r?.id) {
+            navigate(`/dm/${r.id}?bid=1`);
         }
-    }, [room]);
-
+    };
 
     if (loading) {
         return (
@@ -305,30 +297,6 @@ export default function VendorProfile() {
                     </div>
                 )}
             </div>
-
-            {room && (
-                <div ref={chatRef} className="max-w-screen-lg mx-auto mt-4 px-4">
-                    <ChatRoom
-                        room={room}
-                        tokens={tokens}
-                        user={user}
-                        vendor={vendor}
-                        onClose={() => setRoom(null)}
-                    />
-                </div>
-            )}
-
-            {room && (
-                <BidModal
-                    room={room}
-                    open={showBidModal}
-                    onClose={() => setShowBidModal(false)}
-                    tokens={tokens}
-                    onSubmit={() => {
-                        // TODO: wire bid submit handler
-                    }}
-                />
-            )}
         </>
     );
 }

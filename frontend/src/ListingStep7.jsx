@@ -33,10 +33,10 @@ const ICONS = {
 
 const ListingStep7 = () => {
     const navigate = useNavigate();
-    const { setCurrentStep } = useEventCreation();
+    const { setCurrentStep, getStepData, setStepData, saveStep, getNextStep, saveAndExit, event } = useEventCreation();
     const { eventId } = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
-    const [selectedFeatures, setSelectedFeatures] = useState([]);
+    const [selectedFeatures, setSelectedFeatures] = useState(() => getStepData('step7', {}).features || []);
 
     // Scroll to top on mount
     useEffect(() => {
@@ -47,12 +47,19 @@ const ListingStep7 = () => {
         setCurrentStep('step7');
     }, [setCurrentStep]);
 
-    const toggleFeature = (name) => {
-        if (selectedFeatures.includes(name)) {
-            setSelectedFeatures(selectedFeatures.filter(f => f !== name));
-        } else {
-            setSelectedFeatures([...selectedFeatures, name]);
+    useEffect(() => {
+        const stepData = getStepData('step7', {});
+        if (Array.isArray(stepData.features)) {
+            setSelectedFeatures(stepData.features);
         }
+    }, [getStepData]);
+
+    useEffect(() => {
+        setStepData('step7', { features: selectedFeatures });
+    }, [selectedFeatures, setStepData]);
+
+    const toggleFeature = (name) => {
+        setSelectedFeatures((prev) => prev.includes(name) ? prev.filter(f => f !== name) : [...prev, name]);
     };
 
     const commonFeatures = [
@@ -171,11 +178,21 @@ const ListingStep7 = () => {
                     </button>
 
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => saveAndExit(eventId || event?.id)}
+                            className="px-6 py-2.5 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition-colors"
+                        >
+                            Save & exit
+                        </button>
                         <span className="hidden sm:block text-sm font-medium text-gray-500">
                             {selectedFeatures.length} items selected
                         </span>
                         <button
-                            onClick={() => navigate(`${listingBase}/step8`)}
+                            onClick={async () => {
+                                const nextStep = getNextStep('step7');
+                                await saveStep(eventId || event?.id, 'step7', { features: selectedFeatures }, nextStep);
+                                navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
+                            }}
                             className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
                         >
                             Next Step

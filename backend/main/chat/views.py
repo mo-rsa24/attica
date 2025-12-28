@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import ChatAttachment, ChatBid, ChatRoom, Message
 from .serializers import ChatAttachmentSerializer, ChatBidSerializer, ChatRoomSerializer, MessageSerializer
-
+from .utils import broadcast_room_event
 
 class IsAuthenticatedUser(permissions.IsAuthenticated):
     """
@@ -42,6 +42,16 @@ class ChatRoomListView(APIView):
         serializer = ChatRoomSerializer(qs, many=True)
         return Response(serializer.data)
 
+class ChatRoomDetailView(APIView):
+    permission_classes = [IsAuthenticatedUser]
+
+    def get(self, request, room_id):
+        room = get_object_or_404(ChatRoom, id=room_id)
+        if request.user not in [room.organizer, room.vendor]:
+            return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+        serializer = ChatRoomSerializer(room)
+        return Response(serializer.data)
+
 
 class ChatMessageListCreateView(APIView):
     permission_classes = [IsAuthenticatedUser]
@@ -65,7 +75,9 @@ class ChatMessageListCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         message = serializer.save()
         ChatRoom.objects.filter(id=room.id).update(updated_at=message.created_at)
-        return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
+        serialized = MessageSerializer(message).data
+        broadcast_room_event(room.id, {"type": "message", "message": serialized})
+        return Response(serialized, status=status.HTTP_201_CREATED)
 
 
 class ChatAttachmentUploadView(APIView):
@@ -141,10 +153,12 @@ class ChatBidView(APIView):
         message_text = f"Bid {bid.status}"
         if action and 'counter_amount' in action:
             message_text = f"Bid countered to {action.get('counter_amount')}"
-        Message.objects.create(
+        message = Message.objects.create(
             room=room,
             sender=sender,
             text=message_text,
             message_type=Message.MessageType.BID,
             bid=bid,
         )
+        broadcast_room_event(room.id, {"type": "bid", "message": MessageSerializer(message).data,
+                                       "bid": ChatBidSerializer(bid).data})

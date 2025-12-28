@@ -79,10 +79,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def _handle_send(self, content):
         text = content.get('text', '')
+        attachment_ids = content.get('attachment_ids') or []
+        message_type = content.get('message_type') or Message.MessageType.TEXT
         payload = {
             'room': self.room_id,
             'sender': self.scope['user'].id,
             'text': text,
+            'attachment_ids': attachment_ids,
+            'message_type': message_type,
         }
         serializer = MessageSerializer(data=payload)
         serializer.is_valid(raise_exception=True)

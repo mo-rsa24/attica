@@ -1,20 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Image, UploadCloud, Video, X } from 'lucide-react';
 import { useEventCreation } from './context/reactContext.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 
 export default function ListingStep8_Event() {
     const navigate = useNavigate();
-    const { setCurrentStep, saveAndExit, event } = useEventCreation();
+    const { setCurrentStep, saveAndExit, event, setStepData, getStepData, saveStep, getNextStep } = useEventCreation();
     const { eventId } = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const inputRef = useRef(null);
-    const [uploads, setUploads] = useState([]);
+    const initialUploads = useMemo(() => getStepData('step8', {}).uploads || [], [getStepData]);
+    const [uploads, setUploads] = useState(initialUploads);
     const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         setCurrentStep('step8');
     }, [setCurrentStep]);
+
+    useEffect(() => {
+        const stepData = getStepData('step8', {});
+        if (Array.isArray(stepData.uploads)) {
+            setUploads(stepData.uploads);
+        }
+    }, [getStepData]);
+
+    useEffect(() => {
+        setStepData('step8', { uploads });
+    }, [uploads, setStepData]);
 
     const handleFiles = (fileList) => {
         const next = Array.from(fileList)
@@ -79,7 +91,7 @@ export default function ListingStep8_Event() {
                         <button className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">Questions?</button>
                         <button
                             className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200"
-                            onClick={() => saveAndExit(event?.id)}
+                            onClick={() => saveAndExit(eventId || event?.id)}
                         >
                             Save & exit
                         </button>
@@ -177,7 +189,11 @@ export default function ListingStep8_Event() {
                     <button onClick={() => navigate(`${listingBase}/step7`)}
                             className="font-semibold text-gray-800 underline hover:text-black">Back
                     </button>
-                    <button onClick={() => navigate(`${listingBase}/review`)} /* Navigate to a final review step */
+                    <button onClick={async () => {
+                        const nextStep = getNextStep('step8');
+                        await saveStep(eventId || event?.id, 'step8', { uploads }, nextStep);
+                        navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
+                    }}
                             className="px-8 py-3 text-white bg-gray-800 rounded-lg font-semibold hover:bg-black">Next
                     </button>
                 </div>

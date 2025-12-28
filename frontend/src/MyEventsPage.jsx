@@ -4,18 +4,18 @@ import {FaCalendarAlt, FaClock, FaExclamationTriangle, FaPlus, FaRedoAlt} from '
 import {useAuth} from './AuthContext';
 
 const STEP_ROUTE_MAP = {
-    1: '/listing/step1',
-    2: '/listing/step2',
-    3: '/listing/step3',
-    4: '/listing/step4',
-    5: '/listing/step5',
-    6: '/listing/step6',
-    7: '/listing/step7',
-    8: '/listing/step8',
-    review: '/listing/review',
-    location: '/listing/step3/location',
-    artists: '/listing/step3/artists',
-    vendors: '/listing/step3/vendors',
+    1: 'step1',
+    2: 'step2',
+    3: 'step3',
+    4: 'step4',
+    5: 'step5',
+    6: 'step6',
+    7: 'step7',
+    8: 'step8',
+    review: 'review',
+    location: 'step3/location',
+    artists: 'step3/artists',
+    vendors: 'step3/vendors',
 };
 
 const EmptyState = () => (
@@ -85,16 +85,16 @@ const formatDateTime = (value) => {
     }
 };
 
-const resolveStepRoute = (currentStep) => {
+const resolveStepRoute = (currentStep, eventId) => {
     if (!currentStep) return null;
     const rawKey = typeof currentStep === 'string' ? currentStep.toLowerCase() : currentStep;
     if (STEP_ROUTE_MAP[rawKey]) {
-        return STEP_ROUTE_MAP[rawKey];
+        return eventId ? `/listing/${eventId}/${STEP_ROUTE_MAP[rawKey]}` : null;
     }
 
     const parsed = Number(rawKey);
     if (!Number.isNaN(parsed) && STEP_ROUTE_MAP[parsed]) {
-        return STEP_ROUTE_MAP[parsed];
+        return eventId ? `/listing/${eventId}/${STEP_ROUTE_MAP[parsed]}` : null;
     }
 
     if (typeof currentStep === 'string' && currentStep.startsWith('/listing/')) {
@@ -105,10 +105,10 @@ const resolveStepRoute = (currentStep) => {
 };
 
 const EventRow = ({event, onResume}) => {
-    const statusLabel = event.is_draft ? 'Draft' : 'Published';
-    const statusTone = event.is_draft ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    const statusLabel = event.status === 'published' ? 'Published' : 'Draft';
+    const statusTone = event.status === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200';
     const lastUpdated = event.updated_at || event.created_at;
-    const resumePath = resolveStepRoute(event.current_step) || (event.is_draft ? '/listing/step1' : `/events/${event.id}`);
+    const resumePath = resolveStepRoute(event.current_step, event.id) || (event.status === 'published' ? `/listing/${event.id}/review` : `/listing/${event.id}/step1`);
 
     return (
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -159,7 +159,7 @@ export default function MyEventsPage() {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('/api/events/events/?mine=true', {
+            const response = await fetch('/api/events/event-drafts/?mine=true', {
                 headers: tokens?.access ? {Authorization: `Bearer ${tokens.access}`} : {},
                 signal
             });
