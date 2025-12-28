@@ -2,7 +2,7 @@ from rest_framework import serializers
 from locations.serializers import VenueSerializer
 from locations.models import Location
 from tickets.serializers import TicketSerializer
-from .models import Event, PromoCode
+from .models import Event, PromoCode, EventDraft
 
 # NEW: Serializer for the PromoCode model
 class PromoCodeSerializer(serializers.ModelSerializer):
@@ -41,6 +41,8 @@ class EventSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'is_draft',
+            'status',
+            'published_at',
 
             # 1. Ticket Options
             'base_price', 'currency', 'tiered_prices', 'refund_policy',
@@ -53,7 +55,7 @@ class EventSerializer(serializers.ModelSerializer):
             # 3. Audience & Access Controls
             'is_age_restricted', 'access_type', 'custom_questions',
         ]
-        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'status', 'published_at']
 
     def create(self, validated_data):
         # Set the user from the request context
@@ -103,3 +105,28 @@ class EventListSerializer(EventSerializer):
 
     class Meta(EventSerializer.Meta):
         fields = EventSerializer.Meta.fields + ['location_detail', 'distance_km']
+
+class EventDraftSerializer(serializers.ModelSerializer):
+    organizer_id = serializers.IntegerField(source="organizer.id", read_only=True)
+
+    class Meta:
+        model = EventDraft
+        fields = [
+            "id",
+            "organizer_id",
+            "status",
+            "current_step",
+            "data",
+            "created_at",
+            "updated_at",
+            "published_at",
+        ]
+        read_only_fields = ["id", "organizer_id", "status", "created_at", "updated_at", "published_at"]
+        extra_kwargs = {"current_step": {"required": False}}
+
+    def validate_data(self, value):
+        if value is None:
+            return {}
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("Event data must be an object.")
+        return value

@@ -139,7 +139,7 @@ export default function EventsPage() {
                     </Motion.div>
                 </div>
                 <div className="flex justify-end p-6 border-t border-gray-200">
-                    <Link to="/listing/step1">
+                    <Link to="/createEvent">
                         <Motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}

@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Calendar, CheckCircle2, Image, MapPin, Sparkles, UploadCloud, Users, Video } from 'lucide-react';
 import { useEventCreation } from './context/reactContext.jsx';
 
@@ -26,12 +26,43 @@ const Pill = ({ label }) => (
 
 export default function ListingReview() {
     const navigate = useNavigate();
-    const { selectedLocations = [], selectedArtists = [], selectedVendors = [], eventDetails } = useEventCreation();
+    const { eventId } = useParams();
+    const api = useAxios();
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [error, setError] = useState(null);
+    const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
+    const { selectedLocations = [], selectedArtists = [], selectedVendors = [], eventDetails, setCurrentStep } = useEventCreation();
+
+    useEffect(() => {
+        setCurrentStep('review');
+    }, [setCurrentStep]);
 
     const safeDetails = useMemo(() => {
         if (eventDetails && typeof eventDetails === 'object' && !Array.isArray(eventDetails)) return eventDetails;
         return {};
     }, [eventDetails]);
+
+    const statusLabel = useMemo(() => {
+        if (!eventStatus) return null;
+        const label = eventStatus.status === 'published' ? 'Published' : 'Draft';
+        const ts = eventStatus.published_at || eventStatus.updated_at || eventStatus.created_at;
+        return { label, timestamp: ts };
+    }, [eventStatus]);
+
+    const loadEvent = async () => {
+        if (!eventId) return;
+        try {
+            const { data } = await api.get(`/api/events/events/${eventId}/`);
+            setEventDetails(data);
+            setEventStatus({ status: data.status, published_at: data.published_at, updated_at: data.updated_at, created_at: data.created_at });
+        } catch (e) {
+            console.error('Failed to load event', e);
+        }
+    };
+
+    useEffect(() => {
+        loadEvent();
+    }, [eventId]);
 
     const features = useMemo(() => {
         try {
@@ -57,11 +88,21 @@ export default function ListingReview() {
         { label: 'Uploads', value: uploads.length },
     ];
 
-    const handleConfirm = () => {
-        // Placeholder action for final submission.
-        alert('Event created! (Connect this action to your backend)');
-        navigate('/');
-    };
+    const handlePublish = async () => {
+        if (!eventId) {
+            setError('Missing event id.');
+            return;
+        }
+        setIsPublishing(true);
+        setError(null);
+        try {
+            const { data } = await api.post(`/api/events/events/${eventId}/publish/`);
+            setEventStatus({ status: data.status, published_at: data.published_at, updated_at: data.updated_at, created_at: data.created_at });
+        } catch (e) {
+            setError('Unable to publish right now.');
+        } finally {
+            setIsPublishing(false);
+        }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 text-gray-900">
@@ -74,12 +115,26 @@ export default function ListingReview() {
                             <h1 className="text-xl font-bold text-gray-900">Confirm your event details</h1>
                         </div>
                     </div>
-                    <button
-                        onClick={() => navigate('/listing/step8')}
-                        className="text-sm font-semibold text-gray-700 hover:text-gray-900 underline"
-                    >
-                        Edit uploads
-                    </button>
+                    <div className="flex items-center gap-3">
+                        {statusLabel && (
+                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-xs font-semibold text-gray-800">
+                                <span className={statusLabel.label === 'Published' ? 'text-green-600' : 'text-amber-600'}>
+                                    {statusLabel.label}
+                                </span>
+                                {statusLabel.timestamp && (
+                                    <span className="text-gray-500">
+                                        {new Date(statusLabel.timestamp).toLocaleString()}
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        <button
+                            onClick={() => navigate('/listing/step8')}
+                            className="text-sm font-semibold text-gray-700 hover:text-gray-900 underline"
+                        >
+                            Edit uploads
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -220,31 +275,33 @@ export default function ListingReview() {
                     <div className="lg:col-span-1 space-y-6">
                         <div className="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-6 space-y-4">
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center">
+                                <div className={`h-10 w-10 rounded-full ${statusLabel?.label === 'Published' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'} flex items-center justify-center`}>
                                     <CheckCircle2 className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Ready to publish</p>
+                                    <p className="text-sm text-gray-500">{statusLabel?.label === 'Published' ? 'Live' : 'Ready to publish'}</p>
                                     <p className="text-lg font-semibold">Review complete</p>
                                 </div>
                             </div>
                             <ul className="space-y-2 text-sm text-gray-600">
                                 <li>• Confirm your selections before creating your event.</li>
-                                <li>• You can return to any step to make changes.</li>
+                                <li>• You can return to any step to make changes even after publishing.</li>
                                 <li>• Media uploads will be finalized when you publish.</li>
                             </ul>
                             <button
-                                onClick={handleConfirm}
-                                className="w-full rounded-xl bg-black text-white py-3 font-semibold shadow-sm transition hover:bg-gray-800"
+                                onClick={handlePublish}
+                                disabled={isPublishing}
+                                className="w-full rounded-xl bg-black text-white py-3 font-semibold shadow-sm transition hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
-                                Confirm and create event
+                                {isPublishing ? 'Publishing…' : statusLabel?.label === 'Published' ? 'Republish' : 'Publish listing'}
                             </button>
                             <button
-                                onClick={() => navigate('/listing/step6')}
+                                onClick={() => navigate(`${listingBase}/step6`)}
                                 className="w-full rounded-xl border border-gray-200 text-gray-800 py-3 font-semibold transition hover:bg-gray-50"
                             >
                                 Back to pricing (Step 6)
                             </button>
+                             <p className="text-xs text-gray-500 text-center">Admins can view the live listing in the dashboard events table.</p>
                         </div>
                     </div>
                 </div>

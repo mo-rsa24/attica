@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEventCreation } from './context/reactContext.jsx';
 import {
   Truck,
   Martini,
@@ -32,12 +33,19 @@ const ICONS = {
 
 const ListingStep7 = () => {
     const navigate = useNavigate();
+    const { setCurrentStep } = useEventCreation();
+    const { eventId } = useParams();
+    const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const [selectedFeatures, setSelectedFeatures] = useState([]);
 
     // Scroll to top on mount
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
+     useEffect(() => {
+        setCurrentStep('step7');
+    }, [setCurrentStep]);
 
     const toggleFeature = (name) => {
         if (selectedFeatures.includes(name)) {
@@ -156,7 +164,7 @@ const ListingStep7 = () => {
 
                 <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
                     <button
-                        onClick={() => navigate('/listing/step6')}
+                        onClick={() => navigate(`${listingBase}/step6`)}
                         className="px-6 py-2.5 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition-colors"
                     >
                         Back
@@ -167,7 +175,7 @@ const ListingStep7 = () => {
                             {selectedFeatures.length} items selected
                         </span>
                         <button
-                            onClick={() => navigate('/listing/step8')}
+                            onClick={() => navigate(`${listingBase}/step8`)}
                             className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
                         >
                             Next Step

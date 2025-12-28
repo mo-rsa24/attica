@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams} from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaChevronRight, FaMapMarkerAlt, FaUsers, FaTools, FaCheckCircle } from 'react-icons/fa';
 import {useEventCreation} from "./context/reactContext.jsx";
@@ -69,16 +69,41 @@ const SummaryCard = () => {
 // --- Main Component for the Step 3 Hub (Updated) ---
 export default function ListingStep3() {
     const navigate = useNavigate();
-    const { selectedLocations, selectedArtists, selectedVendors } = useEventCreation();
+    const { eventId } = useParams();
+    const {
+        event,
+        selectedLocations,
+        selectedArtists,
+        selectedVendors,
+        saveAndExit,
+        saveStep,
+        getNextStep,
+        setCurrentStep,
+    } = useEventCreation();
+
+    useEffect(() => {
+        setCurrentStep('step3');
+    }, [setCurrentStep]);
 
     const locationSelected = selectedLocations.length > 0;
     const artistsSelected = selectedArtists.length > 0;
     const vendorsSelected = selectedVendors.length > 0;
 
+    const handleNext = async () => {
+        const nextStep = getNextStep('step3');
+        const payload = {
+            location: selectedLocations[0]?.id || selectedLocations[0]?.location_id || selectedLocations[0]?.location,
+        };
+        await saveStep(event?.id, 'step3', payload, nextStep);
+        navigate(nextStep === 'review' ? '/listing/review' : `/listing/${nextStep}`);
+    };
+
+    const basePath = eventId ? `/listing/${eventId}` : '/createEvent';
+
     const sections = [
-        { name: 'Location: Venue', icon: <FaMapMarkerAlt />, isComplete: locationSelected, path: '/listing/step3/location' },
-        { name: 'Talent: Artist/Management', icon: <FaUsers />, isComplete: artistsSelected, path: '/listing/step3/artists' },
-        { name: 'Vendor: Service Providers', icon: <FaTools />, isComplete: vendorsSelected, path: '/listing/step3/vendors' },
+        { name: 'Location: Venue', icon: <FaMapMarkerAlt />, isComplete: locationSelected, path: `${basePath}/step3/location` },
+        { name: 'Talent: Artist/Management', icon: <FaUsers />, isComplete: artistsSelected, path: `${basePath}/step3/artists` },
+        { name: 'Vendor: Service Providers', icon: <FaTools />, isComplete: vendorsSelected, path: `${basePath}/step3/vendors` },
     ];
 
     return (
@@ -89,7 +114,12 @@ export default function ListingStep3() {
                        <a href="/"><AtticaMark tone="dark" /></a>
                         <div className="flex items-center space-x-3">
                             <button className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-full border border-slate-200">Questions?</button>
-                            <button className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-full border border-slate-200">Save & exit</button>
+                             <button
+                                className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-full border border-slate-200"
+                                onClick={() => saveAndExit(event?.id)}
+                            >
+                                Save & exit
+                            </button>
                         </div>
                     </div>
                     <div className="w-full h-1 bg-slate-200 rounded-full overflow-hidden">
@@ -156,10 +186,10 @@ export default function ListingStep3() {
 
             <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 shadow-[0_-8px_30px_-20px_rgba(15,23,42,0.35)]">
                 <div className="max-w-screen-2xl mx-auto flex justify-between items-center px-2">
-                    <button onClick={() => navigate('/listing/step1')} className="font-bold text-slate-800 underline">Back</button>
+                    <button onClick={() => navigate(eventId ? `/listing/${eventId}/step1` : '/createEvent')} className="font-bold text-slate-800 underline">Back</button>
                     <motion.button
-                        onClick={() => navigate('/listing/step5')}
-                         whileHover={{ scale: 1.05, translateY: -2 }}
+                        onClick={handleNext}
+                        whileHover={{ scale: 1.05, translateY: -2 }}
                         whileTap={{ scale: 0.97 }}
                         className="flex items-center space-x-3 px-6 py-3 bg-gradient-to-r from-slate-900 to-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-900/20 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed"
                         disabled={!locationSelected || !artistsSelected || !vendorsSelected}

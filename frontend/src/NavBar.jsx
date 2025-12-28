@@ -2,12 +2,24 @@ import {AiOutlineHome} from 'react-icons/ai';
 import {useAuth} from './AuthContext';
 import {HiOutlineMenu} from 'react-icons/hi';
 import {FaAirbnb} from 'react-icons/fa';
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
 
 const Navbar = ({userProfileImageUrl, onLogout}) => {
 
     const {user, currentRole, setCurrentRole} = useAuth();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
     return (
         <nav className="bg-gradient-to-r from-white via-pink-50 to-white border-b border-pink-100 shadow-sm">
             <div className="max-w-7xl mx-auto px-6">
@@ -97,9 +109,52 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                         )}
 
 
-                        <button className="p-3 rounded-full hover:bg-pink-50 text-gray-700 transition-all shadow-sm">
-                            <HiOutlineMenu className="h-5 w-5"/>
-                        </button>
+                         <div className="relative" ref={menuRef}>
+                            <button
+                                onClick={() => setIsMenuOpen(prev => !prev)}
+                                className="p-3 rounded-full hover:bg-pink-50 text-gray-700 transition-all shadow-sm"
+                                aria-label="Open menu"
+                            >
+                                <HiOutlineMenu className="h-5 w-5"/>
+                            </button>
+                            {isMenuOpen && (
+                                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-2">
+                                    <Link
+                                        to="/my-events"
+                                        className="block px-4 py-2 text-gray-800 hover:bg-pink-50 font-medium"
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        My Events
+                                    </Link>
+                                    <Link
+                                        to="/createEvent"
+                                        className="block px-4 py-2 text-gray-800 hover:bg-pink-50 font-medium"
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        Create event
+                                    </Link>
+                                    {user ? (
+                                        <button
+                                            onClick={() => {
+                                                onLogout?.();
+                                                setIsMenuOpen(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-gray-800 hover:bg-pink-50 font-medium"
+                                        >
+                                            Logout
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            to="/login"
+                                            className="block px-4 py-2 text-gray-800 hover:bg-pink-50 font-medium"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            Login
+                                        </Link>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                 </div>

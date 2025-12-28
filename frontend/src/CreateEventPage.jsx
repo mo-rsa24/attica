@@ -1,7 +1,9 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {motion as Motion} from 'framer-motion';
 import AtticaMark from "./components/AtticaMark.jsx";
+import useAxios from "./utils/useAxios.js";
+import { useAuth } from './AuthContext.js';
 
 // --- Reusable Components ---
 
@@ -40,6 +42,46 @@ const StepCard = ({number, title, description, delay}) => {
 
 // Main EventsPage Component
 export default function CreateEventPage() {
+    const navigate = useNavigate();
+    const api = useMemo(() => useAxios(), []);
+    const { tokens } = useAuth();
+    const [isCreating, setIsCreating] = useState(false);
+    const [error, setError] = useState(null);
+
+    const handleStart = async () => {
+        if (isCreating) return;
+        if (!tokens) {
+            navigate('/login');
+            return;
+        }
+        setIsCreating(true);
+        setError(null);
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const response = await api.post('/api/events/events/', {
+                name: 'Untitled Event',
+                date: today,
+                is_draft: true
+            });
+            const newEventId = response.data?.id;
+            if (newEventId) {
+                navigate(`/listing/${newEventId}/step1`, { replace: true });
+            } else {
+                setError('Could not start the event wizard. Please try again.');
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            if (status === 401) {
+                navigate('/login');
+                return;
+            }
+            setError('Unable to create a draft event right now. Please try again.');
+            console.error('Error creating draft event:', err);
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
     const steps = [
         {
             number: 1,
@@ -153,16 +195,21 @@ export default function CreateEventPage() {
                 </div>
                 <div className="flex items-center justify-between px-6 lg:px-10 py-5 max-w-screen-2xl mx-auto">
                     <div className="text-sm text-slate-500">You can exit anytime — your progress is saved.</div>
-                    <Link to="/listing/step1">
-                        <Motion.button
-                            whileHover={{ scale: 1.04, translateY: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-8 py-3 text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 rounded-xl font-semibold shadow-lg shadow-pink-500/30 hover:shadow-xl"
-                        >
-                            Get started
-                        </Motion.button>
-                    </Link>
+                    <Motion.button
+                        whileHover={{ scale: 1.04, translateY: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-8 py-3 text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 rounded-xl font-semibold shadow-lg shadow-pink-500/30 hover:shadow-xl disabled:opacity-70"
+                        onClick={handleStart}
+                        disabled={isCreating}
+                    >
+                        {isCreating ? 'Preparing...' : 'Get started'}
+                    </Motion.button>
                 </div>
+                {error && (
+                    <div className="text-sm text-red-600 font-semibold mt-2">
+                        {error}
+                    </div>
+                )}
             </footer>
         </div>
     );

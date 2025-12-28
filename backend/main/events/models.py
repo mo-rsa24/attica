@@ -31,7 +31,14 @@ class Event(models.Model):
     banner_image = models.URLField(max_length=255, blank=True, null=True)
     category = models.CharField(max_length=100, blank=True, null=True,
                                 help_text="The category of the event, e.g., 'Music', 'Food & Drink'.")
-    is_draft = models.BooleanField(default=True, help_text="If 4true, this event is a draft and not yet published.")
+    is_draft = models.BooleanField(default=True, help_text="If true, this event is a draft and not yet published.")
+    status = models.CharField(
+        max_length=20,
+        default='draft',
+        choices=[('draft', 'Draft'), ('published', 'Published')],
+        help_text="High level state of the listing that controls organizer actions."
+    )
+    published_at = models.DateTimeField(null=True, blank=True)
 
     # 1. Ticket Options
     base_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -76,3 +83,30 @@ class PromoCode(models.Model):
 
     def __str__(self):
         return f"Code {self.code} for {self.event.name}"
+
+class EventDraft(models.Model):
+    """
+    Organizer-managed event workflow draft.
+    """
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        PUBLISHED = "published", "Published"
+
+    organizer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="event_drafts",
+    )
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
+    current_step = models.CharField(max_length=100)
+    data = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Draft #{self.pk} ({self.get_status_display()})"
+
+    class Meta:
+        ordering = ["-updated_at", "-created_at"]

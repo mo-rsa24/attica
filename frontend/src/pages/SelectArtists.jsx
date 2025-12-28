@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaChevronDown, FaStar, FaTimes } from 'react-icons/fa';
 import { Mail, Phone, Instagram } from 'lucide-react';
@@ -160,6 +160,8 @@ const ArtistProfileModal = ({ artist, onClose, onSelect, isSelected }) => {
 // --- Main Selection Page ---
 export default function SelectArtists() {
     const navigate = useNavigate();
+    const { eventId } = useParams();
+    const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const { selectedArtists, setSelectedArtists } = useEventCreation();
     const [allArtists, setAllArtists] = useState([]);
     const [genres, setGenres] = useState([]);
@@ -198,7 +200,7 @@ export default function SelectArtists() {
     };
 
     const handleDone = () => {
-        navigate('/listing/step3');
+        navigate(`${listingBase}/step3`);
     };
 
     const filteredArtists = useMemo(() => {

@@ -1,0 +1,242 @@
+import React, {useEffect, useMemo, useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
+import {FaCalendarAlt, FaClock, FaExclamationTriangle, FaPlus, FaRedoAlt} from 'react-icons/fa';
+import {useAuth} from './AuthContext';
+
+const STEP_ROUTE_MAP = {
+    1: '/listing/step1',
+    2: '/listing/step2',
+    3: '/listing/step3',
+    4: '/listing/step4',
+    5: '/listing/step5',
+    6: '/listing/step6',
+    7: '/listing/step7',
+    8: '/listing/step8',
+    review: '/listing/review',
+    location: '/listing/step3/location',
+    artists: '/listing/step3/artists',
+    vendors: '/listing/step3/vendors',
+};
+
+const EmptyState = () => (
+    <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-10 text-center shadow-sm">
+        <div className="text-5xl mb-4">🗂️</div>
+        <h3 className="text-2xl font-semibold text-gray-900 mb-2">No events yet</h3>
+        <p className="text-gray-600 max-w-xl mx-auto mb-6">
+            You haven&apos;t started creating any events. Kick off your first listing to see it appear here.
+        </p>
+        <Link
+            to="/createEvent"
+            className="inline-flex items-center px-5 py-3 bg-pink-600 text-white font-semibold rounded-xl shadow-sm hover:bg-pink-700 transition"
+        >
+            <FaPlus className="mr-2"/> Create new event
+        </Link>
+    </div>
+);
+
+const LoadingState = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {Array.from({length: 4}).map((_, idx) => (
+            <div key={idx} className="animate-pulse bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
+                <div className="h-5 bg-gray-200 rounded w-1/2"/>
+                <div className="flex items-center space-x-3">
+                    <div className="h-4 bg-gray-200 rounded w-24"/>
+                    <div className="h-4 bg-gray-200 rounded w-16"/>
+                </div>
+                <div className="h-4 bg-gray-200 rounded w-32"/>
+                <div className="flex items-center justify-between pt-4">
+                    <div className="h-10 bg-gray-200 rounded w-24"/>
+                    <div className="h-10 bg-gray-200 rounded w-32"/>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+const ErrorState = ({message, onRetry}) => (
+    <div className="bg-rose-50 border border-rose-200 text-rose-700 rounded-xl p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+            <FaExclamationTriangle/>
+            <span>{message}</span>
+        </div>
+        {onRetry && (
+            <button
+                onClick={onRetry}
+                className="px-3 py-2 bg-white text-rose-700 rounded-lg border border-rose-200 hover:bg-rose-100 font-semibold"
+            >
+                Try again
+            </button>
+        )}
+    </div>
+);
+
+const formatDateTime = (value) => {
+    if (!value) return 'Not available';
+    try {
+        return new Date(value).toLocaleString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+    } catch (err) {
+        return value;
+    }
+};
+
+const resolveStepRoute = (currentStep) => {
+    if (!currentStep) return null;
+    const rawKey = typeof currentStep === 'string' ? currentStep.toLowerCase() : currentStep;
+    if (STEP_ROUTE_MAP[rawKey]) {
+        return STEP_ROUTE_MAP[rawKey];
+    }
+
+    const parsed = Number(rawKey);
+    if (!Number.isNaN(parsed) && STEP_ROUTE_MAP[parsed]) {
+        return STEP_ROUTE_MAP[parsed];
+    }
+
+    if (typeof currentStep === 'string' && currentStep.startsWith('/listing/')) {
+        return currentStep;
+    }
+
+    return null;
+};
+
+const EventRow = ({event, onResume}) => {
+    const statusLabel = event.is_draft ? 'Draft' : 'Published';
+    const statusTone = event.is_draft ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    const lastUpdated = event.updated_at || event.created_at;
+    const resumePath = resolveStepRoute(event.current_step) || (event.is_draft ? '/listing/step1' : `/events/${event.id}`);
+
+    return (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="space-y-2">
+                <div className="flex items-center space-x-3">
+                    <h3 className="text-xl font-semibold text-gray-900">{event.name || 'Untitled event'}</h3>
+                    <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${statusTone}`}>{statusLabel}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                    <span className="inline-flex items-center space-x-2">
+                        <FaCalendarAlt className="text-pink-500"/>
+                        <span>Last updated: {formatDateTime(lastUpdated)}</span>
+                    </span>
+                    {event.current_step && (
+                        <span className="inline-flex items-center space-x-2">
+                            <FaClock className="text-pink-500"/>
+                            <span>Current step: {event.current_step}</span>
+                        </span>
+                    )}
+                </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <Link
+                    to={`/events/${event.id}`}
+                    className="px-4 py-2 rounded-lg border border-gray-200 text-gray-800 font-semibold hover:bg-gray-50 transition"
+                >
+                    View
+                </Link>
+                <button
+                    onClick={() => onResume(resumePath)}
+                    className="inline-flex items-center px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg shadow-sm hover:bg-pink-700 transition"
+                >
+                    <FaRedoAlt className="mr-2"/> Resume
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default function MyEventsPage() {
+    const {tokens} = useAuth();
+    const navigate = useNavigate();
+    const [events, setEvents] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    const fetchEvents = async (signal) => {
+        setIsLoading(true);
+        setError('');
+        try {
+            const response = await fetch('/api/events/events/?mine=true', {
+                headers: tokens?.access ? {Authorization: `Bearer ${tokens.access}`} : {},
+                signal
+            });
+            if (!response.ok) {
+                throw new Error('Unable to load your events right now.');
+            }
+            const payload = await response.json();
+            const parsedEvents = Array.isArray(payload) ? payload : payload?.results || [];
+            setEvents(parsedEvents);
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                setError(err.message || 'Something went wrong while fetching your events.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!tokens?.access) {
+            setIsLoading(false);
+            setError('Please log in to view your events.');
+            return;
+        }
+        const controller = new AbortController();
+        fetchEvents(controller.signal);
+        return () => controller.abort();
+    }, [tokens?.access]);
+
+    const handleResume = (path) => {
+        navigate(path);
+    };
+
+    const sortedEvents = useMemo(
+        () => [...events].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)),
+        [events]
+    );
+
+    return (
+        <div className="bg-gray-50 min-h-screen">
+            <section className="bg-gradient-to-r from-pink-600 via-pink-500 to-rose-500 text-white">
+                <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <p className="uppercase text-xs tracking-[0.3em] font-semibold text-white/80 mb-2">My events</p>
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-black mb-3">Keep building your experiences</h1>
+                            <p className="text-white/85 text-lg max-w-2xl">
+                                Track drafts, resume setup where you left off, and publish when you&apos;re ready.
+                            </p>
+                        </div>
+                        <Link
+                            to="/createEvent"
+                            className="inline-flex items-center px-5 py-3 bg-white text-pink-600 font-semibold rounded-xl shadow-lg hover:bg-pink-50 transition w-full lg:w-auto justify-center"
+                        >
+                            <FaPlus className="mr-2"/> Create new event
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+                {error && (
+                    <ErrorState message={error} onRetry={tokens?.access ? () => fetchEvents() : null}/>
+                )}
+
+                {isLoading ? (
+                    <LoadingState/>
+                ) : sortedEvents.length === 0 ? (
+                    <EmptyState/>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {sortedEvents.map(event => (
+                            <EventRow key={event.id} event={event} onResume={handleResume}/>
+                        ))}
+                    </div>
+                )}
+            </section>
+        </div>
+    );
+}

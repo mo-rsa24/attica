@@ -1,5 +1,5 @@
 import React, {useState, useEffect, Fragment, useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {motion, AnimatePresence} from 'framer-motion';
 import {
     FaSearch,
@@ -295,6 +295,8 @@ const RequestForm = ({onSubmit}) => {
 // --- Main Selection Page ---
 export default function SelectLocation() {
     const navigate = useNavigate();
+    const { eventId } = useParams();
+    const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const {selectedLocations, setSelectedLocations} = useEventCreation();
     const [allLocations, setAllLocations] = useState([]);
     const [mapLocations, setMapLocations] = useState([]);
@@ -355,7 +357,7 @@ export default function SelectLocation() {
     };
 
     const handleDone = () => {
-        navigate('/listing/step3');
+         navigate(`${listingBase}/step3`);
     };
 
     const totalCost = selectedLocations.reduce((acc, loc) => acc + (loc.has_variable_pricing ? 0 : parseFloat(loc.price)), 0);

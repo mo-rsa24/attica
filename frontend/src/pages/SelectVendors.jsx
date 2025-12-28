@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaSearch, FaStar, FaTimes, FaPlus, FaMinus, FaStickyNote } from 'react-icons/fa';
 import {useEventCreation} from "../context/reactContext.jsx";
@@ -100,6 +100,8 @@ const AddNotesModal = ({ service, onClose, onSave }) => {
 // --- Main Selection Page ---
 export default function SelectVendors() {
     const navigate = useNavigate();
+    const { eventId } = useParams();
+    const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const { selectedVendors, setSelectedVendors } = useEventCreation();
     const [allServices, setAllServices] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -133,7 +135,7 @@ export default function SelectVendors() {
     }, [selectedVendors]);
 
     const handleDone = () => {
-        navigate('/listing/step3');
+        navigate(`${listingBase}/step3`);
     };
 
     const filteredServices = useMemo(() => {
