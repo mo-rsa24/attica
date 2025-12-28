@@ -13,29 +13,28 @@ class ChatAttachmentSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     attachments = ChatAttachmentSerializer(many=True, read_only=True)
     sender_username = serializers.CharField(source='sender.username', read_only=True)
-    fields = [
-        'id',
-        'room',
-        'sender',
-        'sender_username',
-        'text',
-        'tip_amount',
-        'message_type',
-        'bid',
-        'delivered_at',
-        'read_at',
-        'created_at',
-        'attachments',
-    ]
-    read_only_fields = ['id', 'delivered_at', 'read_at', 'created_at']
 
-
-def create(self, validated_data):
-    validated_data.setdefault('created_at', timezone.now())
-    return super().create(validated_data)
     class Meta:
         model = Message
-        fields = ['id', 'room', 'sender', 'text', 'tip_amount', 'created_at']
+        fields = [
+            'id',
+            'room',
+            'sender',
+            'sender_username',
+            'text',
+            'tip_amount',
+            'message_type',
+            'bid',
+            'delivered_at',
+            'read_at',
+            'created_at',
+            'attachments',
+        ]
+        read_only_fields = ['id', 'delivered_at', 'read_at', 'created_at']
+
+    def create(self, validated_data):
+        validated_data.setdefault('created_at', timezone.now())
+        return super().create(validated_data)
 
 class ChatRoomSerializer(serializers.ModelSerializer):
     messages = MessageSerializer(many=True, read_only=True)

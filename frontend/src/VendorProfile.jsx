@@ -56,6 +56,8 @@ export default function VendorProfile() {
 
     // Must have auth + vendor + user
     if (!tokens?.access || !vendor || !user) return null;
+    const vendorUserId = vendor.user_id || vendor.user?.id;
+    if (!vendorUserId) return null;
 
     // Prevent duplicate creates
     if (creatingRoom) return null;
@@ -70,7 +72,7 @@ export default function VendorProfile() {
         },
         body: JSON.stringify({
           organizer: user.id,
-          vendor: vendor.user_id || vendor.id,
+          vendor: vendorUserId,
         }),
       });
 

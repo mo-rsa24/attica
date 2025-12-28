@@ -125,6 +125,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class VendorSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
     profile_image = serializers.ImageField(source="portfolio")
     services = ServiceSerializer(many=True, source="vendorservices", read_only=True)
 
@@ -132,6 +133,7 @@ class VendorSerializer(serializers.ModelSerializer):
         model = Vendor
         fields = [
             "id",
+            "user_id",
             "name",
             "profile_image",
             "description",

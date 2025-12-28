@@ -50,7 +50,7 @@ class ChatMessageListCreateView(APIView):
         room = get_object_or_404(ChatRoom, id=room_id)
         if request.user not in [room.organizer, room.vendor]:
             return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
-        messages = room.messages.select_related('sender').prefetch_related('attachments').order_by('-created_at')
+        messages = room.messages.select_related('sender').prefetch_related('attachments').order_by('created_at')
         serializer = MessageSerializer(messages, many=True)
         return Response(serializer.data)
 
