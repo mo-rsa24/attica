@@ -1,8 +1,11 @@
 from django.db import migrations
 
 def load_service_images(apps, schema_editor):
-    ServiceImage = apps.get_model('vendors', 'ServiceImage')
-    Service = apps.get_model('vendors', 'Service')
+    try:
+        ServiceImage = apps.get_model('vendors', 'ServiceImage')
+        Service = apps.get_model('vendors', 'Service')
+    except LookupError:
+        return
     images = [
         (15, 'service_gallery/300_ps88mmg.jpg', 9),
         (16, 'service_gallery/300_IIOHaib.jpg', 9),

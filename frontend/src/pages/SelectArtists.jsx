@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaChevronDown, FaStar, FaTimes } from 'react-icons/fa';
 import { Mail, Phone, Instagram } from 'lucide-react';
 import {useEventCreation} from "../context/reactContext.jsx";
+import AtticaMark from "../components/AtticaMark.jsx";
 
 // --- API Helper ---
 const api = {
@@ -211,32 +212,41 @@ export default function SelectArtists() {
     const selectedIds = new Set(selectedArtists.map(a => a.id));
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <header className="bg-white sticky top-0 z-30 shadow-sm">
-                <div className="p-4 max-w-screen-2xl mx-auto">
-                    <h1 className="text-2xl font-bold">Select Talent for Your Event</h1>
-                    <p className="text-sm text-gray-500">Home → Events → Step 3 → Artists</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+            <header className="bg-white/95 backdrop-blur-lg sticky top-0 z-30 shadow-sm border-b border-slate-200/80">
+                <div className="p-4 max-w-screen-2xl mx-auto flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                        <AtticaMark tone="dark" />
+                        <div className="flex items-center gap-3 text-sm text-slate-600">
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Questions?</button>
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Save & exit</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Select Talent for Your Event</h1>
+                        <p className="text-sm text-slate-500">Home → Events → Step 3 → Artists</p>
+                    </div>
                 </div>
-                <div className="p-4 border-t border-gray-200 flex flex-wrap gap-4 items-center">
+                <div className="p-4 border-t border-slate-200/80 flex flex-wrap gap-4 items-center bg-slate-50/60">
                     <div className="relative flex-grow"><FaSearch
                         className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"/><input type="text"
                                                                                                    placeholder="Search artists..."
-                                                                                                   className="w-full pl-10 pr-4 py-2 border rounded-full"/>
+                                                                                                   className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-full bg-white shadow-sm"/>
                     </div>
                     <button
-                        className="px-4 py-2 bg-white border rounded-full flex items-center gap-2">Genre <FaChevronDown
+                        className="px-4 py-2 bg-white border border-slate-200 rounded-full flex items-center gap-2 shadow-sm hover:shadow">Genre <FaChevronDown
                         size={12}/></button>
                     <button
-                        className="px-4 py-2 bg-white border rounded-full flex items-center gap-2">Region <FaChevronDown
+                        className="px-4 py-2 bg-white border border-slate-200 rounded-full flex items-center gap-2 shadow-sm hover:shadow">Region <FaChevronDown
                         size={12}/></button>
                 </div>
 
-                <div className="p-4 border-t border-gray-200 flex flex-wrap gap-3 items-center">
+                <div className="p-4 border-t border-slate-200/80 flex flex-wrap gap-3 items-center bg-white/70 backdrop-blur-sm">
                     {genres.map(genre => (
                         <button
                             key={genre}
                             onClick={() => setActiveGenre(genre)}
-                            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${activeGenre === genre ? 'bg-pink-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${activeGenre === genre ? 'bg-pink-600 text-white shadow-sm shadow-pink-500/25' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
                         >
                             {genre}
                         </button>

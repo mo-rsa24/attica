@@ -15,6 +15,7 @@ import {Users, MapPin, Star} from 'lucide-react';
 import {useEventCreation} from "../context/reactContext.jsx";
 import InteractiveMap from "../components/InteractiveMap.jsx";
 import { useDebounce } from 'use-debounce';
+import AtticaMark from "../components/AtticaMark.jsx";
 
 // --- API Helper ---
 const api = {
@@ -361,18 +362,27 @@ export default function SelectLocation() {
     const selectedIds = new Set(selectedLocations.map(l => l.id));
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
             <AnimatePresence>
                 {viewingLocation &&
                     <LocationDetailModal location={viewingLocation} onClose={() => setViewingLocation(null)}/>}
             </AnimatePresence>
 
-            <header className="bg-white sticky top-0 z-10 shadow-md">
-                <div className="p-4 max-w-screen-2xl mx-auto">
-                    <h1 className="text-2xl font-bold">Select a Venue for Your Event</h1>
-                    <p className="text-sm text-gray-500">Home → Events → Venue</p>
+            <header className="bg-white/95 backdrop-blur-lg sticky top-0 z-30 shadow-sm border-b border-slate-200/80">
+                <div className="p-4 max-w-screen-2xl mx-auto flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                        <AtticaMark tone="dark" />
+                        <div className="flex items-center gap-3 text-sm text-slate-600">
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Questions?</button>
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Save & exit</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Select a Venue for Your Event</h1>
+                        <p className="text-sm text-slate-500">Home → Events → Venue</p>
+                    </div>
                 </div>
-                <div className="p-4 border-t border-gray-200 flex flex-wrap gap-4 items-center">
+                <div className="p-4 border-t border-slate-200/80 flex flex-wrap gap-4 items-center bg-slate-50/60">
                     <div className="relative flex-grow">
                         <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"/>
                         <SearchBar
@@ -382,12 +392,12 @@ export default function SelectLocation() {
                         />
                     </div>
                     <button
-                        className="px-4 py-2 bg-white border rounded-full flex items-center gap-2">Region <FaChevronDown
+                         className="px-4 py-2 bg-white border border-slate-200 rounded-full flex items-center gap-2 shadow-sm hover:shadow">Region <FaChevronDown
                         size={12}/></button>
                     <button
-                        className="px-4 py-2 bg-white border rounded-full flex items-center gap-2">Capacity <FaChevronDown
+                        className="px-4 py-2 bg-white border border-slate-200 rounded-full flex items-center gap-2 shadow-sm hover:shadow">Capacity <FaChevronDown
                         size={12}/></button>
-                    <button className="px-4 py-2 bg-white border rounded-full flex items-center gap-2">Price
+                    <button className="px-4 py-2 bg-white border border-slate-200 rounded-full flex items-center gap-2 shadow-sm hover:shadow">Price
                         Range <FaChevronDown size={12}/></button>
                 </div>
             </header>
@@ -408,7 +418,7 @@ export default function SelectLocation() {
                 </div>
 
                 <div className="lg:col-span-4 space-y-6 order-1 lg:order-2">
-                    <div className="bg-gray-300 rounded-lg h-80 shadow-md">
+                    <div className="bg-white rounded-2xl h-80 shadow-[0_20px_60px_-28px_rgba(15,23,42,0.35)] overflow-hidden border border-slate-100">
                         <InteractiveMap
                                 center={mapCenter}
                                 zoom={12}
@@ -421,7 +431,7 @@ export default function SelectLocation() {
                     </div>
                     <RequestForm onSubmit={(data) => console.log('request', data)}/>
                     <BudgetPlanner totalCost={totalCost}/>
-                    <div className="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+                    <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-4 rounded-xl border border-emerald-100 shadow-inner">
                         <h4 className="font-bold text-teal-800 flex items-center gap-2"><FaInfoCircle/> Recommended
                             Combo</h4>
                         <p className="text-sm text-teal-700 mt-1">Book <span

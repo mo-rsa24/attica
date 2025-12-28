@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'django_extensions',
     'events.apps.EventsConfig',
     'vendors.apps.VendorsConfig',
@@ -83,7 +84,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-ASGI_APPLICATION = 'backend.asgi.application'
+ASGI_APPLICATION = 'main.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {

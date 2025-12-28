@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaSearch, FaStar, FaTimes, FaPlus, FaMinus, FaStickyNote } from 'react-icons/fa';
 import {useEventCreation} from "../context/reactContext.jsx";
+import AtticaMark from "../components/AtticaMark.jsx";
 
 // --- API Helper ---
 const api = {
@@ -143,15 +144,24 @@ export default function SelectVendors() {
     }, [allServices, activeCategory]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <header className="bg-white sticky top-0 z-30 shadow-sm">
-                <div className="p-4 max-w-screen-2xl mx-auto">
-                    <h1 className="text-2xl font-bold">Select Service Providers</h1>
-                    <p className="text-sm text-gray-500">Home → Events → Step 3 → Services</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+            <header className="bg-white/95 backdrop-blur-lg sticky top-0 z-30 shadow-sm border-b border-slate-200/80">
+                <div className="p-4 max-w-screen-2xl mx-auto flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                        <AtticaMark tone="dark" />
+                        <div className="flex items-center gap-3 text-sm text-slate-600">
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Questions?</button>
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Save & exit</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Select Service Providers</h1>
+                        <p className="text-sm text-slate-500">Home → Events → Step 3 → Services</p>
+                    </div>
                 </div>
-                <div className="p-4 border-t border-gray-200 flex flex-wrap gap-3 items-center">
+                <div className="p-4 border-t border-slate-200/80 flex flex-wrap gap-3 items-center bg-slate-50/60">
                     {categories.map(cat => (
-                        <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${activeCategory === cat ? 'bg-pink-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                        <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${activeCategory === cat ? 'bg-pink-600 text-white shadow-sm shadow-pink-500/25' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
                             {cat}
                         </button>
                     ))}
