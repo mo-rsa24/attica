@@ -1,4 +1,6 @@
 from django.db import models, transaction
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework.parsers import MultiPartParser
@@ -7,6 +9,10 @@ from rest_framework.views import APIView
 from .models import ChatAttachment, ChatBid, ChatRoom, Message
 from .serializers import ChatAttachmentSerializer, ChatBidSerializer, ChatRoomSerializer, MessageSerializer
 from .utils import broadcast_room_event
+
+
+User = get_user_model()
+
 
 class IsAuthenticatedUser(permissions.IsAuthenticated):
     """
@@ -32,6 +38,29 @@ class ChatRoomCreateView(APIView):
         room, _ = ChatRoom.objects.get_or_create(organizer_id=organizer_id, vendor_id=vendor_id)
         serializer = ChatRoomSerializer(room)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ChatRoomWithUserView(APIView):
+    permission_classes = [IsAuthenticatedUser]
+
+    def post(self, request, username: str):
+        target = get_object_or_404(User, username=username)
+        if target.id == request.user.id:
+            return Response({"detail": "Cannot create a room with yourself."}, status=status.HTTP_400_BAD_REQUEST)
+
+        organizer_id, vendor_id = self._resolve_participants(request.user, target)
+        room, _ = ChatRoom.objects.get_or_create(organizer_id=organizer_id, vendor_id=vendor_id)
+        serializer = ChatRoomSerializer(room)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def _resolve_participants(request_user: User, target: User):
+        """Return an (organizer_id, vendor_id) tuple for the room."""
+        if request_user.user_type == 'vendor' and target.user_type != 'vendor':
+            return target.id, request_user.id
+        if target.user_type == 'vendor' and request_user.user_type != 'vendor':
+            return request_user.id, target.id
+        # fallback: use the requesting user as organizer for deterministic pairing
+        return request_user.id, target.id
 
 
 class ChatRoomListView(APIView):
@@ -74,6 +103,8 @@ class ChatMessageListCreateView(APIView):
         serializer = MessageSerializer(data=payload)
         serializer.is_valid(raise_exception=True)
         message = serializer.save()
+        Message.objects.filter(id=message.id).update(delivered_at=timezone.now())
+        message.refresh_from_db()
         ChatRoom.objects.filter(id=room.id).update(updated_at=message.created_at)
         serialized = MessageSerializer(message).data
         broadcast_room_event(room.id, {"type": "message", "message": serialized})

@@ -4,7 +4,33 @@ from locations.models import Location
 from tickets.serializers import TicketSerializer
 from .models import Event, PromoCode, EventDraft
 
-# NEW: Serializer for the PromoCode model
+def _extract_draft_name(data):
+    """
+    Attempt to pull a human-friendly name from the draft payload.
+    Falls back to 'Untitled event' when no title-like field exists.
+    """
+    if not isinstance(data, dict):
+        return "Untitled event"
+
+    candidates = [
+        data.get("name"),
+        data.get("title"),
+        data.get("eventName"),
+        data.get("event_name"),
+        data.get("eventDetails", {}).get("name"),
+        data.get("eventDetails", {}).get("eventName"),
+        data.get("event_details", {}).get("name"),
+        data.get("event_details", {}).get("eventName"),
+        data.get("steps", {}).get("step1", {}).get("name"),
+        data.get("steps", {}).get("step1", {}).get("eventName"),
+    ]
+
+    for candidate in candidates:
+        if candidate:
+            return candidate
+
+    return "Untitled event"
+
 class PromoCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PromoCode
@@ -130,3 +156,60 @@ class EventDraftSerializer(serializers.ModelSerializer):
         if not isinstance(value, dict):
             raise serializers.ValidationError("Event data must be an object.")
         return value
+
+class MyEventSummarySerializer(serializers.Serializer):
+    """
+    Lightweight serializer that unifies published events and drafts for the
+    organizer-facing “My Events” experience.
+    """
+
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    status = serializers.CharField()
+    lifecycle_state = serializers.CharField()
+    current_step = serializers.CharField(required=False, allow_null=True)
+    published_at = serializers.DateTimeField(required=False, allow_null=True)
+    created_at = serializers.DateTimeField()
+    updated_at = serializers.DateTimeField()
+    record_type = serializers.CharField()
+    is_draft = serializers.BooleanField()
+    readiness_state = serializers.CharField()
+    organizer_id = serializers.IntegerField(required=False, allow_null=True)
+
+    def to_representation(self, instance):
+        if isinstance(instance, EventDraft):
+            name = _extract_draft_name(instance.data or {})
+            return {
+                "id": instance.id,
+                "name": name,
+                "status": instance.status,
+                "lifecycle_state": "draft",
+                "current_step": instance.current_step,
+                "published_at": instance.published_at,
+                "created_at": instance.created_at,
+                "updated_at": instance.updated_at,
+                "record_type": "draft",
+                "is_draft": True,
+                "readiness_state": "in_progress" if instance.status == EventDraft.Status.DRAFT else "ready",
+                "organizer_id": instance.organizer_id,
+            }
+
+        if isinstance(instance, Event):
+            organizer_id = instance.organizer_id or instance.user_id
+            lifecycle_state = instance.status or ("published" if not instance.is_draft else "draft")
+            return {
+                "id": instance.id,
+                "name": instance.name,
+                "status": instance.status,
+                "lifecycle_state": lifecycle_state,
+                "current_step": None,
+                "published_at": instance.published_at,
+                "created_at": instance.created_at,
+                "updated_at": instance.updated_at,
+                "record_type": "event",
+                "is_draft": instance.is_draft,
+                "readiness_state": "published" if lifecycle_state == "published" else "pending",
+                "organizer_id": organizer_id,
+            }
+
+        return super().to_representation(instance)

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {motion as Motion} from 'framer-motion';
 import AtticaMark from "./components/AtticaMark.jsx";
@@ -43,7 +43,7 @@ const StepCard = ({number, title, description, delay}) => {
 // Main EventsPage Component
 export default function CreateEventPage() {
     const navigate = useNavigate();
-    const api = useMemo(() => useAxios(), []);
+    const api = useAxios();
     const { tokens } = useAuth();
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState(null);

@@ -2,12 +2,12 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from .models import Event, PromoCode, EventDraft
 from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSerializer, PromoCodeSerializer, \
-    EventListSerializer, EventDraftSerializer
+    EventListSerializer, EventDraftSerializer, MyEventSummarySerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models.functions import Cos, Sin, Radians
-from django.db.models import F
+from django.db.models import F, Q
 from rest_framework.generics import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 
@@ -25,7 +25,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     queryset = Event.objects.select_related("location")
     serializer_class = EventSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         """
@@ -227,3 +227,23 @@ class EventDraftViewSet(viewsets.ModelViewSet):
         instance.published_at = timezone.now()
         instance.save(update_fields=["status", "published_at", "updated_at"])
         return Response(self.get_serializer(instance).data)
+
+class MyEventsAPIView(generics.GenericAPIView):
+    """
+    Organizer-only listing of drafts and published events for the authenticated user.
+    """
+
+    serializer_class = MyEventSummarySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        organizer = request.user
+        drafts = EventDraft.objects.filter(organizer=organizer).order_by("-updated_at")
+        published = Event.objects.filter(
+            Q(organizer=organizer) | Q(user=organizer)
+        ).filter(status="published").order_by("-updated_at")
+
+        return Response({
+            "drafts": self.get_serializer(drafts, many=True).data,
+            "published": self.get_serializer(published, many=True).data,
+        })

@@ -1,5 +1,6 @@
 import json
 from urllib.parse import parse_qs
+import logging
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
@@ -12,7 +13,7 @@ from .models import ChatRoom, Message
 from .serializers import MessageSerializer
 
 User = get_user_model()
-
+logger = logging.getLogger(__name__)
 
 @database_sync_to_async
 def _get_user_from_token(token):
@@ -54,6 +55,7 @@ class WebSocketJWTAuthMiddleware:
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs'].get('room_id')
+        self.broadcast_enabled = True
         if not self.scope['user'] or self.scope['user'].is_anonymous:
             await self.close(code=4401)
             return
@@ -61,8 +63,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close(code=4403)
             return
         self.room_group_name = f"chat_room_{self.room_id}"
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        if not self.channel_layer:
+            self.broadcast_enabled = False
+            logger.warning("No channel layer configured; realtime disabled for room %s", self.room_id)
+        else:
+            try:
+                await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            except Exception as exc:  # pragma: no cover - defensive
+                logger.warning("Failed to join chat group %s: %s", self.room_group_name, exc)
+                self.broadcast_enabled = False
         await self.accept()
+        if not self.broadcast_enabled:
+            await self.send_json(
+                {"type": "warning", "detail": "Realtime updates unavailable; refresh to see new messages."})
 
     async def disconnect(self, close_code):
         if hasattr(self, 'room_group_name'):
@@ -92,7 +105,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         serializer.is_valid(raise_exception=True)
         message = await database_sync_to_async(serializer.save)()
         await database_sync_to_async(Message.objects.filter(id=message.id).update)(delivered_at=timezone.now())
-        await self._broadcast({'type': 'message', 'message': MessageSerializer(message).data})
+        serialized = MessageSerializer(message).data
+        sent = await self._broadcast({'type': 'message', 'message': serialized})
+        if not sent:
+            await self.send_json({"type": "message", "message": serialized})
 
     async def _handle_read(self, content):
         message_id = content.get('message_id')
@@ -102,14 +118,21 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await database_sync_to_async(Message.objects.filter(id=message_id, room_id=self.room_id).update)(read_at=now)
         await self._broadcast({'type': 'read_receipt', 'message_id': message_id, 'read_at': now.isoformat()})
 
-    async def _broadcast(self, payload):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat.event',
-                'payload': payload,
-            },
-        )
+    async def _broadcast(self, payload) -> bool:
+        if not self.broadcast_enabled or not self.channel_layer:
+            return False
+        try:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat.event',
+                    'payload': payload,
+                },
+            )
+            return True
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.warning("Chat broadcast failed for room %s: %s", self.room_id, exc)
+            return False
 
     async def chat_event(self, event):
         await self.send(text_data=json.dumps(event['payload']))

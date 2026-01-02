@@ -278,7 +278,7 @@ export const EventCreationProvider = ({ children }) => {
             const payload = await response.json();
             const backendSteps = payload?.data?.steps || {};
             const mergedSteps = mergeStepMaps(
-                backendSteps(payload),
+                backendSteps,
                 state.data.steps,
             );
             const mergedData = applyStepsToData(

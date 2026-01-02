@@ -7,10 +7,12 @@ from .views import (
     ChatRoomCreateView,
     ChatRoomDetailView,
     ChatRoomListView,
+    ChatRoomWithUserView,
 )
 
 urlpatterns = [
     path('rooms/', ChatRoomCreateView.as_view(), name='chatroom_create'),
+    path('rooms/with/<str:username>/', ChatRoomWithUserView.as_view(), name='chatroom_with_user'),
     path('rooms/list/', ChatRoomListView.as_view(), name='chatroom_list'),
     path('rooms/<int:room_id>/', ChatRoomDetailView.as_view(), name='chatroom_detail'),
     path('rooms/<int:room_id>/messages/', ChatMessageListCreateView.as_view(), name='chatroom_messages'),

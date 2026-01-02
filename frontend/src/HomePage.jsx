@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import React from 'react';
 import FloatingCreateEventButton from './FloatingCreateEventButton.jsx';
@@ -34,7 +34,7 @@ function HomePage() {
     });
     const [isLoading, setIsLoading] = useState(true);
 
-    const api = useMemo(() => useAxios(), []); // 🛠 Memoize Axios instance
+    const api = useAxios();
 
     const isEventOrganizer = user?.roles?.includes('EVENT_ORGANIZER');
 

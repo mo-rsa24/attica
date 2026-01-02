@@ -37,7 +37,8 @@ const EmptyState = () => (
 const LoadingState = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {Array.from({length: 4}).map((_, idx) => (
-            <div key={idx} className="animate-pulse bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
+            <div key={idx}
+                 className="animate-pulse bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
                 <div className="h-5 bg-gray-200 rounded w-1/2"/>
                 <div className="flex items-center space-x-3">
                     <div className="h-4 bg-gray-200 rounded w-24"/>
@@ -105,17 +106,24 @@ const resolveStepRoute = (currentStep, eventId) => {
 };
 
 const EventRow = ({event, onResume}) => {
-    const statusLabel = event.status === 'published' ? 'Published' : 'Draft';
-    const statusTone = event.status === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200';
+    const isDraft = event.record_type === 'draft' || event.status === 'draft' || event.is_draft;
+    const statusLabel = isDraft ? 'Draft' : 'Published';
+    const statusTone = isDraft ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
     const lastUpdated = event.updated_at || event.created_at;
-    const resumePath = resolveStepRoute(event.current_step, event.id) || (event.status === 'published' ? `/listing/${event.id}/review` : `/listing/${event.id}/step1`);
+    const resumePath = isDraft
+        ? resolveStepRoute(event.current_step, event.id) || `/listing/${event.id}/step1`
+        : `/events/${event.id}`;
+    const resumeLabel = isDraft ? 'Resume' : 'Open';
+
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div
+            className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="space-y-2">
                 <div className="flex items-center space-x-3">
                     <h3 className="text-xl font-semibold text-gray-900">{event.name || 'Untitled event'}</h3>
-                    <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${statusTone}`}>{statusLabel}</span>
+                    <span
+                        className={`text-xs font-semibold px-3 py-1 rounded-full border ${statusTone}`}>{statusLabel}</span>
                 </div>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                     <span className="inline-flex items-center space-x-2">
@@ -131,17 +139,19 @@ const EventRow = ({event, onResume}) => {
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <Link
-                    to={`/events/${event.id}`}
-                    className="px-4 py-2 rounded-lg border border-gray-200 text-gray-800 font-semibold hover:bg-gray-50 transition"
-                >
-                    View
-                </Link>
+                {!isDraft && (
+                    <Link
+                        to={`/events/${event.id}`}
+                        className="px-4 py-2 rounded-lg border border-gray-200 text-gray-800 font-semibold hover:bg-gray-50 transition"
+                    >
+                        View
+                    </Link>
+                )}
                 <button
                     onClick={() => onResume(resumePath)}
                     className="inline-flex items-center px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg shadow-sm hover:bg-pink-700 transition"
                 >
-                    <FaRedoAlt className="mr-2"/> Resume
+                    <FaRedoAlt className="mr-2"/> {resumeLabel}
                 </button>
             </div>
         </div>
@@ -151,7 +161,8 @@ const EventRow = ({event, onResume}) => {
 export default function MyEventsPage() {
     const {tokens} = useAuth();
     const navigate = useNavigate();
-    const [events, setEvents] = useState([]);
+    const [drafts, setDrafts] = useState([]);
+    const [publishedEvents, setPublishedEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -159,7 +170,7 @@ export default function MyEventsPage() {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('/api/events/event-drafts/?mine=true', {
+            const response = await fetch('/api/events/my-events/', {
                 headers: tokens?.access ? {Authorization: `Bearer ${tokens.access}`} : {},
                 signal
             });
@@ -167,8 +178,8 @@ export default function MyEventsPage() {
                 throw new Error('Unable to load your events right now.');
             }
             const payload = await response.json();
-            const parsedEvents = Array.isArray(payload) ? payload : payload?.results || [];
-            setEvents(parsedEvents);
+            setDrafts(payload?.drafts || []);
+            setPublishedEvents(payload?.published || []);
         } catch (err) {
             if (err.name !== 'AbortError') {
                 setError(err.message || 'Something went wrong while fetching your events.');
@@ -190,13 +201,24 @@ export default function MyEventsPage() {
     }, [tokens?.access]);
 
     const handleResume = (path) => {
-        navigate(path);
+        if (path) {
+            navigate(path);
+        }
     };
 
-    const sortedEvents = useMemo(
-        () => [...events].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)),
-        [events]
+    const sortedDrafts = useMemo(
+        () => [...drafts].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)),
+        [drafts]
     );
+
+    const sortedPublished = useMemo(
+        () => [...publishedEvents].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)),
+        [publishedEvents]
+    );
+
+    const hasDrafts = sortedDrafts.length > 0;
+    const hasPublished = sortedPublished.length > 0;
+    const hasAnyEvents = hasDrafts || hasPublished;
 
     return (
         <div className="bg-gray-50 min-h-screen">
@@ -227,13 +249,37 @@ export default function MyEventsPage() {
 
                 {isLoading ? (
                     <LoadingState/>
-                ) : sortedEvents.length === 0 ? (
+                ) : !hasAnyEvents ? (
                     <EmptyState/>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {sortedEvents.map(event => (
-                            <EventRow key={event.id} event={event} onResume={handleResume}/>
-                        ))}
+                    <div className="space-y-8">
+                        {hasDrafts && (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-semibold text-gray-900">Drafts</h2>
+                                    <span className="text-sm text-gray-500">{sortedDrafts.length} in progress</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {sortedDrafts.map(event => (
+                                        <EventRow key={`draft-${event.id}`} event={event} onResume={handleResume}/>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {hasPublished && (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-semibold text-gray-900">Published</h2>
+                                    <span className="text-sm text-gray-500">{sortedPublished.length} live</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {sortedPublished.map(event => (
+                                        <EventRow key={`event-${event.id}`} event={event} onResume={handleResume}/>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </section>
