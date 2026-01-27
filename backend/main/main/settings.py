@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'artists.apps.ArtistsConfig',
     'locations.apps.LocationsConfig',
     'tickets.apps.TicketsConfig',
+    'notifications.apps.NotificationsConfig',
     'rest_framework',
     'corsheaders',
     'django_filters'

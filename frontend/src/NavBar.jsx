@@ -4,6 +4,7 @@ import {HiOutlineMenu} from 'react-icons/hi';
 import {FaAirbnb} from 'react-icons/fa';
 import React, {useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
+import {NotificationBell} from './components/notifications';
 
 const Navbar = ({userProfileImageUrl, onLogout}) => {
 
@@ -82,6 +83,7 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                                 ))}
                             </select>
                         )}
+                        {user && <NotificationBell />}
                         <Link to="/profile"
                               className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-offset-2 ring-pink-200 shadow-sm">
                             <img

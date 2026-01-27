@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {FaArrowLeft, FaImage, FaPaperPlane, FaPaperclip} from 'react-icons/fa';
+import {useDebouncedCallback} from 'use-debounce';
 import {useAuth} from '../AuthContext';
 import BidModal from '../components/chat/BidModal';
 
@@ -99,6 +100,9 @@ export default function DirectMessagePage() {
     const socketRef = useRef(null);
     const listRef = useRef(null);
     const reconnectRef = useRef(null);
+    const typingTimeoutRef = useRef(null);
+    const [isTyping, setIsTyping] = useState(false);
+    const [typingUser, setTypingUser] = useState(null);
 
     const counterpart = useMemo(() => {
         if (!room || !user) return null;
@@ -138,6 +142,21 @@ export default function DirectMessagePage() {
             appendMessages(msgs || []);
         }
     }, [appendMessages, roomId, tokens]);
+
+    const markAsRead = useCallback((messageId) => {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({
+                type: 'read_receipt',
+                message_id: messageId,
+            }));
+        }
+    }, []);
+
+    const sendTyping = useDebouncedCallback(() => {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({type: 'typing'}));
+        }
+    }, 500, {leading: true, trailing: false});
 
 
     useEffect(() => {
@@ -186,10 +205,20 @@ export default function DirectMessagePage() {
                 const payload = JSON.parse(event.data);
                 if (payload.type === 'message' && payload.message) {
                     appendMessages([payload.message]);
+                    // Auto-mark as read if message is from other user and page is visible
+                    if (payload.message.sender !== user?.id && document.visibilityState === 'visible') {
+                        markAsRead(payload.message.id);
+                    }
                 } else if (payload.type === 'bid' && payload.message) {
                     appendMessages([payload.message]);
-                } else if (payload.type === 'typing') {
-                    // typing indicator placeholder
+                } else if (payload.type === 'typing' && payload.user !== user?.username) {
+                    setTypingUser(payload.user);
+                    setIsTyping(true);
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                    typingTimeoutRef.current = setTimeout(() => {
+                        setIsTyping(false);
+                        setTypingUser(null);
+                    }, 2000);
                 } else if (payload.type === 'read_receipt') {
                     setMessages((prev) => prev.map((m) => (m.id === payload.message_id ? {
                         ...m,
@@ -210,9 +239,10 @@ export default function DirectMessagePage() {
 
         return () => {
             if (reconnectRef.current) clearTimeout(reconnectRef.current);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
             socketRef.current?.close();
         };
-    }, [appendMessages, wsUrl]);
+    }, [appendMessages, wsUrl, user]);
 
     useEffect(() => {
         if (!socketError) return undefined;
@@ -234,8 +264,40 @@ export default function DirectMessagePage() {
         }
     }, [searchParams]);
 
+    // Mark unread messages from other user as read when viewing
+    useEffect(() => {
+        if (!user || !messages.length) return;
+        const unreadFromOther = messages.filter(
+            (m) => m.sender !== user.id && !m.read_at
+        );
+        if (unreadFromOther.length > 0 && document.visibilityState === 'visible') {
+            // Mark the latest unread message as read (server will handle the rest)
+            const latest = unreadFromOther[unreadFromOther.length - 1];
+            markAsRead(latest.id);
+        }
+    }, [messages, user, markAsRead]);
+
+    // Handle visibility change to mark messages read when tab becomes visible
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible' && user && messages.length) {
+                const unread = messages.filter((m) => m.sender !== user.id && !m.read_at);
+                if (unread.length > 0) {
+                    markAsRead(unread[unread.length - 1].id);
+                }
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibility);
+        return () => document.removeEventListener('visibilitychange', handleVisibility);
+    }, [messages, user, markAsRead]);
+
     const handleFileChange = (e) => {
         setPendingFiles(Array.from(e.target.files || []));
+    };
+
+    const handleInputChange = (e) => {
+        setComposerText(e.target.value);
+        sendTyping();
     };
 
     const uploadAttachments = async () => {
@@ -291,8 +353,10 @@ export default function DirectMessagePage() {
         }
     };
 
-    const handleBidSubmit = () => {
+    const handleBidSubmit = (bidData) => {
         setShowBidModal(false);
+        // Refresh messages to get the new bid message
+        fetchMessages();
     };
 
     const handleBidAction = async (bidId, action) => {
@@ -368,6 +432,13 @@ export default function DirectMessagePage() {
                 <div className="bg-white rounded-xl shadow border flex flex-col h-[75vh]">
                     <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
                         {messages.map(renderMessage)}
+                        {isTyping && typingUser && (
+                            <div className="flex justify-start">
+                                <div className="bg-gray-200 text-gray-600 px-4 py-2 rounded-2xl text-sm italic">
+                                    {typingUser} is typing...
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <form onSubmit={sendMessage} className="border-t bg-white p-3">
@@ -388,7 +459,7 @@ export default function DirectMessagePage() {
                             <input
                                 type="text"
                                 value={composerText}
-                                onChange={(e) => setComposerText(e.target.value)}
+                                onChange={handleInputChange}
                                 placeholder="Type a message..."
                                 className="flex-1 rounded-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />

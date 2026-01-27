@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from .models import ChatAttachment, ChatBid, ChatRoom, Message
 from .serializers import ChatAttachmentSerializer, ChatBidSerializer, ChatRoomSerializer, MessageSerializer
 from .utils import broadcast_room_event
+from notifications.utils import notify_new_message, notify_new_bid, notify_bid_response
 
 
 User = get_user_model()
@@ -108,6 +109,8 @@ class ChatMessageListCreateView(APIView):
         ChatRoom.objects.filter(id=room.id).update(updated_at=message.created_at)
         serialized = MessageSerializer(message).data
         broadcast_room_event(room.id, {"type": "message", "message": serialized})
+        # Send notification to the other participant
+        notify_new_message(room, request.user, message.text or '')
         return Response(serialized, status=status.HTTP_201_CREATED)
 
 
@@ -156,6 +159,8 @@ class ChatBidView(APIView):
         serializer.is_valid(raise_exception=True)
         bid = serializer.save()
         self._record_bid_message(room, request.user, bid)
+        # Notify vendor of new bid
+        notify_new_bid(room, bid)
         return Response(ChatBidSerializer(bid).data, status=status.HTTP_201_CREATED)
 
     def patch(self, request, room_id, bid_id):
@@ -177,6 +182,8 @@ class ChatBidView(APIView):
             bid.save()
             updates = ChatBidSerializer(bid).data
             self._record_bid_message(room, acting_user, bid, action=request.data)
+            # Notify organizer of bid response
+            notify_bid_response(room, bid, bid.status)
         return Response(updates, status=status.HTTP_200_OK)
 
     @staticmethod

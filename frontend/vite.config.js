@@ -12,10 +12,14 @@ export default defineConfig({
       usePolling: true,  // Try this for WSL2 or Docker environments
     },
     proxy: {
-      '/api': 'http://localhost:8000',  // Proxy all /api requests to Django
-      '/vendors': 'http://localhost:8000',   // Vendor related endpoints
-      '/cart': 'http://localhost:8000',      // Cart endpoints
+      '/api': 'http://localhost:8000',
+      '/vendors': 'http://localhost:8000',
+      '/cart': 'http://localhost:8000',
       '/checkout': 'http://localhost:8000',
+      '/ws': {
+        target: 'http://localhost:8000',
+        ws: true,
+      },
     },
   },
 })
