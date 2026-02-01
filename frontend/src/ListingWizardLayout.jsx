@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Navigate, Outlet, useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from './AuthContext';
 import {useEventCreation} from './context/reactContext.jsx';
@@ -38,6 +38,8 @@ export default function ListingWizardLayout() {
     const {tokens} = useAuth();
     const {event, loadEvent} = useEventCreation();
     const [isLoading, setIsLoading] = useState(true);
+    const loadEventRef = useRef(loadEvent);
+    useEffect(() => { loadEventRef.current = loadEvent; }, [loadEvent]);
 
     useEffect(() => {
         if (!eventId) {
@@ -53,7 +55,7 @@ export default function ListingWizardLayout() {
         let isMounted = true;
         const fetchEvent = async () => {
             setIsLoading(true);
-            const draft = await loadEvent(eventId);
+            const draft = await loadEventRef.current(eventId);
             if (!isMounted) return;
             if (!draft) {
                 navigate('/createEvent', {replace: true});
@@ -74,7 +76,8 @@ export default function ListingWizardLayout() {
         return () => {
             isMounted = false;
         };
-    }, [eventId, loadEvent, location.pathname, navigate, tokens]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [eventId, tokens, navigate]);
 
     if (!eventId) {
         return <Navigate to="/createEvent" replace/>;

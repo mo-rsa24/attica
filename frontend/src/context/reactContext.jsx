@@ -4,7 +4,8 @@ import React, {
     useContext,
     useEffect,
     useMemo,
-    useReducer
+    useReducer,
+    useRef
 } from 'react';
 import { useAuth } from '../AuthContext';
 const LOCAL_STORAGE_KEY = 'eventCreationStore';
@@ -167,6 +168,9 @@ export const EventCreationProvider = ({ children }) => {
     const { tokens } = useAuth();
     const [state, dispatch] = useReducer(eventCreationReducer, initialState, loadPersistedState);
 
+    const stateRef = useRef(state);
+    useEffect(() => { stateRef.current = state; }, [state]);
+
     useEffect(() => {
         const toCache = sanitizePayload({
             ...state,
@@ -276,13 +280,14 @@ export const EventCreationProvider = ({ children }) => {
                 throw new Error('Failed to load event from the server.');
             }
             const payload = await response.json();
+            const currentState = stateRef.current;
             const backendSteps = payload?.data?.steps || {};
             const mergedSteps = mergeStepMaps(
                 backendSteps,
-                state.data.steps,
+                currentState.data.steps,
             );
             const mergedData = applyStepsToData(
-                { ...state.data, ...(payload.data || {}), steps: mergedSteps },
+                { ...currentState.data, ...(payload.data || {}), steps: mergedSteps },
                 mergedSteps,
             );
             dispatch({
@@ -291,7 +296,7 @@ export const EventCreationProvider = ({ children }) => {
                     event: payload,
                     data: mergedData,
                     status: payload.status || 'draft',
-                    current_step: payload.current_step || state.current_step,
+                    current_step: payload.current_step || currentState.current_step,
                 },
             });
             return payload;
@@ -302,7 +307,7 @@ export const EventCreationProvider = ({ children }) => {
         } finally {
             dispatch({ type: 'setLoading', payload: false });
         }
-    }, [authFetch, state.current_step, state.data]);
+    }, [authFetch]);
 
     const saveStep = useCallback(async (id, step, payload, nextStep) => {
         const normalizedStep = step || state.current_step;

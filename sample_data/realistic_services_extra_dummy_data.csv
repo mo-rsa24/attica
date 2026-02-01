@@ -1,0 +1,7 @@
+id,name,vendor_id,category_id,number_of_guests,price,rating,description,location_tags,image_url,gallery_urls
+5,Sunset Portraits,3,2,150,4200,4.8,"Golden hour photo shoot","CPT","https://picsum.photos/seed/service5/600/400","https://picsum.photos/seed/service5a/400/300;https://picsum.photos/seed/service5b/400/300"
+6,Garden Blooms,8,7,250,3500,4.5,"Colorful floral designs","JHB","https://picsum.photos/seed/service6/600/400","https://picsum.photos/seed/service6a/400/300;https://picsum.photos/seed/service6b/400/300"
+7,Vintage Car Rental,6,6,4,1800,4.9,"Classic cars for events","PTA","https://picsum.photos/seed/service7/600/400","https://picsum.photos/seed/service7a/400/300;https://picsum.photos/seed/service7b/400/300"
+8,Grand Ballroom,5,5,700,15000,4.7,"Elegant venue for large events","CPT","https://picsum.photos/seed/service8/600/400","https://picsum.photos/seed/service8a/400/300;https://picsum.photos/seed/service8b/400/300"
+9,DJ Nights,9,4,300,2500,4.6,"Professional DJ and sound","JHB","https://picsum.photos/seed/service9/600/400","https://picsum.photos/seed/service9a/400/300;https://picsum.photos/seed/service9b/400/300"
+10,Catering Deluxe,7,1,500,7000,4.9,"Full-service catering","PTA","https://picsum.photos/seed/service10/600/400","https://picsum.photos/seed/service10a/400/300;https://picsum.photos/seed/service10b/400/300"

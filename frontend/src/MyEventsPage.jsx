@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {FaCalendarAlt, FaClock, FaExclamationTriangle, FaPlus, FaRedoAlt} from 'react-icons/fa';
+import {FaCalendarAlt, FaClock, FaExclamationTriangle, FaPlus, FaRedoAlt, FaTrash} from 'react-icons/fa';
 import {useAuth} from './AuthContext';
 
 const STEP_ROUTE_MAP = {
@@ -105,7 +105,7 @@ const resolveStepRoute = (currentStep, eventId) => {
     return null;
 };
 
-const EventRow = ({event, onResume}) => {
+const EventRow = ({event, onResume, onDelete}) => {
     const isDraft = event.record_type === 'draft' || event.status === 'draft' || event.is_draft;
     const statusLabel = isDraft ? 'Draft' : 'Published';
     const statusTone = isDraft ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
@@ -114,7 +114,6 @@ const EventRow = ({event, onResume}) => {
         ? resolveStepRoute(event.current_step, event.id) || `/listing/${event.id}/step1`
         : `/events/${event.id}`;
     const resumeLabel = isDraft ? 'Resume' : 'Open';
-
 
     return (
         <div
@@ -139,6 +138,15 @@ const EventRow = ({event, onResume}) => {
                 </div>
             </div>
             <div className="flex items-center gap-3">
+                {isDraft && onDelete && (
+                    <button
+                        onClick={() => onDelete(event.id)}
+                        className="inline-flex items-center px-3 py-2 rounded-lg border border-gray-200 text-gray-500 font-semibold hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition"
+                        title="Delete draft"
+                    >
+                        <FaTrash/>
+                    </button>
+                )}
                 {!isDraft && (
                     <Link
                         to={`/events/${event.id}`}
@@ -206,6 +214,23 @@ export default function MyEventsPage() {
         }
     };
 
+    const handleDelete = async (eventId) => {
+        if (!window.confirm('Delete this draft? This cannot be undone.')) return;
+        try {
+            const response = await fetch(`/api/events/event-drafts/${eventId}/`, {
+                method: 'DELETE',
+                headers: tokens?.access ? {Authorization: `Bearer ${tokens.access}`} : {},
+            });
+            if (!response.ok) {
+                throw new Error('Failed to delete draft.');
+            }
+            setDrafts(prev => prev.filter(d => d.id !== eventId));
+            localStorage.removeItem('eventCreationStore');
+        } catch (err) {
+            setError(err.message || 'Could not delete the draft.');
+        }
+    };
+
     const sortedDrafts = useMemo(
         () => [...drafts].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0)),
         [drafts]
@@ -261,7 +286,7 @@ export default function MyEventsPage() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {sortedDrafts.map(event => (
-                                        <EventRow key={`draft-${event.id}`} event={event} onResume={handleResume}/>
+                                        <EventRow key={`draft-${event.id}`} event={event} onResume={handleResume} onDelete={handleDelete}/>
                                     ))}
                                 </div>
                             </div>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
+import React, {useState, useEffect, useCallback, useMemo, useRef} from 'react';
 import {useNavigate, Link, useParams} from 'react-router-dom';
 import {motion, AnimatePresence} from 'framer-motion';
 import {FaChevronRight, FaTimes, FaTrash} from 'react-icons/fa';
@@ -215,21 +215,27 @@ export default function ListingStep1() {
     const [formErrors, setFormErrors] = useState({});
     const [saveError, setSaveError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const loadEventRef = useRef(loadEvent);
+    useEffect(() => { loadEventRef.current = loadEvent; }, [loadEvent]);
 
     useEffect(() => {
         setCurrentStep('step1');
     }, [setCurrentStep]);
 
-    // Load and Auto-save logic
+    // Load event data from backend (once per eventId)
     useEffect(() => {
         if (eventId) {
-            loadEvent(eventId);
+            loadEventRef.current(eventId);
         }
-     }, [eventId, loadEvent]);
+    }, [eventId]);
 
+    // Sync form when event is hydrated from the server (event changes only on hydrate, not on local mergeStepData)
     useEffect(() => {
-        setFormData(prev => ({...prev, ...getStepData('step1', defaultFormState)}));
-    }, [getStepData]);
+        if (event) {
+            setFormData(prev => ({...prev, ...getStepData('step1', defaultFormState)}));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [event]);
 
     useEffect(() => {
         const {
