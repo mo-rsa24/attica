@@ -305,10 +305,15 @@ export default function ListingStep1() {
         setSaveError('');
         setFormErrors(validationErrors);
 
-        if (Object.keys(validationErrors).length > 0) return;
+        if (Object.keys(validationErrors).length > 0) {
+            const firstErrorField = document.querySelector('[name="' + Object.keys(validationErrors)[0] + '"]');
+            if (firstErrorField) firstErrorField.scrollIntoView({behavior: 'smooth', block: 'center'});
+            return;
+        }
         setIsSaving(true);
 
         const startDateTime = formData.startDate ? `${formData.startDate}T${formData.startTime || '00:00'}` : null;
+        const nextStep = destination === 'continue' ? getNextStep('step1') : undefined;
         const payload = {
             name: formData.eventName,
             category: formData.selectedEventType,
@@ -322,7 +327,7 @@ export default function ListingStep1() {
             notes: [formData.description, formData.additionalNotes].filter(Boolean).join('\n\n'),
         };
 
-        const result = await saveStep(eventId, 'step1', payload);
+        const result = await saveStep(eventId, 'step1', payload, nextStep);
         setIsSaving(false);
 
         if (!result.ok) {
@@ -333,7 +338,8 @@ export default function ListingStep1() {
         syncStoreWithForm(result.data || {});
 
         if (destination === 'continue') {
-            navigate(`${listingBase}/step3`);
+            const stepRoute = nextStep === 'review' ? 'review' : nextStep;
+            navigate(`${listingBase}/${stepRoute}`);
         } else if (destination === 'exit') {
             navigate('/my-events');
         }

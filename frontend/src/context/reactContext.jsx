@@ -94,9 +94,9 @@ const applyStepsToData = (data, steps) => {
 };
 
 const sanitizePayload = (payload) => JSON.parse(JSON.stringify(payload, (key, value) => {
-    const isFile = typeof File !== 'undefined' && value instanceof File;
-    if (isFile) return undefined;
-    if (value?.preview) return undefined;
+    if (typeof File !== 'undefined' && value instanceof File) return undefined;
+    if (typeof Blob !== 'undefined' && value instanceof Blob) return undefined;
+    if (typeof value === 'string' && value.startsWith('blob:')) return undefined;
     return value;
 }));
 

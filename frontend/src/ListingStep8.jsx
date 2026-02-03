@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, UploadCloud, Video, X } from 'lucide-react';
 import { useEventCreation } from './context/reactContext.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -9,23 +9,31 @@ export default function ListingStep8_Event() {
     const { eventId } = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const inputRef = useRef(null);
-    const initialUploads = useMemo(() => getStepData('step8', {}).uploads || [], [getStepData]);
-    const [uploads, setUploads] = useState(initialUploads);
+    const [uploads, setUploads] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const initializedRef = useRef(false);
 
     useEffect(() => {
         setCurrentStep('step8');
     }, [setCurrentStep]);
 
+    // Load saved upload metadata from context once when event loads
     useEffect(() => {
-        const stepData = getStepData('step8', {});
-        if (Array.isArray(stepData.uploads)) {
-            setUploads(stepData.uploads);
+        if (event && !initializedRef.current) {
+            const stepData = getStepData('step8', {});
+            if (Array.isArray(stepData.uploads) && stepData.uploads.length > 0) {
+                setUploads(stepData.uploads);
+            }
+            initializedRef.current = true;
         }
-    }, [getStepData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [event]);
 
+    // Keep context in sync for Save & Exit (setStepData is stable, no loop)
     useEffect(() => {
-        setStepData('step8', { uploads });
+        if (initializedRef.current) {
+            setStepData('step8', { uploads });
+        }
     }, [uploads, setStepData]);
 
     const handleFiles = (fileList) => {
@@ -64,11 +72,16 @@ export default function ListingStep8_Event() {
         });
     };
 
-    useEffect(() => () => {
-        uploads.forEach((item) => {
-            if (item.preview) URL.revokeObjectURL(item.preview);
-        });
-    }, [uploads]);
+    // Revoke blob URLs only on unmount to prevent memory leaks
+    const uploadsRef = useRef(uploads);
+    useEffect(() => { uploadsRef.current = uploads; }, [uploads]);
+    useEffect(() => {
+        return () => {
+            uploadsRef.current.forEach((item) => {
+                if (item.preview) URL.revokeObjectURL(item.preview);
+            });
+        };
+    }, []);
 
     const humanSize = (bytes) => {
         if (!bytes && bytes !== 0) return '';

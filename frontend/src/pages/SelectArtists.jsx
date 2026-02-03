@@ -178,14 +178,12 @@ export default function SelectArtists() {
     }, []);
 
     const handleSelectArtist = (artist) => {
-        setSelectedArtists(prev => {
-            const isSelected = prev.some(a => a.id === artist.id);
-            if (isSelected) {
-                return prev.filter(a => a.id !== artist.id);
-            } else {
-                return [...prev, artist];
-            }
-        });
+        const isSelected = selectedArtists.some(a => a.id === artist.id);
+        if (isSelected) {
+            setSelectedArtists(selectedArtists.filter(a => a.id !== artist.id));
+        } else {
+            setSelectedArtists([...selectedArtists, artist]);
+        }
     };
 
     const handleBookAll = () => {

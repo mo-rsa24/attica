@@ -23,17 +23,42 @@ const geoApi = {
 export default function ListingStep4() {
     const navigate = useNavigate();
     const { eventId } = useParams();
-    const { eventDetails, setEventDetails, saveAndExit, setCurrentStep, event } = useEventCreation();
+    const { eventDetails, setEventDetails, saveAndExit, saveStep, getNextStep, setCurrentStep, event } = useEventCreation();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const [searchQuery, setSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState(null); // Will hold { lat, lon, address }
-    const [mapCenter, setMapCenter] = useState([-28.4793, 24.6727]); // Default center of South Africa
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [mapCenter, setMapCenter] = useState([-28.4793, 24.6727]);
     const [mapZoom, setMapZoom] = useState(5);
 
-     useEffect(() => {
+    useEffect(() => {
         setCurrentStep('step4');
     }, [setCurrentStep]);
+
+    // Auto-detect user's location on mount
+    useEffect(() => {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                setMapCenter([latitude, longitude]);
+                setMapZoom(14);
+                try {
+                    const data = await geoApi.reverse(latitude, longitude);
+                    if (data) {
+                        setSelectedLocation({ lat: latitude, lon: longitude, address: data.display_name });
+                        setSearchQuery(data.display_name);
+                    }
+                } catch (err) {
+                    console.error('Reverse geocoding failed:', err);
+                }
+            },
+            () => {
+                // Geolocation denied or unavailable — keep default view
+            }
+        );
+    }, []);
+
     // Debounce search input to avoid excessive API calls
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -70,10 +95,12 @@ export default function ListingStep4() {
         }
     }, []);
 
-    const handleNext = () => {
-        // Save location to context before proceeding
-        setEventDetails(prev => ({ ...prev, location: selectedLocation }));
-        navigate(`${listingBase}/step5`);
+    const handleNext = async () => {
+        if (!selectedLocation) return;
+        const nextStep = getNextStep('step4');
+        setEventDetails({ ...eventDetails, location: selectedLocation });
+        await saveStep(eventId || event?.id, 'step4', { location: selectedLocation }, nextStep);
+        navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
     };
 
     return (
@@ -117,7 +144,7 @@ export default function ListingStep4() {
                         <InteractiveMap
                             center={mapCenter}
                             zoom={mapZoom}
-                            onMapClick={(e) => handleMapInteraction(e.latlng)}
+                            onMapChange={handleMapInteraction}
                             markerPosition={selectedLocation ? [selectedLocation.lat, selectedLocation.lon] : null}
                             onMarkerDragEnd={handleMapInteraction}
                         />

@@ -317,14 +317,12 @@ export default function SelectLocation() {
 
 
     const handleSelect = (location) => {
-        setSelectedLocations(prev => {
-            const isSelected = prev.some(l => l.id === location.id);
-            if (isSelected) {
-                return prev.filter(l => l.id !== location.id);
-            } else {
-                return [...prev, location];
-            }
-        });
+        const isSelected = selectedLocations.some(l => l.id === location.id);
+        if (isSelected) {
+            setSelectedLocations(selectedLocations.filter(l => l.id !== location.id));
+        } else {
+            setSelectedLocations([...selectedLocations, location]);
+        }
     };
 
     const handleMapChange = useCallback(async (latlng) => {
