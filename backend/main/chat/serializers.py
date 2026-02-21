@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import ChatAttachment, ChatBid, ChatRoom, Message
+from .models import Booking, ChatAttachment, ChatBid, ChatRoom, Message, ProviderAvailability
 
 
 class ChatAttachmentSerializer(serializers.ModelSerializer):
@@ -13,6 +13,7 @@ class ChatBidSerializer(serializers.ModelSerializer):
     organizer_username = serializers.CharField(source='organizer.username', read_only=True)
     vendor_username = serializers.CharField(source='vendor.username', read_only=True)
     room_id = serializers.IntegerField(source='room.id', read_only=True)
+    event_name = serializers.CharField(source='event.name', read_only=True)
 
     class Meta:
         model = ChatBid
@@ -24,6 +25,9 @@ class ChatBidSerializer(serializers.ModelSerializer):
             'organizer_username',
             'vendor',
             'vendor_username',
+            'event',
+            'event_name',
+            'provider_type',
             'amount',
             'currency',
             'tier',
@@ -96,6 +100,7 @@ class ChatRoomSerializer(serializers.ModelSerializer):
     messages = MessageSerializer(many=True, read_only=True)
     organizer_username = serializers.CharField(source='organizer.username', read_only=True)
     vendor_username = serializers.CharField(source='vendor.username', read_only=True)
+    event_name = serializers.CharField(source='event.name', read_only=True)
 
     class Meta:
         model = ChatRoom
@@ -105,9 +110,76 @@ class ChatRoomSerializer(serializers.ModelSerializer):
             'organizer_username',
             'vendor',
             'vendor_username',
+            'event',
+            'event_name',
             'created_at',
             'updated_at',
             'messages',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    organizer_username = serializers.CharField(source='organizer.username', read_only=True)
+    provider_username = serializers.CharField(source='provider.username', read_only=True)
+    event_name = serializers.CharField(source='event.name', read_only=True)
+    event_date = serializers.DateField(source='event.date', read_only=True)
+    chatroom_id = serializers.IntegerField(source='chatroom.id', read_only=True)
+
+    class Meta:
+        model = Booking
+        fields = [
+            'id',
+            'event',
+            'event_name',
+            'event_date',
+            'organizer',
+            'organizer_username',
+            'provider',
+            'provider_username',
+            'provider_type',
+            'provider_entity_id',
+            'chatroom',
+            'chatroom_id',
+            'status',
+            'bid_amount',
+            'final_amount',
+            'currency',
+            'proposed_date',
+            'proposed_start_time',
+            'proposed_end_time',
+            'notes',
+            'accepted_bid',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'id', 'organizer', 'status', 'final_amount',
+            'accepted_bid', 'created_at', 'updated_at'
+        ]
+
+    def validate(self, attrs):
+        organizer = self.context['request'].user
+        provider = attrs.get('provider')
+        if organizer == provider:
+            raise serializers.ValidationError("Cannot create a booking with yourself.")
+        return attrs
+
+
+class ProviderAvailabilitySerializer(serializers.ModelSerializer):
+    provider_username = serializers.CharField(source='provider.username', read_only=True)
+    booking_event = serializers.CharField(source='booking.event.name', read_only=True)
+
+    class Meta:
+        model = ProviderAvailability
+        fields = [
+            'id',
+            'provider',
+            'provider_username',
+            'date',
+            'booking',
+            'booking_event',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'created_at']
 

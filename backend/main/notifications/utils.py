@@ -111,3 +111,86 @@ def notify_bid_response(room, bid, action: str):
         link_id=room.id,
         data={'bid_id': bid.id}
     )
+
+
+def notify_booking_request(booking):
+    """Notify provider of a new booking request from organizer."""
+    event_name = booking.event.name if booking.event else 'Unknown Event'
+    amount_str = f'{booking.currency} {booking.bid_amount}' if booking.bid_amount else 'To be discussed'
+
+    create_notification(
+        recipient=booking.provider,
+        sender=booking.organizer,
+        notification_type=Notification.NotificationType.BOOKING_REQUEST,
+        title=f'Booking request from {booking.organizer.username}',
+        message=f'For event: {event_name} - {amount_str}',
+        link_type='booking',
+        link_id=booking.id,
+        data={
+            'booking_id': booking.id,
+            'event_id': booking.event_id,
+            'amount': str(booking.bid_amount) if booking.bid_amount else None,
+            'provider_type': booking.provider_type
+        }
+    )
+
+
+def notify_booking_accepted(booking):
+    """Notify organizer that their booking request was accepted."""
+    event_name = booking.event.name if booking.event else 'Unknown Event'
+    amount_str = f'{booking.currency} {booking.final_amount}' if booking.final_amount else ''
+
+    create_notification(
+        recipient=booking.organizer,
+        sender=booking.provider,
+        notification_type=Notification.NotificationType.BOOKING_CONFIRMED,
+        title=f'{booking.provider.username} accepted your booking!',
+        message=f'For event: {event_name}. {amount_str}'.strip(),
+        link_type='booking',
+        link_id=booking.id,
+        data={
+            'booking_id': booking.id,
+            'event_id': booking.event_id,
+            'provider_type': booking.provider_type
+        }
+    )
+
+
+def notify_booking_rejected(booking):
+    """Notify organizer that their booking request was rejected."""
+    event_name = booking.event.name if booking.event else 'Unknown Event'
+
+    create_notification(
+        recipient=booking.organizer,
+        sender=booking.provider,
+        notification_type=Notification.NotificationType.BOOKING_REJECTED,
+        title=f'{booking.provider.username} declined your booking',
+        message=f'For event: {event_name}',
+        link_type='booking',
+        link_id=booking.id,
+        data={
+            'booking_id': booking.id,
+            'event_id': booking.event_id,
+            'provider_type': booking.provider_type
+        }
+    )
+
+
+def notify_booking_cancelled(booking):
+    """Notify provider that a booking was cancelled by the organizer."""
+    event_name = booking.event.name if booking.event else 'Unknown Event'
+
+    create_notification(
+        recipient=booking.provider,
+        sender=booking.organizer,
+        notification_type=Notification.NotificationType.BOOKING_CANCELLED,
+        title=f'{booking.organizer.username} cancelled their booking',
+        message=f'For event: {event_name}',
+        link_type='booking',
+        link_id=booking.id,
+        data={
+            'booking_id': booking.id,
+            'event_id': booking.event_id,
+            'provider_type': booking.provider_type
+        }
+    )

@@ -12,7 +12,8 @@ from django.views.decorators.http import require_POST
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets, permissions, status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -334,19 +335,36 @@ class CategoryListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
 
-class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
+class ServiceViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows services to be viewed.
+    API endpoint that allows services to be viewed and created.
     Supports filtering by category name for the frontend UI.
     """
     queryset = Service.objects.select_related('category', 'vendor').all()
     serializer_class = ServiceSerializer
-    permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend]
     # This allows filtering like: /api/vendors/services/?category__name=Catering
     filterset_fields = {
         'category__name': ['exact'],
     }
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
+
+    def perform_create(self, serializer):
+        from users.models import Role
+        if not self.request.user.has_role(Role.Names.SERVICE_PROVIDER):
+            raise permissions.PermissionDenied("Only service providers can create services.")
+        try:
+            vendor = self.request.user.vendor
+        except Vendor.DoesNotExist:
+            raise ValidationError({
+                "vendor": "No vendor profile is linked to this account. Create or link a vendor profile first."
+            })
+        serializer.save(vendor=vendor)
+
     @action(detail=True, methods=['get'])
     def availability(self, request, pk=None):
         service = self.get_object()
@@ -422,6 +440,9 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         return context
 
     def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            from .serializers import ServiceCreateSerializer
+            return ServiceCreateSerializer
         if self.action == "retrieve":
             return ServiceDetailSerializer
         return ServiceSerializer
@@ -435,7 +456,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = ServiceSerializer(services, many=True, context={"request": request})
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post", "delete"], permission_classes=[AllowAny])
+    @action(detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         service = self.get_object()
         if request.method == "POST":

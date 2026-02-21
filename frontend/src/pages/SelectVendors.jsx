@@ -34,7 +34,7 @@ const ServiceCard = ({ service, onAdd, onOpenNotes, isSelected }) => (
     </div>
 );
 
-const SelectedServicesSidebar = ({ selected, onUpdate, onRemove, totalCost }) => {
+const SelectedServicesSidebar = ({ selected, onUpdate, onRemove, totalCost, onRequestAll, onOpenPlanner }) => {
     const groupedServices = useMemo(() => {
         return selected.reduce((acc, service) => {
             (acc[service.category_name] = acc[service.category_name] || []).push(service);
@@ -75,6 +75,19 @@ const SelectedServicesSidebar = ({ selected, onUpdate, onRemove, totalCost }) =>
                 <div className="border-t border-gray-200 mt-6 pt-6">
                     <p className="text-gray-600 font-semibold">Total Estimated Cost:</p>
                     <p className="text-4xl font-extrabold text-pink-600 mt-2">R {totalCost.toLocaleString()}</p>
+                    <button
+                        onClick={onRequestAll}
+                        disabled={selected.length === 0}
+                        className="mt-4 w-full bg-teal-500 text-white font-bold py-2.5 rounded-lg hover:bg-teal-600 disabled:bg-gray-400"
+                    >
+                        Request Selected via Scheduler
+                    </button>
+                    <button
+                        onClick={onOpenPlanner}
+                        className="mt-3 w-full bg-white border border-slate-300 text-slate-700 font-bold py-2.5 rounded-lg hover:bg-slate-50"
+                    >
+                        Open Scheduler
+                    </button>
                 </div>
             </div>
         </div>
@@ -134,6 +147,32 @@ export default function SelectVendors() {
         return selectedVendors.reduce((sum, s) => sum + (s.price * s.quantity), 0);
     }, [selectedVendors]);
 
+    const openSchedulerForVendors = (autoRequest = false) => {
+        if (!eventId) {
+            alert('Save your event first, then open scheduler from this step.');
+            return;
+        }
+
+        const vendorIds = [...new Set(
+            selectedVendors
+                .map((service) => service?.vendor?.id || service?.vendor_id || service?.vendor)
+                .filter(Boolean)
+                .map((id) => Number(id)),
+        )];
+
+        if (vendorIds.length === 0) {
+            alert('Select at least one service with a vendor first.');
+            return;
+        }
+
+        const params = new URLSearchParams({
+            event_id: String(eventId),
+            vendor_ids: vendorIds.join(','),
+            ...(autoRequest ? { auto_request: '1' } : {}),
+        });
+        navigate(`/scheduling?${params.toString()}`);
+    };
+
     const handleDone = () => {
         navigate(`${listingBase}/step3`);
     };
@@ -186,7 +225,14 @@ export default function SelectVendors() {
                         </div>
                     </div>
                     <div className="lg:col-span-4 xl:col-span-3">
-                        <SelectedServicesSidebar selected={selectedVendors} onUpdate={handleUpdateService} onRemove={handleRemoveService} totalCost={totalCost} />
+                        <SelectedServicesSidebar
+                            selected={selectedVendors}
+                            onUpdate={handleUpdateService}
+                            onRemove={handleRemoveService}
+                            totalCost={totalCost}
+                            onRequestAll={() => openSchedulerForVendors(true)}
+                            onOpenPlanner={() => openSchedulerForVendors(false)}
+                        />
                     </div>
                 </div>
             </main>

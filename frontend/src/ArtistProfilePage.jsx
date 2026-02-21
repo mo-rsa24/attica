@@ -54,6 +54,85 @@ const StatsBar = ({ stats }) => (
     </div>
 );
 
+const FEE_OPTION_LABELS = {
+    fixed: 'Fixed fee',
+    range: 'Fee range',
+    negotiable: 'Negotiable',
+    quote_only: 'Quote only',
+};
+
+const BookingOverview = ({ artist }) => {
+    const availability = artist.availability && typeof artist.availability === 'object' ? artist.availability : {};
+    const availableDays = Array.isArray(availability.available_days) ? availability.available_days : [];
+    const blackoutDates = Array.isArray(availability.blackout_dates) ? availability.blackout_dates : [];
+    const feeOption = FEE_OPTION_LABELS[availability.booking_fee_option] || null;
+
+    const feeRange =
+        artist.booking_fee_min || artist.booking_fee_max
+            ? `R${artist.booking_fee_min || '-'} to R${artist.booking_fee_max || '-'}`
+            : null;
+
+    return (
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm mb-6">
+            <h3 className="text-lg font-bold text-gray-900">Booking Overview</h3>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <InfoRow label="Fee option" value={feeOption} />
+                <InfoRow label="Default fee" value={artist.booking_fee ? `R${artist.booking_fee}` : null} />
+                <InfoRow label="Fee range" value={feeRange} />
+                <InfoRow label="General ticket" value={artist.general_ticket_price ? `R${artist.general_ticket_price}` : null} />
+                <InfoRow label="Tour dates" value={artist.tour_start_date || artist.tour_end_date ? `${artist.tour_start_date || '?'} to ${artist.tour_end_date || '?'}` : null} />
+                <InfoRow label="Contact email" value={artist.contact_email || null} />
+                <InfoRow label="Phone" value={artist.phone_number || null} />
+                <InfoRow label="Instagram" value={artist.instagram_handle ? `@${artist.instagram_handle.replace(/^@/, '')}` : null} />
+            </div>
+
+            {availableDays.length > 0 && (
+                <div className="mt-4">
+                    <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Available days</p>
+                    <div className="flex flex-wrap gap-2">
+                        {availableDays.map((day) => (
+                            <span key={day} className="px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">
+                                {day}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {blackoutDates.length > 0 && (
+                <div className="mt-4">
+                    <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Blackout dates</p>
+                    <div className="flex flex-wrap gap-2">
+                        {blackoutDates.map((date) => (
+                            <span key={date} className="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold">
+                                {date}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {availability.notes && (
+                <p className="mt-4 text-sm text-gray-700">
+                    <span className="font-semibold">Availability notes:</span> {availability.notes}
+                </p>
+            )}
+            {availability.booking_notes && (
+                <p className="mt-2 text-sm text-gray-700">
+                    <span className="font-semibold">Pricing notes:</span> {availability.booking_notes}
+                </p>
+            )}
+        </div>
+    );
+};
+
+const InfoRow = ({ label, value }) => (
+    <div>
+        <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
+        <p className="text-sm font-semibold text-gray-900 mt-1">{value || 'Not specified'}</p>
+    </div>
+);
+
 // Tab Navigation Component
 const TabNavigation = ({ activeTab, setActiveTab }) => {
     const tabs = ['Portfolio', 'Reviews', 'Events'];
@@ -150,7 +229,7 @@ export default function ArtistProfilePage() {
                 setArtist(await artistRes.json());
                 setPortfolio(await portfolioRes.json());
                 setReviews(await reviewsRes.json());
-                setEvents(await eventsRes.json());4
+                setEvents(await eventsRes.json());
                 setPosts(await postsRes.json());
 
                 // setIsMyProfile(artistData.user.id === loggedInUserId);
@@ -173,7 +252,7 @@ export default function ArtistProfilePage() {
         }));
 
         // API call
-        await fetch(`/api/artists/${id}/follow/`, {
+        await fetch(`/api/artists/artists/${id}/follow/`, {
             method: 'POST',
             // Add authentication headers here
         });
@@ -217,6 +296,7 @@ export default function ArtistProfilePage() {
             {/* --- Main Profile Section (LHS) --- */}
             <div className="lg:col-span-2">
                 <ProfileHeader artist={artist} onFollow={handleFollow} isFollowing={artist.is_following}/>
+                <BookingOverview artist={artist} />
                 <StatsBar stats={artist}/>
                 <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab}/>
                 <div className="mt-8">

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'locations.apps.LocationsConfig',
     'tickets.apps.TicketsConfig',
     'notifications.apps.NotificationsConfig',
+    'scheduling.apps.SchedulingConfig',
     'rest_framework',
     'corsheaders',
     'django_filters'
@@ -101,6 +102,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'main.middleware.ApiMethodDebugMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -221,3 +223,15 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 MEDIA_URL = '/media/'  # URL to access media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Directory to store media files
+
+# Scheduling outbox + webhook worker settings
+SCHEDULING_OUTBOX_MAX_ATTEMPTS = 5
+SCHEDULING_OUTBOX_RETRY_BASE_SECONDS = 30
+SCHEDULING_OUTBOX_RETRY_MAX_SECONDS = 3600
+SCHEDULING_WEBHOOK_URLS = []
+SCHEDULING_WEBHOOK_TARGETS = []
+SCHEDULING_WEBHOOK_SECRET = ""
+SCHEDULING_WEBHOOK_TIMEOUT_SECONDS = 5
+SCHEDULING_WEBHOOK_CIRCUIT_FAILURE_THRESHOLD = 5
+SCHEDULING_WEBHOOK_CIRCUIT_OPEN_SECONDS = 120
+SCHEDULING_WEBHOOK_METRICS_TTL_SECONDS = 86400

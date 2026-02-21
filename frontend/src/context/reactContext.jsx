@@ -46,7 +46,7 @@ const STEP_FIELD_WHITELIST = {
     step5: ['budget', 'guest_count'],
     step6: ['base_price', 'currency', 'tiered_prices'],
     step7: ['refund_policy', 'access_type', 'is_age_restricted', 'custom_questions'],
-    step8: ['image_url', 'banner_image'],
+    step8: ['image_url', 'banner_image', 'uploads'],
 };
 
 const mergeStepMaps = (...maps) => maps.reduce((acc, map) => {

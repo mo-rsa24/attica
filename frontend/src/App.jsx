@@ -1,11 +1,11 @@
-import NavBar from './NavBar.jsx'
 import HomePage from './HomePage.jsx'
-import Footer from './Footer.jsx'
+import OfferingsPage from './OfferingsPage.jsx'
+import SplashPage from './SplashPage.jsx'
 import ListingPage from './ListingPage.jsx'
 import VendorProfile from './VendorProfile.jsx'
 import {CssBaseline} from '@mui/material'
 import {ThemeProvider, createTheme} from '@mui/material/styles'
-import {Routes, Route, Navigate} from 'react-router-dom'
+import {Routes, Route, Navigate, useLocation} from 'react-router-dom'
 import VendorProfileEdit from "./VendorProfileEdit.jsx";
 import PostCreate from "./PostCreate.jsx";
 import Register from "./Register.jsx";
@@ -20,7 +20,6 @@ import TicketBuyerDashboard from "./TicketBuyerDashboard.jsx";
 import EventOrganizerDashboard from "./EventOrganizerDashboard.jsx";
 import CreateEventPage from "./CreateEventPage.jsx";
 import Events from "./Events.jsx";
-import React from "react";
 import DirectMessagePage from "./pages/DirectMessagePage.jsx";
 import ListingStep1 from "./ListingStep1.jsx";
 import ListingStep2 from "./ListingStep2.jsx";
@@ -43,41 +42,69 @@ import SelectVendors from "./pages/SelectVendors.jsx";
 import {EventCreationProvider} from "./context/reactContext.jsx";
 import Services from "./Services.jsx";
 import Artists from "./Artists.jsx";
+import Tours from "./Tours.jsx";
 import ListingWizardLayout from "./ListingWizardLayout.jsx";
 import MyEventsPage from "./MyEventsPage.jsx";
+import CreateServicePage from "./pages/CreateServicePage.jsx";
+import CreateArtistPage from "./pages/CreateArtistPage.jsx";
+import CreateVenuePage from "./pages/CreateVenuePage.jsx";
+import SchedulingPlannerPage from "./pages/SchedulingPlannerPage.jsx";
+import SchedulingOpsPage from "./pages/SchedulingOpsPage.jsx";
 
 function App() {
     const theme = createTheme()
     const {user, logout, tokens} = useAuth();
     const profileImageUrl = user?.profile_picture;
+    const location = useLocation();
+    const isAuthenticated = Boolean(tokens);
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
+    const requireAuth = (element) => (
+        isAuthenticated
+            ? element
+            : <Navigate to="/login" replace state={{from: location.pathname}}/>
+    );
+
+    const guestOnly = (element) => (
+        isAuthenticated ? <Navigate to="/" replace/> : element
+    );
+
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline/>
-            <Navbar
-                isAuthenticated={!!tokens} // Pass a boolean to indicate if the user is logged in
-                userProfileImageUrl={profileImageUrl}
-                onLogout={logout} // Pass the logout function
-            />
+            {isAuthenticated && !isAuthPage && (
+                <Navbar
+                    userProfileImageUrl={profileImageUrl}
+                    onLogout={logout}
+                />
+            )}
             <EventCreationProvider>
                 <Routes>
-                    <Route path="/" element={<HomePage/>}/>
-                    <Route path="/services/:id" element={<ListingPage/>}/>
-                    <Route path="/services" element={<Services/>}/>
-                    <Route path="/artists" element={<Artists/>}/>
-                    <Route path="/artists/:id" element={<ArtistProfilePage/>}/>
-                    <Route path="/locations/:id" element={<LocationDetailPage/>}/>
-                    <Route path="/events/:id" element={<EventListingPage/>}/>
-                    <Route path="/vendor/:username" element={<VendorProfile/>}/>
-                    <Route path="/profile" element={<ProfilePage/>}/>
-                    <Route path="/dashboard/organizer" element={<EventOrganizerDashboard/>}/>
-                    <Route path="/dashboard/artist" element={<ArtistDashboard/>}/>
-                    <Route path="/dashboard/service" element={<ServiceProviderDashboard/>}/>
-                    <Route path="/dashboard/venue" element={<VenueManagerDashboard/>}/>
-                    <Route path="/dashboard/tickets" element={<TicketBuyerDashboard/>}/>
-                    <Route path="/events" element={<Events/>}/>
-                    <Route path="/createEvent" element={<CreateEventPage/>}/>
-                    <Route path="/my-events" element={<MyEventsPage/>}/>
-                    <Route path="/listing/:eventId/*" element={<ListingWizardLayout/>}>
+                    <Route path="/" element={isAuthenticated ? <HomePage/> : <SplashPage/>}/>
+                    <Route path="/offerings" element={requireAuth(<OfferingsPage/>)} />
+                    <Route path="/services/:id" element={requireAuth(<ListingPage/>)} />
+                    <Route path="/services" element={requireAuth(<Services/>)} />
+                    <Route path="/artists" element={requireAuth(<Artists/>)} />
+                    <Route path="/tours" element={requireAuth(<Tours/>)} />
+                    <Route path="/artists/:id" element={requireAuth(<ArtistProfilePage/>)} />
+                    <Route path="/locations/:id" element={requireAuth(<LocationDetailPage/>)} />
+                    <Route path="/events/:id" element={requireAuth(<EventListingPage/>)} />
+                    <Route path="/vendor/:username" element={requireAuth(<VendorProfile/>)} />
+                    <Route path="/profile" element={requireAuth(<ProfilePage/>)} />
+                    <Route path="/dashboard/organizer" element={requireAuth(<EventOrganizerDashboard/>)} />
+                    <Route path="/dashboard/artist" element={requireAuth(<ArtistDashboard/>)} />
+                    <Route path="/dashboard/service" element={requireAuth(<ServiceProviderDashboard/>)} />
+                    <Route path="/dashboard/venue" element={requireAuth(<VenueManagerDashboard/>)} />
+                    <Route path="/dashboard/tickets" element={requireAuth(<TicketBuyerDashboard/>)} />
+                    <Route path="/events" element={requireAuth(<Events/>)} />
+                    <Route path="/createEvent" element={requireAuth(<CreateEventPage/>)} />
+                    <Route path="/create/service" element={requireAuth(<CreateServicePage/>)} />
+                    <Route path="/create/artist" element={requireAuth(<CreateArtistPage/>)} />
+                    <Route path="/create/venue" element={requireAuth(<CreateVenuePage/>)} />
+                    <Route path="/my-events" element={requireAuth(<MyEventsPage/>)} />
+                    <Route path="/scheduling" element={requireAuth(<SchedulingPlannerPage/>)} />
+                    <Route path="/scheduling/ops" element={requireAuth(<SchedulingOpsPage/>)} />
+                    <Route path="/listing/:eventId/*" element={requireAuth(<ListingWizardLayout/>)}>
                         <Route index element={<ListingStep1/>}/>
                         <Route path="step1" element={<ListingStep1/>}/>
                         <Route path="step2" element={<ListingStep2/>}/>
@@ -92,18 +119,18 @@ function App() {
                         <Route path="step8" element={<ListingStep8/>}/>
                         <Route path="review" element={<ListingReview/>}/>
                     </Route>
-                    <Route path="/listing/*" element={<Navigate to="/createEvent" replace/>}/>
-                    <Route path="/profile/update" element={<VendorProfileEdit/>}/>
-                    <Route path="/post/create" element={<PostCreate/>}/>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="/register" element={<Register/>}/>
-                    <Route path="/me" element={<Profile/>}/>
-                    <Route path="/services/:id/request" element={<RequestToBook/>}/>
-                    <Route path="/logout" element={<Logout/>}/>
-                    <Route path="/dm/:roomId" element={<DirectMessagePage/>}/>
+                    <Route path="/listing/*" element={requireAuth(<Navigate to="/createEvent" replace/>)} />
+                    <Route path="/profile/update" element={requireAuth(<VendorProfileEdit/>)} />
+                    <Route path="/post/create" element={requireAuth(<PostCreate/>)} />
+                    <Route path="/login" element={guestOnly(<Login/>)} />
+                    <Route path="/register" element={guestOnly(<Register/>)} />
+                    <Route path="/me" element={requireAuth(<Profile/>)} />
+                    <Route path="/services/:id/request" element={requireAuth(<RequestToBook/>)} />
+                    <Route path="/logout" element={requireAuth(<Logout/>)} />
+                    <Route path="/dm/:roomId" element={requireAuth(<DirectMessagePage/>)} />
+                    <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} replace/>}/>
                 </Routes>
             </EventCreationProvider>
-            {/*<Footer />*/}
         </ThemeProvider>
     )
 }

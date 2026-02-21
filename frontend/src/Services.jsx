@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaBolt, FaMapMarkerAlt, FaTags } from 'react-icons/fa';
 import ServiceCard from './ServiceCard.jsx';
+import { useAuth } from './AuthContext';
 
 const CITY_COORDINATES = {
     JHB: { name: 'Johannesburg', lat: -26.2041, lng: 28.0473 },
@@ -123,6 +124,7 @@ const sortServices = (items, sortKey, userCityTag) => {
 };
 
 export default function Services() {
+    const { tokens } = useAuth();
     const [services, setServices] = useState([]);
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -183,7 +185,12 @@ export default function Services() {
                     ? `?category__name=${encodeURIComponent(selectedCategory)}`
                     : '';
             try {
-                const response = await fetch(`/api/vendors/services/${categoryFilter}`, { signal: controller.signal });
+                const response = await fetch(`/api/vendors/services/${categoryFilter}`, {
+                    signal: controller.signal,
+                    headers: tokens?.access
+                        ? { Authorization: `Bearer ${tokens.access}` }
+                        : {},
+                });
                 if (!response.ok) {
                     throw new Error('Unable to load services');
                 }
@@ -208,7 +215,7 @@ export default function Services() {
             isMounted = false;
             controller.abort();
         };
-    }, [selectedCategory, selectedSort, userCityTag]);
+    }, [selectedCategory, selectedSort, userCityTag, tokens?.access]);
 
     const filteredServices = useMemo(() => {
         const query = searchTerm.toLowerCase();

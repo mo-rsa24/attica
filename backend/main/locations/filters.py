@@ -4,6 +4,7 @@ from django_filters import rest_framework as filters
 from .models import Location, Feature
 
 class LocationFilter(filters.FilterSet):
+    owner = filters.NumberFilter(field_name="owner_id")
     capacity__gte = filters.NumberFilter(field_name="capacity", lookup_expr='gte')
     price__lte = filters.NumberFilter(field_name="price", lookup_expr='lte')
     features = filters.ModelMultipleChoiceFilter(
@@ -15,4 +16,4 @@ class LocationFilter(filters.FilterSet):
 
     class Meta:
         model = Location
-        fields = ['capacity__gte', 'price__lte', 'features']
+        fields = ['owner', 'capacity__gte', 'price__lte', 'features']

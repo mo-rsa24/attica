@@ -1,7 +1,8 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {FaCheckCircle, FaPaperPlane, FaStar} from "react-icons/fa";
+import {FaCheckCircle, FaPaperPlane, FaStar, FaCalendarPlus} from "react-icons/fa";
 import {useAuth} from "./AuthContext";
+import {EventSelector, BookingModal} from "./components/booking";
 
 
 export default function VendorProfile() {
@@ -17,6 +18,12 @@ export default function VendorProfile() {
 
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [chatError, setChatError] = useState(null);
+
+    // Booking flow state
+    const [showEventSelector, setShowEventSelector] = useState(false);
+    const [showBookingModal, setShowBookingModal] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [currentChatroom, setCurrentChatroom] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -109,9 +116,67 @@ export default function VendorProfile() {
     };
 
     const handlePlaceBid = async () => {
-        const r = await ensureRoom();
-        if (r?.id) {
-            navigate(`/dm/${r.id}?bid=1`);
+        // First check if user is signed in
+        if (!tokens?.access) {
+            setChatError("Please sign in to request a booking.");
+            return;
+        }
+        // Show event selector to pick which event to book for
+        setShowEventSelector(true);
+    };
+
+    const handleEventSelect = async (event) => {
+        setShowEventSelector(false);
+        setSelectedEvent(event);
+
+        // Create or get chatroom with event context
+        const vendorUserId = vendor.user_id || vendor.user?.id;
+        if (!vendorUserId) {
+            setChatError("This vendor can't receive bookings right now.");
+            return;
+        }
+
+        setCreatingRoom(true);
+        try {
+            const res = await fetch("/api/chat/rooms/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${tokens.access}`,
+                },
+                body: JSON.stringify({
+                    organizer: user.id,
+                    vendor: vendorUserId,
+                    event: event.id,
+                }),
+            });
+
+            if (!res.ok) {
+                let detail = "Unable to create booking right now. Please try again.";
+                try {
+                    const errorData = await res.json();
+                    if (errorData?.detail) detail = errorData.detail;
+                } catch {
+                    // ignore JSON parse errors
+                }
+                setChatError(detail);
+                return;
+            }
+
+            const room = await res.json();
+            setCurrentChatroom(room);
+            setShowBookingModal(true);
+        } catch (e) {
+            setChatError("Failed to prepare booking. Please try again.");
+        } finally {
+            setCreatingRoom(false);
+        }
+    };
+
+    const handleBookingSuccess = (booking) => {
+        // Navigate to the chat room after successful booking creation
+        if (booking.chatroom_id || currentChatroom?.id) {
+            navigate(`/dm/${booking.chatroom_id || currentChatroom.id}?booking=${booking.id}`);
         }
     };
 
@@ -167,9 +232,10 @@ export default function VendorProfile() {
                                     <button
                                         onClick={handlePlaceBid}
                                         disabled={!tokens?.access || creatingRoom}
-                                        className="px-3 py-2 rounded-full bg-green-600 text-white text-sm font-medium shadow hover:bg-green-500 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                                        className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-pink-600 text-white text-sm font-medium shadow hover:bg-pink-500 transition disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
-                                        {creatingRoom ? "Preparing…" : "Place Bid"}
+                                        <FaCalendarPlus />
+                                        {creatingRoom ? "Preparing…" : "Request Booking"}
                                     </button>
                                 )}
                             </div>
@@ -297,6 +363,33 @@ export default function VendorProfile() {
                     </div>
                 )}
             </div>
+
+            {/* Event Selector Modal */}
+            <EventSelector
+                open={showEventSelector}
+                onClose={() => setShowEventSelector(false)}
+                onSelect={handleEventSelect}
+                providerName={vendor?.name}
+            />
+
+            {/* Booking Modal */}
+            <BookingModal
+                open={showBookingModal}
+                onClose={() => {
+                    setShowBookingModal(false);
+                    setSelectedEvent(null);
+                    setCurrentChatroom(null);
+                }}
+                event={selectedEvent}
+                provider={{
+                    id: vendor?.user_id || vendor?.user?.id,
+                    name: vendor?.name,
+                    entity_id: vendor?.id,
+                }}
+                providerType="vendor"
+                chatroomId={currentChatroom?.id}
+                onSuccess={handleBookingSuccess}
+            />
         </>
     );
 }

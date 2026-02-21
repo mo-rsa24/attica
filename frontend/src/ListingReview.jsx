@@ -27,6 +27,7 @@ const Pill = ({label}) => (
 export default function ListingReview() {
     const navigate = useNavigate();
     const {eventId} = useParams();
+    const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const [isPublishing, setIsPublishing] = useState(false);
     const [error, setError] = useState(null);
     const [eventStatus, setEventStatus] = useState(null);
@@ -40,7 +41,8 @@ export default function ListingReview() {
         publish,
         loadEvent,
         data,
-        event
+        event,
+        getStepData,
     } = useEventCreation();
 
     useEffect(() => {
@@ -85,20 +87,20 @@ export default function ListingReview() {
     }, [event, eventStatus]);
 
     const features = useMemo(() => {
-        try {
-            return JSON.parse(sessionStorage.getItem('listingStep7Selections') || '[]');
-        } catch {
-            return [];
-        }
-    }, []);
+        const fromContext = getStepData('step7', {})?.features;
+        if (Array.isArray(fromContext)) return fromContext;
+        const fromDraft = event?.data?.steps?.step7?.features;
+        if (Array.isArray(fromDraft)) return fromDraft;
+        return [];
+    }, [event?.data?.steps, getStepData]);
 
     const uploads = useMemo(() => {
-        try {
-            return JSON.parse(sessionStorage.getItem('listingStep8Uploads') || '[]');
-        } catch {
-            return [];
-        }
-    }, []);
+        const fromContext = getStepData('step8', {})?.uploads;
+        if (Array.isArray(fromContext)) return fromContext;
+        const fromDraft = event?.data?.steps?.step8?.uploads;
+        if (Array.isArray(fromDraft)) return fromDraft;
+        return [];
+    }, [event?.data?.steps, getStepData]);
 
     const stats = [
         {label: 'Venues', value: selectedLocations.length},

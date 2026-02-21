@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaStar, FaTag } from 'react-icons/fa';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { useAuth } from './AuthContext';
@@ -21,28 +21,41 @@ const StarRating = ({ rating }) => {
 function ServiceCard({ service }) {
   const navigate = useNavigate();
   const { tokens } = useAuth();
-  const [liked, setLiked] = useState(service?.liked);
-  const [likeCount, setLikeCount] = useState(service?.likes_count || 0);
+  const [liked, setLiked] = useState(Boolean(service?.liked));
+  const [likeCount, setLikeCount] = useState(Number(service?.likes) || 0);
+  const [isTogglingLike, setIsTogglingLike] = useState(false);
 
-  const toggleLike = (e) => {
+  useEffect(() => {
+    setLiked(Boolean(service?.liked));
+    setLikeCount(Number(service?.likes) || 0);
+  }, [service?.id, service?.liked, service?.likes]);
+
+  const toggleLike = async (e) => {
     e.stopPropagation();
-    if (!tokens) {
+    if (!tokens?.access) {
         navigate('/login');
         return;
     }
-    fetch(`/api/vendors/services/${service.id}/like/`, {
-      method: liked ? 'DELETE' : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${tokens.access}`,
-      },
-    })
-      .then(res => res.ok ? res.json() : Promise.reject('API request failed'))
-      .then(data => {
-        setLiked(data.liked);
-        setLikeCount(data.likes);
-      })
-      .catch(console.error);
+    if (isTogglingLike) return;
+
+    setIsTogglingLike(true);
+    try {
+      const res = await fetch(`/api/vendors/services/${service.id}/like/`, {
+        method: liked ? 'DELETE' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokens.access}`,
+        },
+      });
+      if (!res.ok) throw new Error('Like request failed');
+      const data = await res.json();
+      setLiked(Boolean(data.liked));
+      setLikeCount(Number(data.likes) || 0);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsTogglingLike(false);
+    }
   };
 
   // Render nothing if the essential service data is missing
@@ -53,55 +66,63 @@ function ServiceCard({ service }) {
   return (
     <div
       onClick={() => navigate(`/services/${service.id}`)}
-      className="block bg-white rounded-2xl shadow-md hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2 overflow-hidden group cursor-pointer"
+      className="group relative block cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
     >
       <div className="relative">
         <img
           src={service.image}
           alt={service.name}
-          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+          className="h-52 w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent"></div>
+        <div className="absolute left-4 top-4">
+            <span className="inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-700 backdrop-blur">
+                {service.category_name || 'General'}
+            </span>
+        </div>
         <button
             onClick={toggleLike}
-            className="absolute top-3 right-3 z-10 flex items-center bg-white/20 backdrop-blur-sm text-white rounded-full px-2 py-1 hover:bg-white/30 transition-colors"
+            disabled={isTogglingLike}
+            className="absolute right-4 top-4 z-10 flex items-center rounded-full bg-white/90 px-2.5 py-1.5 text-gray-700 shadow-sm transition-colors hover:bg-white"
         >
-            {liked ? <AiFillHeart className="w-5 h-5 text-rose-500"/> : <AiOutlineHeart className="w-5 h-5"/>}
-            <span className="ml-1 text-sm font-medium">{likeCount}</span>
+            {liked ? <AiFillHeart className="h-4 w-4 text-rose-500"/> : <AiOutlineHeart className="h-4 w-4"/>}
+            <span className="ml-1 text-xs font-semibold">{likeCount}</span>
         </button>
         <div
             onClick={(e) => {e.stopPropagation(); navigate(`/vendor/${service.vendor.username}`)}}
-            className="absolute bottom-0 left-4 transform translate-y-1/2"
+            className="absolute bottom-0 left-4 translate-y-1/2"
         >
-            {/* SAFELY access nested properties */}
             <img
                 src={service?.vendor?.profile_image || 'https://i.pravatar.cc/150'}
                 alt={service?.vendor?.name}
-                className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-lg transition-transform hover:scale-110"
+                className="h-16 w-16 rounded-2xl border-4 border-white object-cover shadow-lg transition-transform hover:scale-105"
             />
         </div>
       </div>
-      <div className="p-4 pt-10">
+      <div className="p-4 pt-11">
         <h4
             onClick={(e) => {e.stopPropagation(); navigate(`/vendor/${service.vendor.username}`)}}
-            className="text-xl font-bold text-gray-800 truncate hover:text-pink-600"
+            className="truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-pink-600"
         >
             {service?.vendor?.name}
         </h4>
-        <div className="flex items-center text-sm text-gray-500 mt-1">
+        <p className="mt-1 line-clamp-1 text-sm text-gray-500">
+            {service.name || 'Premium service experience'}
+        </p>
+        <div className="mt-3 flex items-center text-sm text-gray-600">
           <FaTag className="mr-2 text-pink-500" />
-          <span>{service.category_name || 'General Services'}</span>
+          <span className="line-clamp-1">{service.category_name || 'General Services'}</span>
         </div>
-        <div className="flex items-center text-sm text-gray-500 mt-1">
+        <div className="mt-1 flex items-center text-sm text-gray-600">
           <FaMapMarkerAlt className="mr-2 text-pink-500" />
-          <span>{service.location_tags || 'Not specified'}</span>
+          <span className="line-clamp-1">{service.location_tags || 'Not specified'}</span>
         </div>
-        <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+        <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
             <StarRating rating={service.rating} />
             {service.price && (
                  <div className="text-right">
                     <p className="text-lg font-bold text-pink-600">R{service.price}</p>
-                    <p className="text-xs text-gray-500">starting from</p>
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">starting from</p>
                 </div>
             )}
         </div>

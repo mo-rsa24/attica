@@ -11,6 +11,8 @@ class Notification(models.Model):
         BID_COUNTERED = 'bid_countered', 'Bid Countered'
         BOOKING_REQUEST = 'booking_request', 'Booking Request'
         BOOKING_CONFIRMED = 'booking_confirmed', 'Booking Confirmed'
+        BOOKING_REJECTED = 'booking_rejected', 'Booking Rejected'
+        BOOKING_CANCELLED = 'booking_cancelled', 'Booking Cancelled'
 
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,

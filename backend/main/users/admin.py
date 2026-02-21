@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Role, UserProfile
+from .models import CustomUser, Role, UserProfile, SocialPost, SocialPostComment
 
 class UserProfileInline(admin.StackedInline):
     """
@@ -41,5 +41,20 @@ class RoleAdmin(admin.ModelAdmin):
     """
     list_display = ('name',)
     search_fields = ('name',)
+
+
+@admin.register(SocialPost)
+class SocialPostAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "created_at", "shares_count")
+    search_fields = ("user__username", "text")
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(SocialPostComment)
+class SocialPostCommentAdmin(admin.ModelAdmin):
+    list_display = ("id", "post", "user", "created_at")
+    search_fields = ("user__username", "content")
+    readonly_fields = ("created_at",)
+
 
 admin.site.register(CustomUser, CustomUserAdmin)

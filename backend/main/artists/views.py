@@ -8,17 +8,33 @@ from .serializers import ArtistSerializer, ArtistBookingSerializer, PopularArtis
     ArtistPortfolioItemSerializer, ArtistPostSerializer
 
 
-class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
+class ArtistViewSet(viewsets.ModelViewSet):
     """
-    A ViewSet for viewing Artist profiles and related content.
+    A ViewSet for viewing and creating Artist profiles and related content.
     """
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     # --- ENHANCEMENT: Added filtering capabilities ---
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['genres']  # Allows filtering like /api/artists/?genres=Amapiano
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAuthenticatedOrReadOnly()]
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            from .serializers import ArtistCreateSerializer
+            return ArtistCreateSerializer
+        return ArtistSerializer
+
+    def perform_create(self, serializer):
+        from users.models import Role
+        if not self.request.user.has_role(Role.Names.ARTIST):
+            raise permissions.PermissionDenied("Only artists can create artist profiles.")
+        serializer.save(owner=self.request.user, user=self.request.user)
+    filterset_fields = ['genres', 'user', 'owner']  # Allows filtering by genre and owner/user ids
 
     @action(detail=True, methods=['get'])
     def portfolio(self, request, pk=None):

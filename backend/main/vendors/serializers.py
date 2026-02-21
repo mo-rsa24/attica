@@ -185,6 +185,22 @@ class VendorPostSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "vendor", "likes", "created_at"]
 
 
+class ServiceCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating/updating services."""
+    amenities = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Amenity.objects.all(), required=False
+    )
+
+    class Meta:
+        model = Service
+        fields = [
+            "id", "name", "category", "description", "price",
+            "number_of_guests", "max_capacity", "image",
+            "location_tags", "available_timeslots", "amenities",
+        ]
+        read_only_fields = ["id"]
+
+
 class VendorDetailSerializer(VendorSerializer):
     posts = VendorPostSerializer(many=True, read_only=True)
 

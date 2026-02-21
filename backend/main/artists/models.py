@@ -14,10 +14,17 @@ class Artist(models.Model):
     # --- Enriched Fields ---
     booking_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
                                       help_text="Cost per performance or hourly rate.")
+    booking_fee_min = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    booking_fee_max = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     contact_email = models.EmailField(blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
     instagram_handle = models.CharField(max_length=100, blank=True)
     availability = models.JSONField(default=dict, blank=True, help_text='e.g., {"2024-07-25": "unavailable"}')
+    tour_start_date = models.DateField(null=True, blank=True)
+    tour_end_date = models.DateField(null=True, blank=True)
+    tour_cities = models.JSONField(default=list, blank=True)
+    tour_clubs = models.JSONField(default=list, blank=True)
+    general_ticket_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     is_popular = models.BooleanField(default=False)  # To replace mock data logic
 
 

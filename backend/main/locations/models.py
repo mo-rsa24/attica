@@ -20,7 +20,7 @@ class Location(TimeStampedModel, OwnedModel):
     venue_count = models.IntegerField(default=0)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)
     listed_date = models.DateTimeField(null=True, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2, default=0.0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     image = models.ImageField(upload_to='location_images/', null=True, blank=True)
     image_url = models.URLField(blank=True, null=True)
     virtual_tour_url = models.URLField(max_length=1024, blank=True, null=True)

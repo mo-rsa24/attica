@@ -34,7 +34,7 @@ const PostCard = ({ post, artist }) => {
             {post.image && (
                 <img
                     src={post.image}
-                    alt="Post media"
+                    alt="Offering media"
                     className="rounded-lg object-cover w-full aspect-square"
                 />
             )}

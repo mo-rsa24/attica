@@ -111,6 +111,80 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(events, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'], url_path='manifest', permission_classes=[IsAuthenticated])
+    def manifest(self, request, pk=None):
+        """
+        Returns all providers (vendors, artists, venues) associated with the event,
+        grouped by status and provider type.
+        """
+        event = self.get_object()
+
+        # Verify user has access to this event
+        if event.organizer != request.user and event.user != request.user:
+            return Response(
+                {"detail": "You don't have permission to view this event's manifest."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        from chat.models import Booking
+        from chat.serializers import BookingSerializer
+
+        bookings = Booking.objects.filter(event=event).select_related(
+            'provider', 'organizer', 'chatroom'
+        ).order_by('provider_type', '-created_at')
+
+        # Group by status
+        result = {
+            'drafts': [],
+            'pending': [],
+            'confirmed': [],
+            'rejected': [],
+            'cancelled': [],
+        }
+
+        status_map = {
+            'draft': 'drafts',
+            'pending': 'pending',
+            'successful': 'confirmed',
+            'rejected': 'rejected',
+            'cancelled': 'cancelled',
+        }
+
+        for booking in bookings:
+            key = status_map.get(booking.status, 'drafts')
+            result[key].append(BookingSerializer(booking).data)
+
+        # Also group by provider type
+        by_type = {
+            'vendors': [],
+            'artists': [],
+            'venues': [],
+        }
+
+        type_map = {
+            'vendor': 'vendors',
+            'artist': 'artists',
+            'venue': 'venues',
+        }
+
+        for booking in bookings:
+            key = type_map.get(booking.provider_type, 'vendors')
+            by_type[key].append(BookingSerializer(booking).data)
+
+        return Response({
+            'event_id': event.id,
+            'event_name': event.name,
+            'by_status': result,
+            'by_type': by_type,
+            'totals': {
+                'drafts': len(result['drafts']),
+                'pending': len(result['pending']),
+                'confirmed': len(result['confirmed']),
+                'rejected': len(result['rejected']),
+                'cancelled': len(result['cancelled']),
+            }
+        })
+
 
 class PromoCodeViewSet(viewsets.ModelViewSet):
     """

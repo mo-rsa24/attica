@@ -13,35 +13,44 @@ import {
 } from 'react-icons/fa';
 import {Users, MapPin, Star} from 'lucide-react';
 import {useEventCreation} from "../context/reactContext.jsx";
+import { useAuth } from '../AuthContext';
 import InteractiveMap from "../components/InteractiveMap.jsx";
 import { useDebounce } from 'use-debounce';
 import AtticaMark from "../components/AtticaMark.jsx";
 
 // --- API Helper ---
 const api = {
-    searchLocations: (query, region = '') => fetch(`/api/locations/search/?q=${query}&region=${region}`).then(res => res.json()),
-    reverseGeocode: (lat, lng) => fetch(`/api/locations/reverse/?lat=${lat}&lng=${lng}`).then(res => res.json()),
-    fetchLocations: (filters = {}) => {
+    searchLocations: (token, query, region = '') => fetch(`/api/locations/search/?q=${query}&region=${region}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).then(res => res.json()),
+    reverseGeocode: (token, lat, lng) => fetch(`/api/locations/reverse/?lat=${lat}&lng=${lng}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).then(res => res.json()),
+    fetchLocations: (token, filters = {}) => {
         const query = new URLSearchParams(filters).toString();
-        return fetch(`/api/locations/locations/?${query}`).then(res => {
+        return fetch(`/api/locations/locations/?${query}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }).then(res => {
             if (!res.ok) throw new Error('Network response was not ok');
             return res.json();
         });
     },
-    fetchMapData: () => fetch('/api/locations/locations/map-data/').then(res => res.json()),
+    fetchMapData: (token) => fetch('/api/locations/locations/map-data/', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).then(res => res.json()),
 };
 
-const SearchBar = ({ onSelectSuggestion, value, setValue }) => {
+const SearchBar = ({ authToken, onSelectSuggestion, value, setValue }) => {
     const [suggestions, setSuggestions] = useState([]);
     const [debouncedSearch] = useDebounce(value, 300);
 
     useEffect(() => {
         if (debouncedSearch) {
-            api.searchLocations(debouncedSearch).then(setSuggestions);
+            api.searchLocations(authToken, debouncedSearch).then(setSuggestions);
         } else {
             setSuggestions([]);
         }
-    }, [debouncedSearch]);
+    }, [debouncedSearch, authToken]);
 
     const handleSelect = (location) => {
         setValue(location.name);
@@ -296,6 +305,8 @@ const RequestForm = ({onSubmit}) => {
 export default function SelectLocation() {
     const navigate = useNavigate();
     const { eventId } = useParams();
+    const { tokens } = useAuth();
+    const authToken = tokens?.access;
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const {selectedLocations, setSelectedLocations} = useEventCreation();
     const [allLocations, setAllLocations] = useState([]);
@@ -304,16 +315,22 @@ export default function SelectLocation() {
     const [mapCenter, setMapCenter] = useState([-26.2041, 28.0473]); // Default to Johannesburg
     const [markerPosition, setMarkerPosition] = useState(mapCenter);
     const [searchValue, setSearchValue] = useState('');
+    const [loadError, setLoadError] = useState('');
 
     useEffect(() => {
         // Fetch both full data for cards and lightweight data for map
-        Promise.all([api.fetchLocations(), api.fetchMapData()])
+        if (!authToken) return;
+        Promise.all([api.fetchLocations(authToken), api.fetchMapData(authToken)])
             .then(([fullData, mapData]) => {
+                setLoadError('');
                 setAllLocations(fullData.results || fullData || []);
-                setMapLocations(mapData || []);
+                setMapLocations(Array.isArray(mapData) ? mapData : []);
             })
-            .catch(err => console.error("Failed to fetch location data:", err));
-    }, []);
+            .catch(err => {
+                console.error("Failed to fetch location data:", err);
+                setLoadError('Unable to load venues right now.');
+            });
+    }, [authToken]);
 
 
     const handleSelect = (location) => {
@@ -330,13 +347,13 @@ export default function SelectLocation() {
         setMapCenter(newCenter);
         setMarkerPosition(newCenter);
         try {
-            const data = await api.reverseGeocode(latlng.lat, latlng.lng);
+            const data = await api.reverseGeocode(authToken, latlng.lat, latlng.lng);
             setSearchValue(data.address || `Lat: ${latlng.lat.toFixed(4)}, Lng: ${latlng.lng.toFixed(4)}`);
         } catch (error) {
             console.error("Reverse geocoding failed:", error);
             setSearchValue(`Lat: ${latlng.lat.toFixed(4)}, Lng: ${latlng.lng.toFixed(4)}`);
         }
-    }, []);
+    }, [authToken]);
 
     const handleSelectSuggestion = (location) => {
         const newCenter = [location.latitude, location.longitude];
@@ -356,6 +373,26 @@ export default function SelectLocation() {
 
     const handleDone = () => {
          navigate(`${listingBase}/step3`);
+    };
+
+    const openSchedulerForVenues = (autoRequest = false) => {
+        if (!eventId) {
+            alert('Save your event first, then open scheduler from this step.');
+            return;
+        }
+
+        const venueIds = selectedLocations.map((loc) => Number(loc.id)).filter((id) => Number.isInteger(id) && id > 0);
+        if (venueIds.length === 0) {
+            alert('Select at least one venue first.');
+            return;
+        }
+
+        const params = new URLSearchParams({
+            event_id: String(eventId),
+            venue_ids: venueIds.join(','),
+            ...(autoRequest ? { auto_request: '1' } : {}),
+        });
+        navigate(`/scheduling?${params.toString()}`);
     };
 
     const totalCost = selectedLocations.reduce((acc, loc) => acc + (loc.has_variable_pricing ? 0 : parseFloat(loc.price)), 0);
@@ -386,6 +423,7 @@ export default function SelectLocation() {
                     <div className="relative flex-grow">
                         <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"/>
                         <SearchBar
+                        authToken={authToken}
                         value={searchValue}
                         setValue={setSearchValue}
                         onSelectSuggestion={handleSelectSuggestion}
@@ -404,6 +442,11 @@ export default function SelectLocation() {
 
             <main className="max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-8 order-2 lg:order-1">
+                    {loadError && (
+                        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {loadError}
+                        </div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {allLocations.map(loc => (
                             <VenueCard
@@ -415,6 +458,11 @@ export default function SelectLocation() {
                             />
                         ))}
                     </div>
+                    {!loadError && allLocations.length === 0 && (
+                        <div className="mt-6 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+                            No venues available yet.
+                        </div>
+                    )}
                 </div>
 
                 <div className="lg:col-span-4 space-y-6 order-1 lg:order-2">
@@ -425,12 +473,27 @@ export default function SelectLocation() {
                                 onMapChange={handleMapChange}
                                 markerPosition={markerPosition}
                                 onMarkerDragEnd={handleMapChange}
-                                locations={allLocations}
-                                onMarkerClick={(loc) => setViewingLocation(loc)}
+                                locations={mapLocations.length > 0 ? mapLocations : allLocations}
+                                onMarkerClick={handleMarkerClick}
                             />
                     </div>
                     <RequestForm onSubmit={(data) => console.log('request', data)}/>
                     <BudgetPlanner totalCost={totalCost}/>
+                    <div className="bg-white p-4 rounded-lg shadow space-y-3">
+                        <button
+                            onClick={() => openSchedulerForVenues(true)}
+                            disabled={selectedLocations.length === 0}
+                            className="w-full py-2.5 px-4 bg-teal-500 text-white rounded-md font-bold hover:bg-teal-600 disabled:bg-gray-400"
+                        >
+                            Request Selected Venues
+                        </button>
+                        <button
+                            onClick={() => openSchedulerForVenues(false)}
+                            className="w-full py-2.5 px-4 bg-white border border-slate-300 text-slate-700 rounded-md font-bold hover:bg-slate-50"
+                        >
+                            Open Scheduler
+                        </button>
+                    </div>
                     <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-4 rounded-xl border border-emerald-100 shadow-inner">
                         <h4 className="font-bold text-teal-800 flex items-center gap-2"><FaInfoCircle/> Recommended
                             Combo</h4>

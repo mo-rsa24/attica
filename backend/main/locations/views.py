@@ -58,12 +58,28 @@ class ReverseGeocodeView(APIView):
             return Response({'error': str(e)}, status=500)
 
 
-class VenueViewSet(viewsets.ReadOnlyModelViewSet):
+class VenueViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = VenueSerializer
-    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_class = LocationFilter
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAuthenticated()]
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            from .serializers import LocationCreateSerializer
+            return LocationCreateSerializer
+        return VenueSerializer
+
+    def perform_create(self, serializer):
+        from users.models import Role
+        if not self.request.user.has_role(Role.Names.VENUE_MANAGER):
+            raise permissions.PermissionDenied("Only venue managers can create venues.")
+        serializer.save(owner=self.request.user, agent=self.request.user)
 
     # --- New Action for Map Data ---
     @action(detail=False, methods=['get'], url_path='map-data')

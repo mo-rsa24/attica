@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Role, UserProfile
+from .models import CustomUser, Role, UserProfile, SocialPost, SocialPostComment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -95,3 +95,84 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user_serializer.save()
 
         return instance
+
+
+class SocialPostUserSerializer(serializers.ModelSerializer):
+    roles = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="name",
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = [
+            "id",
+            "username",
+            "profile_picture",
+            "roles",
+        ]
+
+
+class SocialPostCommentSerializer(serializers.ModelSerializer):
+    user = SocialPostUserSerializer(read_only=True)
+
+    class Meta:
+        model = SocialPostComment
+        fields = [
+            "id",
+            "post",
+            "user",
+            "content",
+            "created_at",
+        ]
+        read_only_fields = ["id", "post", "user", "created_at"]
+
+
+class SocialPostSerializer(serializers.ModelSerializer):
+    user = SocialPostUserSerializer(read_only=True)
+    like_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SocialPost
+        fields = [
+            "id",
+            "user",
+            "text",
+            "image",
+            "created_at",
+            "updated_at",
+            "like_count",
+            "comment_count",
+            "shares_count",
+            "is_liked",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "created_at",
+            "updated_at",
+            "like_count",
+            "comment_count",
+            "shares_count",
+            "is_liked",
+        ]
+
+    def get_like_count(self, obj):
+        return getattr(obj, "likes_total", obj.likes.count())
+
+    def get_comment_count(self, obj):
+        return getattr(obj, "comments_total", obj.comments.count())
+
+    def get_is_liked(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+
+        prefetched_likes = getattr(obj, "_prefetched_objects_cache", {}).get("likes")
+        if prefetched_likes is not None:
+            return any(like.id == request.user.id for like in prefetched_likes)
+
+        return obj.likes.filter(id=request.user.id).exists()

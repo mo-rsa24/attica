@@ -10,10 +10,6 @@ import AtticaMark from "../components/AtticaMark.jsx";
 const api = {
     fetchArtists: () => fetch('/api/artists/artists').then(res => res.json()),
     fetchGenres: () => fetch('/api/artists/genres/').then(res => res.json()), // New API call
-    requestToBook: (artistId, eventId, eventDate) => {
-        console.log(`Requesting to book artist ${artistId} for event ${eventId} on ${eventDate}`);
-        return Promise.resolve({ success: true, status: 'pending' });
-    }
 };
 
 // --- Reusable Components ---
@@ -43,7 +39,7 @@ const ArtistCard = ({ artist, onSelect, onOpenModal, isSelected }) => (
     </motion.div>
 );
 
-const SelectedArtistsSidebar = ({ selected, onRemove, totalCost, onBookAll }) => (
+const SelectedArtistsSidebar = ({ selected, onRemove, totalCost, onBookAll, onOpenPlanner }) => (
     <div className="sticky top-24">
         <div className="bg-white p-6 rounded-xl shadow-lg">
             <h3 className="text-2xl font-bold text-gray-900">Your Lineup</h3>
@@ -72,6 +68,12 @@ const SelectedArtistsSidebar = ({ selected, onRemove, totalCost, onBookAll }) =>
                     className="mt-6 w-full bg-teal-500 text-white font-bold py-3 rounded-lg hover:bg-teal-600 disabled:bg-gray-400"
                 >
                     Request to Book All
+                </button>
+                <button
+                    onClick={onOpenPlanner}
+                    className="mt-3 w-full bg-white border border-slate-300 text-slate-700 font-bold py-3 rounded-lg hover:bg-slate-50"
+                >
+                    Open Scheduler
                 </button>
             </div>
         </div>
@@ -186,15 +188,27 @@ export default function SelectArtists() {
         }
     };
 
-    const handleBookAll = () => {
-        const eventId = 1;
-        const eventDate = "2024-12-10";
-        const bookingPromises = selectedArtists.map(artist =>
-            api.requestToBook(artist.id, eventId, eventDate)
-        );
-        Promise.all(bookingPromises).then(() => {
-            alert("Booking requests sent to all selected artists!");
+    const openSchedulerForArtists = (autoRequest = false) => {
+        if (!eventId) {
+            alert('Save your event first, then open scheduler from this step.');
+            return;
+        }
+        const artistIds = selectedArtists.map((artist) => artist.id).filter(Boolean);
+        if (artistIds.length === 0) {
+            alert('Select at least one artist first.');
+            return;
+        }
+
+        const params = new URLSearchParams({
+            event_id: String(eventId),
+            artist_ids: artistIds.join(','),
+            ...(autoRequest ? { auto_request: '1' } : {}),
         });
+        navigate(`/scheduling?${params.toString()}`);
+    };
+
+    const handleBookAll = () => {
+        openSchedulerForArtists(true);
     };
 
     const handleDone = () => {
@@ -270,7 +284,13 @@ export default function SelectArtists() {
                         </div>
                     </div>
                     <div className="lg:col-span-4 xl:col-span-3">
-                        <SelectedArtistsSidebar selected={selectedArtists} onRemove={handleSelectArtist} totalCost={totalCost} onBookAll={handleBookAll} />
+                        <SelectedArtistsSidebar
+                            selected={selectedArtists}
+                            onRemove={handleSelectArtist}
+                            totalCost={totalCost}
+                            onBookAll={handleBookAll}
+                            onOpenPlanner={() => openSchedulerForArtists(false)}
+                        />
                     </div>
                 </div>
             </main>

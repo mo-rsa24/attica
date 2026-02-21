@@ -55,6 +55,35 @@ class UserProfile(models.Model):
     def __str__(self):
         return f'{self.user.username} Profile'
 
+
+class SocialPost(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='social_posts')
+    text = models.TextField()
+    image = models.ImageField(upload_to='social_posts/', blank=True, null=True)
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='liked_social_posts')
+    shares_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:40]}"
+
+
+class SocialPostComment(models.Model):
+    post = models.ForeignKey(SocialPost, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='social_post_comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on post {self.post_id}"
+
 # These functions ensure that a UserProfile is automatically created
 # for every new User that is created. This is a common Django pattern.
 

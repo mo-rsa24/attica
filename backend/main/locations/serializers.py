@@ -46,6 +46,7 @@ class LocationMapSerializer(serializers.ModelSerializer):
 
 
 class VenueSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(read_only=True)
     images = LocationImageSerializer(many=True, read_only=True)
     features = FeatureSerializer(many=True, read_only=True)
     floor_plans = FloorPlanSerializer(many=True, read_only=True)
@@ -56,7 +57,7 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = [
-            'id', 'name', 'address', 'capacity', 'is_approved',
+            'id', 'owner', 'name', 'address', 'capacity', 'is_approved',
             'venue_count', 'image', 'image_url', 'created_at',
             'updated_at', 'rating', 'listed_date', 'price',
             'images', 'features', 'floor_plans', 'reviews',
@@ -65,6 +66,31 @@ class VenueSerializer(serializers.ModelSerializer):
                                                     'budget_estimate_min', 'budget_estimate_max', 'amenities',
             'organizer_notes', 'preferred_dates', 'is_indoor', 'is_outdoor'
         ]
+
+class LocationCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating/updating venue listings."""
+    amenities = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Amenity.objects.all(), required=False
+    )
+
+    class Meta:
+        model = Location
+        fields = [
+            "id", "name", "address", "capacity", "price", "image",
+            "parking_info", "is_wheelchair_accessible",
+            "is_indoor", "is_outdoor", "amenities",
+            "latitude", "longitude",
+        ]
+        read_only_fields = ["id"]
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        for field in ("price", "latitude", "longitude"):
+            value = attrs.get(field)
+            if value is not None and hasattr(value, "is_finite") and not value.is_finite():
+                raise serializers.ValidationError({field: "Must be a finite numeric value."})
+        return attrs
+
 
 class PopularVenueSerializer(serializers.ModelSerializer):
     class Meta:

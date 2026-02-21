@@ -1,9 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
-import {FaArrowLeft, FaImage, FaPaperPlane, FaPaperclip} from 'react-icons/fa';
+import {FaArrowLeft, FaImage, FaPaperPlane, FaPaperclip, FaCalendarAlt} from 'react-icons/fa';
 import {useDebouncedCallback} from 'use-debounce';
 import {useAuth} from '../AuthContext';
 import BidModal from '../components/chat/BidModal';
+import {BookingStatusBadge} from '../components/booking';
 
 const MessageBubble = ({message, isMe, canActOnBid, onBidAction}) => {
     const attachments = message.attachments || [];
@@ -96,6 +97,10 @@ export default function DirectMessagePage() {
     const [pendingFiles, setPendingFiles] = useState([]);
     const [showBidModal, setShowBidModal] = useState(false);
     const [socketError, setSocketError] = useState(false);
+
+    // Booking context
+    const [booking, setBooking] = useState(null);
+    const bookingId = searchParams.get('booking');
 
     const socketRef = useRef(null);
     const listRef = useRef(null);
@@ -224,6 +229,12 @@ export default function DirectMessagePage() {
                         ...m,
                         read_at: payload.read_at
                     } : m)));
+                } else if (payload.type === 'booking' && payload.booking) {
+                    // Update booking status in real-time
+                    setBooking(prev => prev?.id === payload.booking.id ? payload.booking : prev);
+                    if (payload.message) {
+                        appendMessages([payload.message]);
+                    }
                 } else if (payload.type === 'warning' && payload.detail) {
                     setSocketError(true);
                 }
@@ -263,6 +274,27 @@ export default function DirectMessagePage() {
             setShowBidModal(true);
         }
     }, [searchParams]);
+
+    // Fetch booking if booking ID is in URL
+    useEffect(() => {
+        if (!bookingId || !tokens?.access) return;
+
+        const fetchBooking = async () => {
+            try {
+                const res = await fetch(`/api/chat/bookings/${bookingId}/`, {
+                    headers: {Authorization: `Bearer ${tokens.access}`},
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setBooking(data);
+                }
+            } catch (err) {
+                console.error('Failed to fetch booking:', err);
+            }
+        };
+
+        fetchBooking();
+    }, [bookingId, tokens?.access]);
 
     // Mark unread messages from other user as read when viewing
     useEffect(() => {
@@ -413,14 +445,38 @@ export default function DirectMessagePage() {
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="max-w-5xl mx-auto py-4 px-4 space-y-4">
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="text-blue-600 text-sm flex items-center gap-2">
-                        <FaArrowLeft/> Back
-                    </button>
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Direct Message</p>
-                        <h1 className="text-xl font-semibold">{counterpart?.name || 'Chat'}</h1>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => navigate(-1)} className="text-blue-600 text-sm flex items-center gap-2">
+                            <FaArrowLeft/> Back
+                        </button>
+                        <div>
+                            <p className="text-xs text-gray-500 uppercase">Direct Message</p>
+                            <h1 className="text-xl font-semibold">{counterpart?.name || 'Chat'}</h1>
+                        </div>
                     </div>
+
+                    {/* Booking Context Banner */}
+                    {(booking || room?.event_name) && (
+                        <div className="flex items-center gap-3 px-4 py-2 bg-pink-50 rounded-lg border border-pink-200">
+                            <FaCalendarAlt className="text-pink-600" />
+                            <div className="text-sm">
+                                <p className="font-medium text-gray-900">
+                                    {booking?.event_name || room?.event_name}
+                                </p>
+                                {booking && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <BookingStatusBadge status={booking.status} size="sm" />
+                                        {booking.bid_amount && (
+                                            <span className="text-gray-600">
+                                                {booking.currency} {booking.bid_amount}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
                 {socketError && (
                     <div className="p-3 rounded-lg bg-orange-50 text-orange-800 border border-orange-200 text-sm">

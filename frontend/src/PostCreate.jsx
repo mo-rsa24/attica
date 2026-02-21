@@ -4,15 +4,15 @@ import { useAuth } from './AuthContext';
 
 export default function PostCreate() {
   const { tokens } = useAuth()
-  const [caption, setCaption] = useState('')
+  const [text, setText] = useState('')
   const [image, setImage] = useState(null)
 
   const handleSubmit = e => {
     e.preventDefault()
     const formData = new FormData()
     if (image) formData.append('image', image)
-    formData.append('caption', caption)
-    fetch('/api/vendors/posts/', {
+    formData.append('text', text)
+    fetch('/api/accounts/social-posts/', {
       method: 'POST',
       headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : {},
       body: formData
@@ -23,7 +23,7 @@ export default function PostCreate() {
     <Container sx={{ mt: 4 }}>
       <form onSubmit={handleSubmit}>
         <Stack spacing={2} maxWidth={400}>
-          <TextField label="Caption" value={caption} onChange={e => setCaption(e.target.value)} />
+          <TextField label="Post text" value={text} onChange={e => setText(e.target.value)} />
           <input type="file" onChange={e => setImage(e.target.files[0])} />
           <Button variant="contained" type="submit">Create</Button>
         </Stack>

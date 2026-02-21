@@ -11,6 +11,7 @@ export default function ListingStep8_Event() {
     const inputRef = useRef(null);
     const [uploads, setUploads] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [uploadError, setUploadError] = useState('');
     const initializedRef = useRef(false);
 
     useEffect(() => {
@@ -37,10 +38,20 @@ export default function ListingStep8_Event() {
     }, [uploads, setStepData]);
 
     const handleFiles = (fileList) => {
-        const next = Array.from(fileList)
-            .filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'))
-            .map((file) => ({
-                id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+        const pickedFiles = Array.from(fileList || []);
+        if (!pickedFiles.length) return;
+
+        const accepted = pickedFiles.filter((file) => file.type.startsWith('image/') || file.type.startsWith('video/'));
+        if (!accepted.length) {
+            setUploadError('Only image and video files are supported.');
+            return;
+        }
+
+        const skippedCount = pickedFiles.length - accepted.length;
+        setUploadError(skippedCount > 0 ? `${skippedCount} file(s) were skipped because they are not image/video.` : '');
+
+        const next = accepted.map((file) => ({
+                id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`,
                 file,
                 preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
                 isImage: file.type.startsWith('image/'),
@@ -124,6 +135,15 @@ export default function ListingStep8_Event() {
                         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                         onDragLeave={() => setIsDragging(false)}
                         onDrop={onDrop}
+                        onClick={() => inputRef.current?.click()}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                inputRef.current?.click();
+                            }
+                        }}
+                        role="button"
+                        tabIndex={0}
                     >
                         <div className="flex flex-col items-center space-y-4">
                             <UploadCloud className="h-16 w-16 text-gray-400" strokeWidth={1.5} />
@@ -134,7 +154,10 @@ export default function ListingStep8_Event() {
                             <div className="flex flex-col items-center space-y-2">
                                 <button
                                     type="button"
-                                    onClick={() => inputRef.current?.click()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        inputRef.current?.click();
+                                    }}
                                     className="inline-flex items-center justify-center rounded-full bg-black px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:scale-[1.01] hover:bg-gray-800"
                                 >
                                     Browse files
@@ -156,6 +179,9 @@ export default function ListingStep8_Event() {
                             </div>
                         </div>
                     </div>
+                    {uploadError && (
+                        <p className="mt-3 text-sm font-medium text-amber-700">{uploadError}</p>
+                    )}
                     {/* Upload Preview */}
                     {uploads.length > 0 && (
                         <div className="mt-8 text-left space-y-3">
