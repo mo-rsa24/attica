@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FaSearch, FaStar, FaTimes, FaPlus, FaMinus, FaStickyNote } from 'react-icons/fa';
 import {useEventCreation} from "../context/reactContext.jsx";
 import AtticaMark from "../components/AtticaMark.jsx";
+import {saveDraftAndExit} from "../utils/wizardExit.js";
 
 // --- API Helper ---
 const api = {
@@ -115,11 +116,15 @@ export default function SelectVendors() {
     const navigate = useNavigate();
     const { eventId } = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
-    const { selectedVendors, setSelectedVendors } = useEventCreation();
+    const { selectedVendors, setSelectedVendors, saveAndExit, setCurrentStep } = useEventCreation();
     const [allServices, setAllServices] = useState([]);
     const [categories, setCategories] = useState([]);
     const [activeCategory, setActiveCategory] = useState('All');
     const [modalService, setModalService] = useState(null);
+
+    useEffect(() => {
+        setCurrentStep('step3');
+    }, [setCurrentStep]);
 
     useEffect(() => {
         Promise.all([api.fetchServices(), api.fetchCategories()])
@@ -177,6 +182,14 @@ export default function SelectVendors() {
         navigate(`${listingBase}/step3`);
     };
 
+    const handleSaveAndExit = async () => {
+        await saveDraftAndExit({
+            saveAndExit,
+            draftId: eventId,
+            navigate,
+        });
+    };
+
     const filteredServices = useMemo(() => {
         if (activeCategory === 'All') {
             return allServices;
@@ -192,7 +205,7 @@ export default function SelectVendors() {
                         <AtticaMark tone="dark" />
                         <div className="flex items-center gap-3 text-sm text-slate-600">
                             <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Questions?</button>
-                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Save & exit</button>
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold" onClick={handleSaveAndExit}>Save & exit</button>
                         </div>
                     </div>
                     <div>

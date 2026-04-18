@@ -72,6 +72,7 @@ export const schedulingApi = {
   },
 
   createRequest: async (token, body) => {
+    // Accepts body with event_id OR event_draft_id (for in-wizard booking)
     const response = await fetch(`${API_ROOT}/requests/create/`, {
       method: 'POST',
       headers: authHeaders(token, {
@@ -79,6 +80,68 @@ export const schedulingApi = {
         'Idempotency-Key': generateIdempotencyKey('request'),
       }),
       body: JSON.stringify(body),
+    });
+    return parseResponse(response);
+  },
+
+  getCheckoutSession: async (token, checkoutSessionId) => {
+    const response = await fetch(`${API_ROOT}/checkout-sessions/${checkoutSessionId}/`, {
+      headers: authHeaders(token),
+    });
+    return parseResponse(response);
+  },
+
+  listCheckoutSessions: async (token, eventDraftId) => {
+    const response = await fetch(`${API_ROOT}/checkout-sessions/?event_draft_id=${eventDraftId}`, {
+      headers: authHeaders(token),
+    });
+    return parseResponse(response);
+  },
+
+  startCheckout: async (token, body) => {
+    const response = await fetch(`${API_ROOT}/checkout-sessions/start/`, {
+      method: 'POST',
+      headers: authHeaders(token, {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': generateIdempotencyKey('checkout-start'),
+      }),
+      body: JSON.stringify(body),
+    });
+    return parseResponse(response);
+  },
+
+  refreshCheckout: async (token, checkoutSessionId) => {
+    const response = await fetch(`${API_ROOT}/checkout-sessions/${checkoutSessionId}/refresh/`, {
+      method: 'POST',
+      headers: authHeaders(token, {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': generateIdempotencyKey('checkout-refresh'),
+      }),
+      body: JSON.stringify({}),
+    });
+    return parseResponse(response);
+  },
+
+  completeMockDeposit: async (token, checkoutSessionId, payload) => {
+    const response = await fetch(`${API_ROOT}/checkout-sessions/${checkoutSessionId}/complete-mock-deposit/`, {
+      method: 'POST',
+      headers: authHeaders(token, {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': generateIdempotencyKey('checkout-mock-deposit'),
+      }),
+      body: JSON.stringify(payload),
+    });
+    return parseResponse(response);
+  },
+
+  releaseCheckout: async (token, checkoutSessionId) => {
+    const response = await fetch(`${API_ROOT}/checkout-sessions/${checkoutSessionId}/release/`, {
+      method: 'POST',
+      headers: authHeaders(token, {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': generateIdempotencyKey('checkout-release'),
+      }),
+      body: JSON.stringify({}),
     });
     return parseResponse(response);
   },
@@ -109,6 +172,15 @@ export const schedulingApi = {
       method: 'POST',
       headers: authHeaders(token, { 'Content-Type': 'application/json' }),
       body: JSON.stringify({ provider_message: providerMessage }),
+    });
+    return parseResponse(response);
+  },
+
+  completeBooking: async (token, bookingId) => {
+    const response = await fetch(`${API_ROOT}/bookings/${bookingId}/complete/`, {
+      method: 'POST',
+      headers: authHeaders(token, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({}),
     });
     return parseResponse(response);
   },
@@ -185,6 +257,62 @@ export const schedulingApi = {
     const query = toQueryString(params);
     const response = await fetch(`${API_ROOT}/ops/dead-letters/${query ? `?${query}` : ''}`, {
       headers: authHeaders(token),
+    });
+    return parseResponse(response);
+  },
+
+  searchEnriched: async (token, params) => {
+    const query = toQueryString(params);
+    const response = await fetch(`${API_ROOT}/availability/search/enriched/?${query}`, {
+      headers: authHeaders(token),
+    });
+    return parseResponse(response);
+  },
+
+  counterPropose: async (token, requestId, payload) => {
+    const response = await fetch(`${API_ROOT}/requests/${requestId}/counter/`, {
+      method: 'POST',
+      headers: authHeaders(token, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify(payload),
+    });
+    return parseResponse(response);
+  },
+
+  acceptCounter: async (token, requestId) => {
+    const response = await fetch(`${API_ROOT}/requests/${requestId}/accept-counter/`, {
+      method: 'POST',
+      headers: authHeaders(token, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({}),
+    });
+    return parseResponse(response);
+  },
+
+  rejectCounter: async (token, requestId, message = '') => {
+    const response = await fetch(`${API_ROOT}/requests/${requestId}/reject-counter/`, {
+      method: 'POST',
+      headers: authHeaders(token, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ message }),
+    });
+    return parseResponse(response);
+  },
+
+  nudgeRequest: async (token, requestId) => {
+    const response = await fetch(`${API_ROOT}/requests/${requestId}/nudge/`, {
+      method: 'POST',
+      headers: authHeaders(token, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({}),
+    });
+    return parseResponse(response);
+  },
+
+  withdrawRequest: async (token, requestId) => {
+    const response = await fetch(`${API_ROOT}/requests/${requestId}/withdraw/`, {
+      method: 'POST',
+      headers: authHeaders(token, {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': generateIdempotencyKey('withdraw'),
+      }),
+      body: JSON.stringify({}),
     });
     return parseResponse(response);
   },

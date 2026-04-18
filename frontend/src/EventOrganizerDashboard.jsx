@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import {
   FaCalendarAlt,
@@ -12,6 +12,8 @@ import {
   FaStore,
   FaMusic,
   FaMapMarkerAlt,
+  FaListAlt,
+  FaUserPlus,
 } from 'react-icons/fa';
 import { BookingCard, BookingStatusBadge } from './components/booking';
 
@@ -63,24 +65,25 @@ function EventSection({ event, bookings, onCancelBooking }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Event Header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-      >
-        <div className="flex items-center gap-4">
+      <div className="px-6 py-4 flex items-center justify-between">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-4 flex-1 text-left hover:opacity-80 transition-opacity"
+        >
           <div className="p-3 bg-pink-100 rounded-xl">
             <FaCalendarAlt className="w-5 h-5 text-pink-600" />
           </div>
-          <div className="text-left">
+          <div>
             <h3 className="font-semibold text-gray-900">
               {event.name || event.data?.name || 'Untitled Event'}
             </h3>
             <p className="text-sm text-gray-500">
               {formatDate(event.date || event.data?.date)} • {bookings.length} provider{bookings.length !== 1 ? 's' : ''}
+              {event.isDraft && <span className="ml-2 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded">Draft</span>}
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
+        </button>
+        <div className="flex items-center gap-3 flex-shrink-0">
           <div className="flex gap-2">
             {bookingsByStatus.confirmed.length > 0 && (
               <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
@@ -93,11 +96,29 @@ function EventSection({ event, bookings, onCancelBooking }) {
               </span>
             )}
           </div>
-          <FaChevronRight
-            className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? 'rotate-90' : ''}`}
-          />
+          {/* Manage providers — re-enters wizard step 3 for drafts, or marketplace for published */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (event.isDraft) {
+                navigate(`/listing/${event.id}/step3`);
+              } else {
+                navigate(`/services?event=${event.id}`);
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-pink-600 border border-pink-200 rounded-lg hover:bg-pink-50 transition-colors"
+            title={event.isDraft ? 'Return to provider booking step' : 'Browse marketplace to add providers'}
+          >
+            <FaUserPlus className="w-3 h-3" />
+            {event.isDraft ? 'Add Providers' : 'Find Providers'}
+          </button>
+          <button onClick={() => setExpanded(!expanded)}>
+            <FaChevronRight
+              className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? 'rotate-90' : ''}`}
+            />
+          </button>
         </div>
-      </button>
+      </div>
 
       {/* Bookings */}
       {expanded && bookings.length > 0 && (
@@ -121,7 +142,7 @@ function EventSection({ event, bookings, onCancelBooking }) {
             <FaUsers className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p>No providers booked yet.</p>
             <button
-              onClick={() => navigate('/services')}
+              onClick={() => navigate(`/services?event=${event.id}`)}
               className="mt-3 text-pink-600 hover:text-pink-700 font-medium"
             >
               Find Providers
@@ -133,11 +154,85 @@ function EventSection({ event, bookings, onCancelBooking }) {
   );
 }
 
+const SCHEDULING_STATUS_LABEL = {
+  pending: 'Awaiting response',
+  approved: 'Approved',
+  declined: 'Declined',
+  counter_proposed: 'Counter proposed',
+  withdrawn: 'Withdrawn',
+  expired: 'Expired',
+};
+
+const SCHEDULING_STATUS_COLOR = {
+  pending: 'bg-yellow-100 text-yellow-700',
+  approved: 'bg-emerald-100 text-emerald-700',
+  declined: 'bg-red-100 text-red-700',
+  counter_proposed: 'bg-violet-100 text-violet-700',
+  withdrawn: 'bg-gray-100 text-gray-600',
+  expired: 'bg-gray-100 text-gray-500',
+};
+
+function SchedulingRequestRow({ request }) {
+  const statusColor = SCHEDULING_STATUS_COLOR[request.status] || 'bg-gray-100 text-gray-600';
+  const statusLabel = SCHEDULING_STATUS_LABEL[request.status] || request.status;
+  const fmtDate = (v) => v ? new Date(v).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+
+  return (
+    <Link
+      to={`/bookings/${request.id}`}
+      className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-pink-200 hover:shadow-sm transition-all"
+    >
+      <div className="min-w-0">
+        <p className="font-semibold text-gray-900 truncate">
+          {request.resource_display_name || `Request #${request.id}`}
+        </p>
+        <p className="text-sm text-gray-500 mt-0.5">
+          {request.event_title ? `Event: ${request.event_title} · ` : ''}
+          {fmtDate(request.requested_start_at)}
+        </p>
+      </div>
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${statusColor}`}>
+          {statusLabel}
+        </span>
+        <FaChevronRight className="text-gray-300 w-3 h-3" />
+      </div>
+    </Link>
+  );
+}
+
+function SchedulingBookingRow({ booking }) {
+  const fmtDate = (v) => v ? new Date(v).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+  return (
+    <Link
+      to={`/booking-detail/${booking.id}`}
+      className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-pink-200 hover:shadow-sm transition-all"
+    >
+      <div className="min-w-0">
+        <p className="font-semibold text-gray-900 truncate">
+          {booking.resource_display_name || `Booking #${booking.id}`}
+        </p>
+        <p className="text-sm text-gray-500 mt-0.5">
+          {fmtDate(booking.start_at)} — {fmtDate(booking.end_at)}
+        </p>
+      </div>
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700 capitalize">
+          {booking.status}
+        </span>
+        <FaChevronRight className="text-gray-300 w-3 h-3" />
+      </div>
+    </Link>
+  );
+}
+
 export default function EventOrganizerDashboard() {
   const { user, tokens } = useAuth();
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [schedulingRequests, setSchedulingRequests] = useState([]);
+  const [schedulingBookings, setSchedulingBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
@@ -150,14 +245,14 @@ export default function EventOrganizerDashboard() {
       setError(null);
 
       try {
-        // Fetch events and bookings in parallel
-        const [eventsRes, bookingsRes] = await Promise.all([
-          fetch('/api/events/my/', {
-            headers: { Authorization: `Bearer ${tokens.access}` },
-          }),
-          fetch('/api/chat/bookings/?role=organizer', {
-            headers: { Authorization: `Bearer ${tokens.access}` },
-          }),
+        const headers = { Authorization: `Bearer ${tokens.access}` };
+
+        // Fetch all data in parallel
+        const [eventsRes, bookingsRes, schedReqRes, schedBookRes] = await Promise.all([
+          fetch('/api/events/my/', { headers }),
+          fetch('/api/chat/bookings/?role=organizer', { headers }),
+          fetch('/api/scheduling/requests/?role=organizer', { headers }),
+          fetch('/api/scheduling/bookings/?role=organizer', { headers }),
         ]);
 
         if (!eventsRes.ok || !bookingsRes.ok) {
@@ -167,7 +262,6 @@ export default function EventOrganizerDashboard() {
         const eventsData = await eventsRes.json();
         const bookingsData = await bookingsRes.json();
 
-        // Combine drafts and published events
         const allEvents = [
           ...(eventsData.drafts || []).map(e => ({ ...e, isDraft: true })),
           ...(eventsData.published || []).map(e => ({ ...e, isDraft: false })),
@@ -175,6 +269,15 @@ export default function EventOrganizerDashboard() {
 
         setEvents(allEvents);
         setBookings(bookingsData);
+
+        if (schedReqRes.ok) {
+          const d = await schedReqRes.json();
+          setSchedulingRequests(Array.isArray(d) ? d : (d?.results ?? []));
+        }
+        if (schedBookRes.ok) {
+          const d = await schedBookRes.json();
+          setSchedulingBookings(Array.isArray(d) ? d : (d?.results ?? []));
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -215,23 +318,34 @@ export default function EventOrganizerDashboard() {
   const handleCancelBooking = async (booking) => {
     if (!window.confirm('Are you sure you want to cancel this booking?')) return;
 
+    // Scheduling bookings (from marketplace) use a different API than legacy chat bookings.
+    const isSchedulingBooking = Boolean(booking.resource || booking.source_request);
+    const url = isSchedulingBooking
+      ? `/api/scheduling/bookings/${booking.id}/cancel/`
+      : `/api/chat/bookings/${booking.id}/cancel/`;
+
     try {
-      const response = await fetch(`/api/chat/bookings/${booking.id}/cancel/`, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${tokens?.access}`,
+          'Content-Type': 'application/json',
         },
+        body: isSchedulingBooking ? JSON.stringify({ reason: '' }) : undefined,
       });
 
       if (!response.ok) {
         throw new Error('Failed to cancel booking');
       }
 
-      // Refresh bookings
-      const updatedBooking = await response.json();
-      setBookings(prev =>
-        prev.map(b => b.id === updatedBooking.id ? updatedBooking : b)
-      );
+      if (isSchedulingBooking) {
+        setSchedulingBookings(prev => prev.filter(b => b.id !== booking.id));
+      } else {
+        const updatedBooking = await response.json();
+        setBookings(prev =>
+          prev.map(b => b.id === updatedBooking.id ? updatedBooking : b)
+        );
+      }
     } catch (err) {
       alert(err.message);
     }
@@ -338,6 +452,7 @@ export default function EventOrganizerDashboard() {
             { id: 'drafts', label: 'Drafts', count: bookingStats.drafts },
             { id: 'pending', label: 'Pending', count: bookingStats.pending },
             { id: 'confirmed', label: 'Confirmed', count: bookingStats.confirmed },
+            { id: 'requests', label: 'Marketplace Requests', count: schedulingRequests.length + schedulingBookings.length },
           ].map(tab => (
             <button
               key={tab.id}
@@ -362,7 +477,46 @@ export default function EventOrganizerDashboard() {
           ))}
         </div>
 
-        {/* Events with Bookings */}
+        {/* Marketplace Requests Tab */}
+        {activeTab === 'requests' && (
+          <div className="space-y-8">
+            {/* Pending Requests */}
+            <div>
+              <h3 className="text-base font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <FaListAlt className="text-pink-500" /> Booking Requests
+              </h3>
+              {schedulingRequests.length === 0 ? (
+                <div className="bg-white rounded-xl border border-gray-100 p-8 text-center text-gray-500">
+                  <p className="font-medium">No booking requests yet.</p>
+                  <Link to="/artists" className="mt-2 text-pink-600 hover:underline text-sm block">Browse artists</Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {schedulingRequests.map(req => <SchedulingRequestRow key={req.id} request={req} />)}
+                </div>
+              )}
+            </div>
+
+            {/* Confirmed Bookings */}
+            <div>
+              <h3 className="text-base font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <FaCheckCircle className="text-emerald-500" /> Confirmed Bookings
+              </h3>
+              {schedulingBookings.length === 0 ? (
+                <div className="bg-white rounded-xl border border-gray-100 p-8 text-center text-gray-500">
+                  <p className="font-medium">No confirmed bookings yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {schedulingBookings.map(b => <SchedulingBookingRow key={b.id} booking={b} />)}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Events with Chat Bookings */}
+        {activeTab !== 'requests' && (
         <div className="space-y-6">
           {events.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
@@ -398,6 +552,7 @@ export default function EventOrganizerDashboard() {
             })
           )}
         </div>
+        )}
       </div>
     </div>
   );

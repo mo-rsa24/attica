@@ -1,31 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const formatDate = (date) => {
-    if (!date) return 'TBA';
-    const parsed = new Date(date);
-    if (Number.isNaN(parsed.getTime())) return 'TBA';
-    return parsed.toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-};
-
-const normalizeList = (value) => {
-    if (Array.isArray(value)) return value.filter(Boolean);
-    if (typeof value === 'string') {
-        const trimmed = value.trim();
-        if (!trimmed) return [];
-        try {
-            const parsed = JSON.parse(trimmed);
-            if (Array.isArray(parsed)) return parsed.filter(Boolean);
-        } catch {
-            return trimmed.split(',').map(v => v.trim()).filter(Boolean);
-        }
-    }
-    return [];
-};
+import { formatTourDate, hasTourContent, mapArtistToTour } from './utils/tourUtils';
 
 export default function Tours() {
     const [isLoading, setIsLoading] = useState(true);
@@ -49,20 +24,8 @@ export default function Tours() {
                     : artistsPayload?.results || [];
 
                 const normalizedTours = artists
-                    .map((artist) => ({
-                        artist,
-                        startDate: artist.tour_start_date || null,
-                        endDate: artist.tour_end_date || null,
-                        cities: normalizeList(artist.tour_cities),
-                        clubs: normalizeList(artist.tour_clubs),
-                        ticketPrice: artist.general_ticket_price,
-                    }))
-                    .filter((tour) =>
-                        tour.startDate ||
-                        tour.endDate ||
-                        tour.cities.length > 0 ||
-                        tour.clubs.length > 0
-                    )
+                    .map(mapArtistToTour)
+                    .filter(hasTourContent)
                     .sort((a, b) => {
                         const aDate = a.startDate ? new Date(a.startDate).getTime() : Number.MAX_SAFE_INTEGER;
                         const bDate = b.startDate ? new Date(b.startDate).getTime() : Number.MAX_SAFE_INTEGER;
@@ -154,59 +117,66 @@ export default function Tours() {
                             Showing {filteredPosts.length} {filteredPosts.length === 1 ? 'tour' : 'tours'}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredPosts.map((tour) => (
-                                <article key={tour.artist.id} className="bg-white rounded-2xl shadow hover:shadow-lg transition-shadow p-5 border border-gray-100">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <img
-                                            src={tour.artist?.profile_image || 'https://placehold.co/48x48/F3F4F6/9CA3AF?text=A'}
-                                            alt={tour.artist?.name || 'Artist'}
-                                            className="w-12 h-12 rounded-full object-cover"
-                                        />
-                                        <div>
-                                            <Link
-                                                to={`/artists/${tour.artist?.id}`}
-                                                className="font-semibold text-gray-900 hover:text-emerald-700 transition-colors"
-                                            >
-                                                {tour.artist?.name || 'Unknown Artist'}
-                                            </Link>
-                                            <p className="text-xs text-gray-500">{tour.artist?.genres || 'Genres not listed'}</p>
-                                        </div>
-                                    </div>
+                            {filteredPosts.map((tour) => {
+                                const artistId = tour?.artist?.id;
+                                if (!artistId) return null;
 
-                                    <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mb-4">
-                                        <p className="text-xs uppercase tracking-wider font-semibold text-emerald-700 mb-1">Tour Window</p>
-                                        <p className="text-sm text-gray-800">
-                                            {formatDate(tour.startDate)} to {formatDate(tour.endDate)}
-                                        </p>
-                                    </div>
+                                return (
+                                    <Link
+                                        key={artistId}
+                                        to={`/tours/${artistId}`}
+                                        state={{ tour }}
+                                        className="group block"
+                                        aria-label={`Open ${tour.artist?.name || 'artist'} tour guide`}
+                                    >
+                                        <article className="bg-white rounded-2xl shadow p-5 border border-gray-100 transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-0.5">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <img
+                                                    src={tour.artist?.profile_image || 'https://placehold.co/48x48/F3F4F6/9CA3AF?text=A'}
+                                                    alt={tour.artist?.name || 'Artist'}
+                                                    className="w-12 h-12 rounded-full object-cover"
+                                                />
+                                                <div>
+                                                    <p className="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">
+                                                        {tour.artist?.name || 'Unknown Artist'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">{tour.artist?.genres || 'Genres not listed'}</p>
+                                                </div>
+                                            </div>
 
-                                    {tour.cities.length > 0 && (
-                                        <div className="mb-3">
-                                            <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Cities</p>
-                                            <p className="text-sm text-gray-700 line-clamp-2">{tour.cities.join(', ')}</p>
-                                        </div>
-                                    )}
+                                            <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mb-4">
+                                                <p className="text-xs uppercase tracking-wider font-semibold text-emerald-700 mb-1">Tour Window</p>
+                                                <p className="text-sm text-gray-800">
+                                                    {formatTourDate(tour.startDate)} to {formatTourDate(tour.endDate)}
+                                                </p>
+                                            </div>
 
-                                    {tour.clubs.length > 0 && (
-                                        <div className="mb-3">
-                                            <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Venues / Clubs</p>
-                                            <p className="text-sm text-gray-700 line-clamp-2">{tour.clubs.join(', ')}</p>
-                                        </div>
-                                    )}
+                                            {tour.cities.length > 0 && (
+                                                <div className="mb-3">
+                                                    <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Cities</p>
+                                                    <p className="text-sm text-gray-700 line-clamp-2">{tour.cities.join(', ')}</p>
+                                                </div>
+                                            )}
 
-                                    <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
-                                        <span className="text-gray-500 truncate max-w-[65%]">
-                                            {tour.ticketPrice ? `From R${tour.ticketPrice}` : 'Ticket price TBA'}
-                                        </span>
-                                        <Link
-                                            to={`/artists/${tour.artist?.id}`}
-                                            className="font-semibold text-emerald-700 hover:text-emerald-800"
-                                        >
-                                            View artist
-                                        </Link>
-                                    </div>
-                                </article>
-                            ))}
+                                            {tour.clubs.length > 0 && (
+                                                <div className="mb-3">
+                                                    <p className="text-xs uppercase tracking-wider font-semibold text-gray-500 mb-1">Venues / Clubs</p>
+                                                    <p className="text-sm text-gray-700 line-clamp-2">{tour.clubs.join(', ')}</p>
+                                                </div>
+                                            )}
+
+                                            <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
+                                                <span className="text-gray-500 truncate max-w-[65%]">
+                                                    {tour.ticketPrice ? `From R${tour.ticketPrice}` : 'Ticket price TBA'}
+                                                </span>
+                                                <span className="font-semibold text-emerald-700 group-hover:text-emerald-800">
+                                                    Open tour
+                                                </span>
+                                            </div>
+                                        </article>
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </>
                 )}

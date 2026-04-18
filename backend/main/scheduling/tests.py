@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+from decimal import Decimal
 from datetime import date, datetime, time, timedelta, timezone as datetime_timezone
 from urllib import error as urllib_error
 from unittest.mock import patch
@@ -10,7 +11,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from events.models import Event
+from events.models import Event, EventDraft
 from notifications.models import Notification
 
 from .models import (
@@ -19,13 +20,14 @@ from .models import (
     BookingConflictIncident,
     Booking,
     BookingRequest,
+    CheckoutSession,
     MarketplaceResource,
     OutboxDeadLetter,
     OutboxEvent,
     ResourcePolicy,
     WebhookTarget,
 )
-from .services import dispatch_outbox_events, materialize_availability_slots, search_availability
+from .services import dispatch_outbox_events, expire_checkout_sessions, materialize_availability_slots, search_availability
 
 
 class _DummyUrlOpenResponse:
@@ -307,6 +309,399 @@ class SchedulingWorkflowTests(TestCase):
             response = self.client.post("/api/scheduling/bookings/create/", payload, format="json")
         self.assertEqual(response.status_code, 409)
         self.assertIn("conflicting booking", str(response.data["detail"]).lower())
+
+
+class SchedulingCheckoutWorkflowTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.organizer = self._make_user("checkout_organizer", "organizer")
+        self.organizer_two = self._make_user("checkout_organizer_two", "organizer")
+        self.provider = self._make_user("checkout_provider", "vendor")
+        self.provider_two = self._make_user("checkout_provider_two", "vendor")
+
+        self.event_draft = EventDraft.objects.create(
+            organizer=self.organizer,
+            current_step="step3",
+            data={"steps": {"step1": {"name": "Checkout Draft"}}},
+        )
+        self.event_draft_two = EventDraft.objects.create(
+            organizer=self.organizer_two,
+            current_step="step3",
+            data={"steps": {"step1": {"name": "Competing Draft"}}},
+        )
+
+        self.resource = MarketplaceResource.objects.create(
+            owner=self.provider,
+            resource_type=MarketplaceResource.ResourceType.VENDOR,
+            display_name="Checkout Vendor",
+            timezone="UTC",
+            city="Johannesburg",
+            is_active=True,
+        )
+        self.resource_two = MarketplaceResource.objects.create(
+            owner=self.provider_two,
+            resource_type=MarketplaceResource.ResourceType.ARTIST,
+            display_name="Checkout Artist",
+            timezone="UTC",
+            city="Cape Town",
+            is_active=True,
+        )
+
+        self.start_at = timezone.now() + timedelta(days=14)
+        self.end_at = self.start_at + timedelta(hours=4)
+
+    @staticmethod
+    def _make_user(username, user_type):
+        from users.models import CustomUser
+
+        return CustomUser.objects.create_user(
+            username=username,
+            password="test-pass-123",
+            user_type=user_type,
+            email=f"{username}@example.com",
+        )
+
+    def _accept_request(
+        self,
+        *,
+        organizer,
+        event_draft,
+        resource,
+        provider,
+        requires_deposit=False,
+        deposit_type=ResourcePolicy.DepositType.FIXED_AMOUNT,
+        deposit_value="0.00",
+        hold_minutes=30,
+    ):
+        ResourcePolicy.objects.update_or_create(
+            resource=resource,
+            defaults={
+                "booking_mode": ResourcePolicy.BookingMode.APPROVAL_REQUIRED,
+                "min_notice_hours": 0,
+                "max_horizon_days": 365,
+                "requires_deposit": requires_deposit,
+                "deposit_type": deposit_type,
+                "deposit_value": deposit_value,
+                "checkout_hold_minutes": hold_minutes,
+                "publish_requires_mock_deposit": requires_deposit,
+            },
+        )
+        AvailabilitySlot.objects.update_or_create(
+            resource=resource,
+            start_at=self.start_at,
+            end_at=self.end_at,
+            defaults={
+                "capacity_total": 1,
+                "capacity_reserved": 0,
+                "is_bookable": True,
+            },
+        )
+
+        self.client.force_authenticate(organizer)
+        create_response = self.client.post(
+            "/api/scheduling/requests/create/",
+            {
+                "event_draft_id": event_draft.id,
+                "resource_id": resource.id,
+                "start_at": self.start_at.isoformat(),
+                "end_at": self.end_at.isoformat(),
+                "attendee_count": 1,
+                "message": "Please confirm",
+            },
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, 201)
+        request_id = create_response.data["id"]
+
+        self.client.force_authenticate(provider)
+        approve_response = self.client.post(
+            f"/api/scheduling/requests/{request_id}/approve/",
+            {"provider_message": "Accepted"},
+            format="json",
+        )
+        self.assertEqual(approve_response.status_code, 200)
+        booking_request = BookingRequest.objects.select_related("resource").get(id=request_id)
+        self.assertEqual(booking_request.status, BookingRequest.Status.APPROVED)
+        self.assertIsNone(booking_request.checkout_session_id)
+        return booking_request
+
+    def test_start_checkout_for_single_resource_blocks_availability(self):
+        booking_request = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+            requires_deposit=False,
+            deposit_value="0.00",
+        )
+
+        self.client.force_authenticate(self.organizer)
+        response = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {
+                "event_draft_id": self.event_draft.id,
+                "request_ids": [booking_request.id],
+            },
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="checkout-single-1",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["status"], CheckoutSession.Status.ACTIVE)
+        self.assertEqual(response.data["requests"][0]["workflow_state"], "ready_for_publish")
+
+        booking_request.refresh_from_db()
+        slot = AvailabilitySlot.objects.get(resource=self.resource)
+        self.assertEqual(slot.capacity_reserved, 1)
+        self.assertIsNotNone(booking_request.checkout_session_id)
+        self.assertIsNotNone(booking_request.draft_hold_expires_at)
+
+        availability = search_availability(
+            start_at=self.start_at,
+            end_at=self.end_at,
+            resource_type=self.resource.resource_type,
+        )
+        self.assertEqual(availability, [])
+
+    def test_start_checkout_for_multiple_resources_uses_one_session(self):
+        request_one = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+            requires_deposit=True,
+            deposit_value="500.00",
+        )
+        request_two = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource_two,
+            provider=self.provider_two,
+            requires_deposit=False,
+            deposit_value="0.00",
+        )
+
+        self.client.force_authenticate(self.organizer)
+        response = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {
+                "event_draft_id": self.event_draft.id,
+                "request_ids": [request_one.id, request_two.id],
+            },
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="checkout-bundle-1",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(response.data["requests"]), 2)
+        self.assertEqual(Decimal(str(response.data["total_deposit_due"])), Decimal("500.00"))
+
+        request_one.refresh_from_db()
+        request_two.refresh_from_db()
+        self.assertEqual(request_one.checkout_session_id, request_two.checkout_session_id)
+
+    def test_overlapping_checkout_hold_is_rejected_for_another_organizer(self):
+        request_one = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+        )
+        request_two = self._accept_request(
+            organizer=self.organizer_two,
+            event_draft=self.event_draft_two,
+            resource=self.resource,
+            provider=self.provider,
+        )
+
+        self.client.force_authenticate(self.organizer)
+        first = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft.id, "request_ids": [request_one.id]},
+            format="json",
+        )
+        self.assertEqual(first.status_code, 201)
+
+        self.client.force_authenticate(self.organizer_two)
+        second = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft_two.id, "request_ids": [request_two.id]},
+            format="json",
+        )
+        self.assertEqual(second.status_code, 409)
+        self.assertTrue(
+            any(
+                token in str(second.data["detail"]).lower()
+                for token in ["already held", "slot capacity exceeded"]
+            )
+        )
+
+    def test_expired_checkout_releases_reserved_capacity(self):
+        booking_request = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+        )
+        self.client.force_authenticate(self.organizer)
+        response = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft.id, "request_ids": [booking_request.id]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        session = CheckoutSession.objects.get(id=response.data["id"])
+        session.hold_expires_at = timezone.now() - timedelta(minutes=1)
+        session.save(update_fields=["hold_expires_at"])
+        BookingRequest.objects.filter(id=booking_request.id).update(
+            draft_hold_expires_at=timezone.now() - timedelta(minutes=1)
+        )
+
+        expired = expire_checkout_sessions(limit=10)
+        self.assertEqual(expired, 1)
+
+        slot = AvailabilitySlot.objects.get(resource=self.resource)
+        self.assertEqual(slot.capacity_reserved, 0)
+        booking_request.refresh_from_db()
+        session.refresh_from_db()
+        self.assertEqual(session.status, CheckoutSession.Status.EXPIRED)
+
+        availability = search_availability(
+            start_at=self.start_at,
+            end_at=self.end_at,
+            resource_type=self.resource.resource_type,
+        )
+        self.assertEqual(len(availability), 1)
+
+    @override_settings(ROOT_URLCONF="main.test_urls_cli")
+    def test_publish_skips_deposit_required_hold_without_mock_payment(self):
+        booking_request = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+            requires_deposit=True,
+            deposit_value="300.00",
+        )
+
+        self.client.force_authenticate(self.organizer)
+        start = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft.id, "request_ids": [booking_request.id]},
+            format="json",
+        )
+        self.assertEqual(start.status_code, 201)
+
+        publish = self.client.post(f"/api/events/event-drafts/{self.event_draft.id}/publish/")
+        self.assertEqual(publish.status_code, 200)
+        self.assertEqual(publish.data["booking_publish_summary"]["finalized_request_ids"], [])
+        self.assertEqual(publish.data["booking_publish_summary"]["released_request_ids"], [booking_request.id])
+        self.assertEqual(Booking.objects.count(), 0)
+
+        slot = AvailabilitySlot.objects.get(resource=self.resource)
+        self.assertEqual(slot.capacity_reserved, 0)
+
+    @override_settings(ROOT_URLCONF="main.test_urls_cli")
+    def test_publish_allows_non_required_deposit_hold_without_payment(self):
+        booking_request = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+            requires_deposit=False,
+            deposit_value="0.00",
+        )
+
+        self.client.force_authenticate(self.organizer)
+        start = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft.id, "request_ids": [booking_request.id]},
+            format="json",
+        )
+        self.assertEqual(start.status_code, 201)
+
+        publish = self.client.post(f"/api/events/event-drafts/{self.event_draft.id}/publish/")
+        self.assertEqual(publish.status_code, 200)
+        self.assertEqual(len(publish.data["booking_publish_summary"]["finalized_request_ids"]), 1)
+        booking_request.refresh_from_db()
+        self.assertIsNotNone(booking_request.created_booking)
+
+    @override_settings(ROOT_URLCONF="main.test_urls_cli")
+    def test_publish_converts_mock_paid_deposit_hold_into_booking(self):
+        booking_request = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+            requires_deposit=True,
+            deposit_value="250.00",
+        )
+
+        self.client.force_authenticate(self.organizer)
+        start = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft.id, "request_ids": [booking_request.id]},
+            format="json",
+        )
+        self.assertEqual(start.status_code, 201)
+        session_id = start.data["id"]
+
+        paid = self.client.post(
+            f"/api/scheduling/checkout-sessions/{session_id}/complete-mock-deposit/",
+            {
+                "card_brand": "visa",
+                "card_last4": "4242",
+                "card_expiry_month": 12,
+                "card_expiry_year": timezone.now().year + 1,
+            },
+            format="json",
+        )
+        self.assertEqual(paid.status_code, 200)
+        self.assertIsNotNone(paid.data["paid_at"])
+
+        publish = self.client.post(f"/api/events/event-drafts/{self.event_draft.id}/publish/")
+        self.assertEqual(publish.status_code, 200)
+        self.assertEqual(len(publish.data["booking_publish_summary"]["finalized_request_ids"]), 1)
+        booking = Booking.objects.get(source_request_id=booking_request.id)
+        self.assertEqual(booking.status, Booking.Status.CONFIRMED)
+
+    def test_checkout_session_read_and_list_endpoints(self):
+        """GET /checkout-sessions/<id>/ and ?event_draft_id= return session data."""
+        booking_request = self._accept_request(
+            organizer=self.organizer,
+            event_draft=self.event_draft,
+            resource=self.resource,
+            provider=self.provider,
+            requires_deposit=False,
+            deposit_value="0.00",
+        )
+
+        self.client.force_authenticate(self.organizer)
+        start = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft.id, "request_ids": [booking_request.id]},
+            format="json",
+        )
+        self.assertEqual(start.status_code, 201)
+        session_id = start.data["id"]
+
+        # GET by ID
+        detail = self.client.get(f"/api/scheduling/checkout-sessions/{session_id}/")
+        self.assertEqual(detail.status_code, 200)
+        self.assertEqual(detail.data["id"], session_id)
+        self.assertEqual(detail.data["status"], CheckoutSession.Status.ACTIVE)
+
+        # LIST by event_draft_id
+        list_resp = self.client.get(
+            f"/api/scheduling/checkout-sessions/?event_draft_id={self.event_draft.id}"
+        )
+        self.assertEqual(list_resp.status_code, 200)
+        self.assertEqual(len(list_resp.data), 1)
+        self.assertEqual(list_resp.data[0]["id"], session_id)
+
+        # Another organizer cannot read the session
+        self.client.force_authenticate(self.organizer_two)
+        denied = self.client.get(f"/api/scheduling/checkout-sessions/{session_id}/")
+        self.assertEqual(denied.status_code, 403)
 
 
 class SchedulingTimezoneEdgeCaseTests(TestCase):

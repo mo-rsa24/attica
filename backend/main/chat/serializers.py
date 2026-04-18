@@ -121,6 +121,9 @@ class ChatRoomSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     organizer_username = serializers.CharField(source='organizer.username', read_only=True)
+    organizer_first_name = serializers.CharField(source='organizer.first_name', read_only=True)
+    organizer_last_name = serializers.CharField(source='organizer.last_name', read_only=True)
+    organizer_profile_picture = serializers.SerializerMethodField()
     provider_username = serializers.CharField(source='provider.username', read_only=True)
     event_name = serializers.CharField(source='event.name', read_only=True)
     event_date = serializers.DateField(source='event.date', read_only=True)
@@ -135,6 +138,9 @@ class BookingSerializer(serializers.ModelSerializer):
             'event_date',
             'organizer',
             'organizer_username',
+            'organizer_first_name',
+            'organizer_last_name',
+            'organizer_profile_picture',
             'provider',
             'provider_username',
             'provider_type',
@@ -157,6 +163,17 @@ class BookingSerializer(serializers.ModelSerializer):
             'id', 'organizer', 'status', 'final_amount',
             'accepted_bid', 'created_at', 'updated_at'
         ]
+
+    def get_organizer_profile_picture(self, obj):
+        profile_picture = getattr(obj.organizer, 'profile_picture', None)
+        if not profile_picture:
+            return None
+        try:
+            url = profile_picture.url
+        except Exception:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(url) if request else url
 
     def validate(self, attrs):
         organizer = self.context['request'].user

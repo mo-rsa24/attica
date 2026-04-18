@@ -1,0 +1,13 @@
+project_id = "wzdrqwgpbhcyqushcjtm"
+
+[functions.send-booking-email]
+verify_jwt = false
+
+[functions.send-verification-code]
+verify_jwt = false
+
+[functions.send-whatsapp-reminder]
+verify_jwt = false
+
+[functions.send-booking-notification]
+verify_jwt = false

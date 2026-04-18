@@ -1,7 +1,9 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {Calendar, CheckCircle2, Image, MapPin, Sparkles, UploadCloud, Users, Video} from 'lucide-react';
+import {Calendar, CheckCircle2, MapPin, Sparkles, Users, X} from 'lucide-react';
 import {useEventCreation} from './context/reactContext.jsx';
+import {useAuth} from './AuthContext';
+import {schedulingApi} from './api/schedulingApi.js';
 
 const SectionCard = ({title, icon, children, action}) => (
     <div className="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-6 space-y-4">
@@ -24,14 +26,118 @@ const Pill = ({label}) => (
     </span>
 );
 
+const STATUS_CONFIG = {
+    approved: {label: 'Confirmed', color: 'bg-green-100 text-green-700'},
+    pending: {label: 'Pending', color: 'bg-amber-100 text-amber-700'},
+    counter_proposed: {label: 'Counter', color: 'bg-blue-100 text-blue-700'},
+    declined: {label: 'Declined', color: 'bg-red-100 text-red-700'},
+    withdrawn: {label: 'Withdrawn', color: 'bg-gray-100 text-gray-500'},
+    expired: {label: 'Expired', color: 'bg-gray-100 text-gray-400'},
+};
+
+function ReadinessModal({requests, onConfirm, onClose, isPublishing}) {
+    const byStatus = useMemo(() => {
+        const groups = {approved: [], pending: [], counter_proposed: [], other: []};
+        (requests || []).forEach((r) => {
+            if (r.status === 'approved') groups.approved.push(r);
+            else if (r.status === 'pending') groups.pending.push(r);
+            else if (r.status === 'counter_proposed') groups.counter_proposed.push(r);
+            else groups.other.push(r);
+        });
+        return groups;
+    }, [requests]);
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
+                <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                    <h2 className="text-lg font-bold text-gray-900">Ready to publish?</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5"/></button>
+                </div>
+                <div className="p-6 space-y-4 max-h-96 overflow-y-auto">
+                    <p className="text-sm text-gray-600">
+                        Publishing makes your event visible. You can continue booking providers even after publishing — ticket sale revenue can be used to pay them.
+                    </p>
+
+                    {requests.length === 0 && (
+                        <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">
+                            No booking requests sent yet. You can add providers after publishing.
+                        </div>
+                    )}
+
+                    {byStatus.approved.length > 0 && (
+                        <div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Confirmed</p>
+                            <ul className="space-y-1">
+                                {byStatus.approved.map((r) => (
+                                    <li key={r.id} className="flex items-center justify-between text-sm bg-green-50 rounded-lg px-3 py-2">
+                                        <span className="font-medium">{r.resource_display_name || `Request #${r.id}`}</span>
+                                        <span className="text-xs font-semibold text-green-700 bg-green-100 rounded-full px-2 py-0.5">Confirmed</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {byStatus.pending.length > 0 && (
+                        <div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Awaiting response</p>
+                            <ul className="space-y-1">
+                                {byStatus.pending.map((r) => (
+                                    <li key={r.id} className="flex items-center justify-between text-sm bg-amber-50 rounded-lg px-3 py-2">
+                                        <span className="font-medium">{r.resource_display_name || `Request #${r.id}`}</span>
+                                        <span className="text-xs font-semibold text-amber-700 bg-amber-100 rounded-full px-2 py-0.5">Pending</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {byStatus.counter_proposed.length > 0 && (
+                        <div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Counter proposals</p>
+                            <ul className="space-y-1">
+                                {byStatus.counter_proposed.map((r) => (
+                                    <li key={r.id} className="flex items-center justify-between text-sm bg-blue-50 rounded-lg px-3 py-2">
+                                        <span className="font-medium">{r.resource_display_name || `Request #${r.id}`}</span>
+                                        <span className="text-xs font-semibold text-blue-700 bg-blue-100 rounded-full px-2 py-0.5">Counter</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+                <div className="p-6 border-t border-gray-100 flex gap-3">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                        Go back
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={isPublishing}
+                        className="flex-1 rounded-xl bg-black text-white py-2.5 text-sm font-semibold hover:bg-gray-800 disabled:opacity-60"
+                    >
+                        {isPublishing ? 'Publishing…' : 'Publish now'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function ListingReview() {
     const navigate = useNavigate();
     const {eventId} = useParams();
+    const {tokens} = useAuth();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const [isPublishing, setIsPublishing] = useState(false);
     const [error, setError] = useState(null);
     const [eventStatus, setEventStatus] = useState(null);
     const [reviewDetails, setReviewDetails] = useState({});
+    const [showReadinessModal, setShowReadinessModal] = useState(false);
+    const [bookingRequests, setBookingRequests] = useState([]);
     const {
         selectedLocations = [],
         selectedArtists = [],
@@ -64,8 +170,10 @@ export default function ListingReview() {
                     updated_at: draft.updated_at,
                     created_at: draft.created_at,
                 });
-                if (draft.data && !Object.keys(reviewDetails || {}).length) {
-                    setReviewDetails(draft.data);
+                if (draft.data) {
+                    setReviewDetails((current) => (
+                        Object.keys(current || {}).length ? current : draft.data
+                    ));
                 }
             }
         };
@@ -94,31 +202,44 @@ export default function ListingReview() {
         return [];
     }, [event?.data?.steps, getStepData]);
 
-    const uploads = useMemo(() => {
-        const fromContext = getStepData('step8', {})?.uploads;
-        if (Array.isArray(fromContext)) return fromContext;
-        const fromDraft = event?.data?.steps?.step8?.uploads;
-        if (Array.isArray(fromDraft)) return fromDraft;
-        return [];
-    }, [event?.data?.steps, getStepData]);
+    const mediaAssets = useMemo(
+        () => (Array.isArray(event?.assets) ? event.assets.filter((asset) => asset.asset_type === 'media') : []),
+        [event?.assets],
+    );
+    const seatingChartAsset = useMemo(
+        () => (Array.isArray(event?.assets) ? event.assets.find((asset) => asset.asset_type === 'seating_chart') || null : null),
+        [event?.assets],
+    );
 
     const stats = [
         {label: 'Venues', value: selectedLocations.length},
         {label: 'Artists', value: selectedArtists.length},
         {label: 'Vendors', value: selectedVendors.length},
         {label: 'Features', value: features.length},
-        {label: 'Uploads', value: uploads.length},
+        {label: 'Media', value: mediaAssets.length},
     ];
 
-    const handlePublish = async () => {
+    const handlePublishClick = async () => {
         if (!eventId) {
             setError('Missing event id.');
             return;
         }
+        // Fetch current booking requests for readiness check
+        try {
+            const data = await schedulingApi.getRequests(tokens?.access, {event_draft_id: eventId});
+            setBookingRequests(data?.results || data || []);
+        } catch {
+            setBookingRequests([]);
+        }
+        setShowReadinessModal(true);
+    };
+
+    const handlePublish = async () => {
         setIsPublishing(true);
         setError(null);
         const ok = await publish(eventId);
         if (ok) {
+            setShowReadinessModal(false);
             const refreshed = await loadEvent(eventId);
             if (refreshed) {
                 setEventStatus({
@@ -136,6 +257,14 @@ export default function ListingReview() {
 
         return (
             <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 text-gray-900">
+                {showReadinessModal && (
+                    <ReadinessModal
+                        requests={bookingRequests}
+                        onConfirm={handlePublish}
+                        onClose={() => setShowReadinessModal(false)}
+                        isPublishing={isPublishing}
+                    />
+                )}
                 <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm border-b border-gray-200">
                     <div className="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -162,12 +291,6 @@ export default function ListingReview() {
                                     )}
                                 </div>
                             )}
-                            <button
-                                onClick={() => navigate(`${listingBase}/step8`)}
-                                className="text-sm font-semibold text-gray-700 hover:text-gray-900 underline"
-                            >
-                                Edit uploads
-                            </button>
                         </div>
                     </div>
                 </header>
@@ -288,29 +411,26 @@ export default function ListingReview() {
                             </SectionCard>
 
                             <SectionCard
-                                title="Uploads"
-                                icon={<UploadCloud className="h-5 w-5"/>}
-                                action={<Pill label="Step 8"/>}
+                                title="Uploaded files"
+                                icon={<CheckCircle2 className="h-5 w-5"/>}
+                                action={<Pill label="Steps 5 & 8"/>}
                             >
-                                {uploads.length ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {uploads.map((file) => (
-                                            <div key={file.id}
-                                                 className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-                                                <div
-                                                    className="h-12 w-12 rounded-lg bg-white shadow-sm ring-1 ring-gray-100 flex items-center justify-center text-gray-600">
-                                                    {file.type?.startsWith('video') || file.isVideo ?
-                                                        <Video className="h-5 w-5"/> : <Image className="h-5 w-5"/>}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-semibold truncate">{file.name}</p>
-                                                    <p className="text-xs text-gray-500 truncate">{file.type || 'Media'} • {file.size ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` : 'Size unavailable'}</p>
-                                                </div>
-                                            </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    <div className="rounded-lg bg-gray-50 p-3">
+                                        <p className="text-gray-500 mb-1">Media uploads</p>
+                                        <p className="font-semibold">{mediaAssets.length} saved to draft</p>
+                                    </div>
+                                    <div className="rounded-lg bg-gray-50 p-3">
+                                        <p className="text-gray-500 mb-1">Seating chart</p>
+                                        <p className="font-semibold">{seatingChartAsset ? seatingChartAsset.name : 'Not uploaded'}</p>
+                                    </div>
+                                </div>
+                                {mediaAssets.length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                        {mediaAssets.slice(0, 6).map((asset) => (
+                                            <Pill key={asset.id} label={asset.name}/>
                                         ))}
                                     </div>
-                                ) : (
-                                    <p className="text-sm text-gray-500">No media uploaded yet.</p>
                                 )}
                             </SectionCard>
                         </div>
@@ -330,10 +450,10 @@ export default function ListingReview() {
                                 <ul className="space-y-2 text-sm text-gray-600">
                                     <li>• Confirm your selections before creating your event.</li>
                                     <li>• You can return to any step to make changes even after publishing.</li>
-                                    <li>• Media uploads will be finalized when you publish.</li>
+                                    <li>• Uploaded files are saved to this draft, and your first images become the published poster and banner.</li>
                                 </ul>
                                 <button
-                                    onClick={handlePublish}
+                                    onClick={handlePublishClick}
                                     disabled={isPublishing}
                                     className="w-full rounded-xl bg-black text-white py-3 font-semibold shadow-sm transition hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
@@ -345,6 +465,9 @@ export default function ListingReview() {
                                 >
                                     Back to pricing (Step 6)
                                 </button>
+                                {error && (
+                                    <p className="text-sm text-rose-600 text-center">{error}</p>
+                                )}
                                 <p className="text-xs text-gray-500 text-center">Admins can view the live listing in the
                                     dashboard events table.</p>
                             </div>

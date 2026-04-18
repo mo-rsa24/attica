@@ -3,8 +3,17 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
 from locations.models import Location
+from pathlib import Path
+import uuid
 
 User = get_user_model()
+
+
+def event_draft_asset_upload_to(instance, filename):
+    ext = Path(filename).suffix
+    asset_name = f"{uuid.uuid4().hex}{ext}"
+    organizer_id = instance.draft.organizer_id or "unknown"
+    return f"event_draft_assets/organizer_{organizer_id}/draft_{instance.draft_id}/{instance.asset_type}/{asset_name}"
 
 
 class Event(models.Model):
@@ -63,6 +72,9 @@ class Event(models.Model):
     # Example: [{"question": "T-Shirt Size?", "type": "dropdown", "options": ["S", "M", "L"]}, ...]
     custom_questions = models.JSONField(null=True, blank=True)
 
+    # 4. Event features / amenities (e.g. Food Trucks, VIP Area, Bar Available)
+    features = models.JSONField(null=True, blank=True, help_text="List of amenity/feature names selected in the wizard.")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -110,3 +122,27 @@ class EventDraft(models.Model):
 
     class Meta:
         ordering = ["-updated_at", "-created_at"]
+
+
+class EventDraftAsset(models.Model):
+    class AssetType(models.TextChoices):
+        MEDIA = "media", "Media"
+        SEATING_CHART = "seating_chart", "Seating chart"
+
+    draft = models.ForeignKey(
+        EventDraft,
+        on_delete=models.CASCADE,
+        related_name="assets",
+    )
+    asset_type = models.CharField(max_length=32, choices=AssetType.choices)
+    name = models.CharField(max_length=255, blank=True)
+    file = models.FileField(upload_to=event_draft_asset_upload_to)
+    mime_type = models.CharField(max_length=255, blank=True)
+    size = models.PositiveBigIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_asset_type_display()} for draft #{self.draft_id}"
+
+    class Meta:
+        ordering = ["created_at", "id"]

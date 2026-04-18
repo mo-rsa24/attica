@@ -80,6 +80,10 @@ class ResourcePolicy(TimeStampedModel):
         APPROVAL_REQUIRED = "approval_required", "Approval Required"
         HYBRID = "hybrid", "Hybrid"
 
+    class DepositType(models.TextChoices):
+        FIXED_AMOUNT = "fixed_amount", "Fixed Amount"
+        PERCENTAGE = "percentage", "Percentage"
+
     resource = models.OneToOneField(
         MarketplaceResource,
         on_delete=models.CASCADE,
@@ -98,10 +102,32 @@ class ResourcePolicy(TimeStampedModel):
     default_capacity = models.PositiveIntegerField(default=1)
     allow_reschedule = models.BooleanField(default=True)
     require_message_for_request = models.BooleanField(default=False)
+    requires_deposit = models.BooleanField(default=False)
+    deposit_type = models.CharField(
+        max_length=16,
+        choices=DepositType.choices,
+        default=DepositType.FIXED_AMOUNT,
+    )
+    deposit_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    checkout_hold_minutes = models.PositiveIntegerField(default=30)
+    publish_requires_mock_deposit = models.BooleanField(default=False)
     version = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return f"Policy for {self.resource_id}"
+
+    def clean(self):
+        if self.checkout_hold_minutes <= 0:
+            raise ValidationError("checkout_hold_minutes must be greater than zero.")
+
+        if self.deposit_value is not None and self.deposit_value < 0:
+            raise ValidationError("deposit_value cannot be negative.")
+
+        if self.deposit_type == self.DepositType.PERCENTAGE and self.deposit_value and self.deposit_value > 100:
+            raise ValidationError("percentage deposits cannot exceed 100.")
+
+        if (self.requires_deposit or self.publish_requires_mock_deposit) and self.deposit_value in (None, 0):
+            raise ValidationError("Deposit policies require a positive deposit_value.")
 
 
 class AvailabilityRule(TimeStampedModel):
@@ -225,18 +251,74 @@ class AvailabilitySlot(TimeStampedModel):
         return f"Slot {self.resource_id} [{self.start_at} - {self.end_at}]"
 
 
+class CheckoutSession(TimeStampedModel):
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        FINALIZED = "finalized", "Finalized"
+        RELEASED = "released", "Released"
+        EXPIRED = "expired", "Expired"
+
+    organizer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="checkout_sessions_created",
+    )
+    event_draft = models.ForeignKey(
+        "events.EventDraft",
+        on_delete=models.CASCADE,
+        related_name="checkout_sessions",
+    )
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.ACTIVE)
+    hold_minutes = models.PositiveIntegerField(default=30)
+    hold_expires_at = models.DateTimeField()
+    paid_at = models.DateTimeField(null=True, blank=True)
+    finalized_at = models.DateTimeField(null=True, blank=True)
+    released_at = models.DateTimeField(null=True, blank=True)
+    card_brand = models.CharField(max_length=32, blank=True)
+    card_last4 = models.CharField(max_length=4, blank=True)
+    card_expiry_month = models.PositiveSmallIntegerField(null=True, blank=True)
+    card_expiry_year = models.PositiveSmallIntegerField(null=True, blank=True)
+    mock_payment_reference = models.CharField(max_length=128, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["organizer", "status"]),
+            models.Index(fields=["event_draft", "status"]),
+            models.Index(fields=["status", "hold_expires_at"]),
+        ]
+
+    def clean(self):
+        if self.hold_minutes <= 0:
+            raise ValidationError("hold_minutes must be greater than zero.")
+        if self.card_last4 and len(self.card_last4) != 4:
+            raise ValidationError("card_last4 must contain exactly 4 digits.")
+
+    def __str__(self):
+        return f"CheckoutSession {self.pk} [{self.status}]"
+
+
 class BookingRequest(TimeStampedModel):
     class Status(models.TextChoices):
         DRAFT = "draft", "Draft"
         PENDING = "pending", "Pending"
         APPROVED = "approved", "Approved"
         DECLINED = "declined", "Declined"
+        COUNTER_PROPOSED = "counter_proposed", "Counter Proposed"
         WITHDRAWN = "withdrawn", "Withdrawn"
         EXPIRED = "expired", "Expired"
 
     event = models.ForeignKey(
         "events.Event",
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="scheduling_requests",
+    )
+    event_draft = models.ForeignKey(
+        "events.EventDraft",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="scheduling_requests",
     )
     organizer = models.ForeignKey(
@@ -253,9 +335,27 @@ class BookingRequest(TimeStampedModel):
     requested_end_at = models.DateTimeField()
     attendee_count = models.PositiveIntegerField(default=1)
     message = models.TextField(blank=True)
-    status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING)
+    status = models.CharField(max_length=24, choices=Status.choices, default=Status.PENDING)
     provider_message = models.TextField(blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
+    checkout_session = models.ForeignKey(
+        CheckoutSession,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="booking_requests",
+    )
+    checkout_started_at = models.DateTimeField(null=True, blank=True)
+    checkout_released_at = models.DateTimeField(null=True, blank=True)
+    deposit_required_at_checkout = models.BooleanField(default=False)
+    publish_requires_mock_deposit = models.BooleanField(default=False)
+    deposit_type_snapshot = models.CharField(max_length=16, blank=True)
+    deposit_value_snapshot = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    estimated_total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    deposit_due_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    remaining_balance_estimate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    # Set when checkout opens for a draft-linked request; cleared when a hold is finalized or restarted.
+    draft_hold_expires_at = models.DateTimeField(null=True, blank=True)
     reviewed_at = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -266,17 +366,28 @@ class BookingRequest(TimeStampedModel):
     )
     idempotency_key = models.CharField(max_length=128, null=True, blank=True)
 
+    # Counter-proposal fields (set by provider when status = COUNTER_PROPOSED)
+    counter_start_at = models.DateTimeField(null=True, blank=True)
+    counter_end_at = models.DateTimeField(null=True, blank=True)
+    counter_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    counter_message = models.TextField(blank=True)
+
     class Meta:
         indexes = [
             models.Index(fields=["resource", "status"]),
             models.Index(fields=["organizer", "status"]),
             models.Index(fields=["event", "status"]),
+            models.Index(fields=["event_draft", "status"]),
             models.Index(fields=["expires_at"]),
+            models.Index(fields=["checkout_session"]),
+            models.Index(fields=["draft_hold_expires_at"]),
         ]
 
     def clean(self):
         if self.requested_end_at <= self.requested_start_at:
             raise ValidationError("requested_end_at must be after requested_start_at.")
+        if not self.event_id and not self.event_draft_id:
+            raise ValidationError("A BookingRequest must be linked to either an Event or an EventDraft.")
 
     def __str__(self):
         return f"Request {self.pk} [{self.status}]"
@@ -621,3 +732,60 @@ class BookingConflictIncident(TimeStampedModel):
 
     def __str__(self):
         return f"{self.operation}:{self.conflict_source} ({self.resource_id})"
+
+
+class Review(TimeStampedModel):
+    """Post-booking review. Organizers review providers; providers review organizers."""
+
+    class ReviewerType(models.TextChoices):
+        ORGANIZER = "organizer", "Organizer"
+        PROVIDER = "provider", "Provider"
+
+    booking = models.ForeignKey(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+    )
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="scheduling_reviews_given",
+    )
+    reviewee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="scheduling_reviews_received",
+        null=True,
+        blank=True,
+    )
+    reviewer_type = models.CharField(
+        max_length=16,
+        choices=ReviewerType.choices,
+        default=ReviewerType.ORGANIZER,
+    )
+    resource = models.ForeignKey(
+        MarketplaceResource,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        null=True,
+        blank=True,
+    )
+    rating = models.PositiveSmallIntegerField()  # 1–5
+    comment = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["booking", "reviewer_type"],
+                name="uniq_review_per_booking_side",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["resource", "created_at"]),
+            models.Index(fields=["reviewer", "created_at"]),
+            models.Index(fields=["reviewee", "created_at"]),
+            models.Index(fields=["booking", "reviewer_type"]),
+        ]
+
+    def __str__(self):
+        return f"Review #{self.id} [{self.reviewer_type}] — {self.rating}★"

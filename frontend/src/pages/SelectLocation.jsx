@@ -17,6 +17,7 @@ import { useAuth } from '../AuthContext';
 import InteractiveMap from "../components/InteractiveMap.jsx";
 import { useDebounce } from 'use-debounce';
 import AtticaMark from "../components/AtticaMark.jsx";
+import {saveDraftAndExit} from "../utils/wizardExit.js";
 
 // --- API Helper ---
 const api = {
@@ -308,7 +309,7 @@ export default function SelectLocation() {
     const { tokens } = useAuth();
     const authToken = tokens?.access;
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
-    const {selectedLocations, setSelectedLocations} = useEventCreation();
+    const {selectedLocations, setSelectedLocations, saveAndExit, setCurrentStep} = useEventCreation();
     const [allLocations, setAllLocations] = useState([]);
     const [mapLocations, setMapLocations] = useState([]);
     const [viewingLocation, setViewingLocation] = useState(null);
@@ -316,6 +317,10 @@ export default function SelectLocation() {
     const [markerPosition, setMarkerPosition] = useState(mapCenter);
     const [searchValue, setSearchValue] = useState('');
     const [loadError, setLoadError] = useState('');
+
+    useEffect(() => {
+        setCurrentStep('step3');
+    }, [setCurrentStep]);
 
     useEffect(() => {
         // Fetch both full data for cards and lightweight data for map
@@ -375,6 +380,14 @@ export default function SelectLocation() {
          navigate(`${listingBase}/step3`);
     };
 
+    const handleSaveAndExit = async () => {
+        await saveDraftAndExit({
+            saveAndExit,
+            draftId: eventId,
+            navigate,
+        });
+    };
+
     const openSchedulerForVenues = (autoRequest = false) => {
         if (!eventId) {
             alert('Save your event first, then open scheduler from this step.');
@@ -411,7 +424,7 @@ export default function SelectLocation() {
                         <AtticaMark tone="dark" />
                         <div className="flex items-center gap-3 text-sm text-slate-600">
                             <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Questions?</button>
-                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold">Save & exit</button>
+                            <button className="px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-100 font-semibold" onClick={handleSaveAndExit}>Save & exit</button>
                         </div>
                     </div>
                     <div>

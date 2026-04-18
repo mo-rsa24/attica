@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 35 30% 96%;
+    --foreground: 25 20% 16%;
+
+    --card: 35 25% 93%;
+    --card-foreground: 25 20% 16%;
+
+    --popover: 35 30% 96%;
+    --popover-foreground: 25 20% 16%;
+
+    --primary: 152 28% 32%;
+    --primary-foreground: 35 30% 96%;
+
+    --secondary: 30 25% 88%;
+    --secondary-foreground: 25 20% 22%;
+
+    --muted: 30 15% 90%;
+    --muted-foreground: 25 10% 45%;
+
+    --accent: 28 45% 65%;
+    --accent-foreground: 25 20% 12%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 18% 84%;
+    --input: 30 18% 84%;
+    --ring: 152 28% 32%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Sans 3', system-ui, sans-serif;
+
+    --gradient-warm: linear-gradient(135deg, hsl(35 30% 96%), hsl(30 25% 88%));
+    --gradient-primary: linear-gradient(135deg, hsl(152 28% 32%), hsl(152 28% 42%));
+    --shadow-soft: 0 4px 20px -4px hsl(25 20% 16% / 0.08);
+    --shadow-elevated: 0 12px 40px -8px hsl(25 20% 16% / 0.12);
+    --shadow-glow: 0 0 30px hsl(152 28% 32% / 0.15);
+  }
+
+  .dark {
+    --background: 25 15% 10%;
+    --foreground: 35 20% 90%;
+    --card: 25 15% 14%;
+    --card-foreground: 35 20% 90%;
+    --popover: 25 15% 10%;
+    --popover-foreground: 35 20% 90%;
+    --primary: 152 28% 45%;
+    --primary-foreground: 25 15% 10%;
+    --secondary: 25 15% 20%;
+    --secondary-foreground: 35 20% 90%;
+    --muted: 25 10% 20%;
+    --muted-foreground: 30 10% 60%;
+    --accent: 28 45% 55%;
+    --accent-foreground: 35 20% 90%;
+    --border: 25 10% 22%;
+    --input: 25 10% 22%;
+    --ring: 152 28% 45%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 12px 40px -8px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 30px hsl(152 28% 45% / 0.2);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Selection color */
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+  .section-padding {
+    @apply px-4 py-16 sm:px-6 sm:py-20 md:px-12 lg:px-24 lg:py-28;
+  }
+
+  .glass {
+    @apply bg-background/70 backdrop-blur-xl border border-border/50;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+}
+
+/* Focus visible styles for accessibility */
+@layer base {
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    border-radius: calc(var(--radius) - 2px);
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Decorative divider between sections */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--border)),
+    hsl(var(--primary) / 0.3),
+    hsl(var(--border)),
+    transparent
+  );
+}

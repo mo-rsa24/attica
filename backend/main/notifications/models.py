@@ -13,6 +13,12 @@ class Notification(models.Model):
         BOOKING_CONFIRMED = 'booking_confirmed', 'Booking Confirmed'
         BOOKING_REJECTED = 'booking_rejected', 'Booking Rejected'
         BOOKING_CANCELLED = 'booking_cancelled', 'Booking Cancelled'
+        COUNTER_PROPOSED = 'counter_proposed', 'Counter Proposed'
+        NEW_FOLLOWER = 'new_follower', 'New Follower'
+        POST_LIKED = 'post_liked', 'Post Liked'
+        POST_COMMENTED = 'post_commented', 'Post Commented'
+        CHECKOUT_NUDGE = 'checkout_nudge', 'Checkout Nudge'
+        REVIEW_RECEIVED = 'review_received', 'Review Received'
 
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,

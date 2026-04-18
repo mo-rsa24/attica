@@ -1,7 +1,7 @@
 import {useAuth} from './AuthContext';
-import {HiOutlineMenu} from 'react-icons/hi';
+import {HiOutlineMenu, HiSearch} from 'react-icons/hi';
 import {useEffect, useRef, useState} from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {NotificationBell} from './components/notifications';
 import atticaLogo from './assets/attica2.png';
 import { getActiveRole, getRoleWorkspace } from './utils/roleWorkspace';
@@ -19,10 +19,13 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
     const {user, currentRole, setCurrentRole} = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isArtistsMenuOpen, setIsArtistsMenuOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const menuRef = useRef(null);
     const artistsMenuRef = useRef(null);
     const artistsMenuCloseTimerRef = useRef(null);
+    const searchInputRef = useRef(null);
     const location = useLocation();
+    const navigate = useNavigate();
 
     const roleToLabel = (role) => {
         if (!role) return '';
@@ -35,6 +38,8 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
     const activeRole = getActiveRole(user, currentRole);
     const myWorkspaceLabel = getRoleWorkspace(activeRole)?.myLabel || 'My Events';
     const isAdminUser = Boolean(user?.is_staff || user?.is_superuser || user?.roles?.includes('ADMIN'));
+    const PROVIDER_ROLES = ['ARTIST', 'SERVICE_PROVIDER', 'VENUE_MANAGER', 'VENDOR', 'VENUE'];
+    const isProvider = PROVIDER_ROLES.includes(activeRole);
 
     const isActive = (path) => {
         if (path === '/') {
@@ -69,14 +74,30 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
         setIsMenuOpen(false);
     }, [location.pathname]);
 
+    useEffect(() => {
+        const handleKey = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+            }
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, []);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const q = searchQuery.trim();
+        if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+    };
+
     const navLinks = [
         { to: '/', label: 'Explore' },
-        { to: '/offerings', label: 'Offerings' },
         { to: '/events', label: 'Events' },
         { to: '/services', label: 'Services' },
     ];
 
-    const isArtistsOrTours = location.pathname === '/artists' || location.pathname === '/tours';
+    const isArtistsOrTours = isActive('/artists') || isActive('/tours');
 
     const openArtistsMenu = () => {
         if (artistsMenuCloseTimerRef.current) {
@@ -102,12 +123,12 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
             <div className="navbar-orb navbar-orb--one" />
             <div className="navbar-orb navbar-orb--two" />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
-                <div className="flex items-center justify-between h-24 md:h-28">
+                <div className="flex items-center justify-between h-28 md:h-32">
 
                     {/* Logo and Nav Links */}
                     <div className="flex items-center gap-10">
-                        <Link to="/" className="flex items-center flex-shrink-0">
-                            <img src={atticaLogo} alt="Attica" className="h-16 md:h-20 w-auto drop-shadow-sm" />
+                        <Link to="/" className="flex items-center flex-shrink-0 rounded-2xl px-2 py-1 bg-white/60 backdrop-blur-sm ring-1 ring-white/80">
+                            <img src={atticaLogo} alt="Attica" className="h-20 md:h-24 w-auto drop-shadow-[0_8px_18px_rgba(15,23,42,0.35)] saturate-125 contrast-110" />
                         </Link>
 
                         <div className="hidden md:flex items-center gap-2">
@@ -155,7 +176,7 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                                     <Link
                                         to="/artists"
                                         className={`block px-4 py-3 text-base font-semibold rounded-t-2xl transition-colors ${
-                                            location.pathname === '/artists' ? 'text-slate-900 bg-slate-100/80' : 'text-slate-700 hover:bg-slate-100/70'
+                                            isActive('/artists') ? 'text-slate-900 bg-slate-100/80' : 'text-slate-700 hover:bg-slate-100/70'
                                         }`}
                                     >
                                         Browse Artists
@@ -163,7 +184,7 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                                     <Link
                                         to="/tours"
                                         className={`block px-4 py-3 text-base font-semibold rounded-b-2xl transition-colors ${
-                                            location.pathname === '/tours' ? 'text-slate-900 bg-slate-100/80' : 'text-slate-700 hover:bg-slate-100/70'
+                                            isActive('/tours') ? 'text-slate-900 bg-slate-100/80' : 'text-slate-700 hover:bg-slate-100/70'
                                         }`}
                                     >
                                         Tours
@@ -172,6 +193,21 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Search bar */}
+                    <form onSubmit={handleSearch} className="hidden md:flex items-center">
+                        <div className="relative">
+                            <HiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                            <input
+                                ref={searchInputRef}
+                                type="search"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                placeholder="Search artists, events… ⌘K"
+                                className="pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-white/80 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent w-64"
+                            />
+                        </div>
+                    </form>
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-3">
@@ -203,6 +239,30 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                         {/* Notifications */}
                         {user && <NotificationBell />}
 
+                        {user && isProvider && (
+                            <Link
+                                to="/provider-dashboard"
+                                className={`hidden sm:inline-flex items-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${
+                                    isActive('/provider-dashboard')
+                                        ? 'border-pink-400 bg-pink-50 text-pink-700'
+                                        : 'border-slate-300 bg-white/90 text-slate-700 hover:bg-white'
+                                }`}
+                            >
+                                My Dashboard
+                            </Link>
+                        )}
+                        {user && !isProvider && activeRole === 'EVENT_ORGANIZER' && (
+                            <Link
+                                to="/dashboard/organizer"
+                                className={`hidden sm:inline-flex items-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${
+                                    isActive('/dashboard/organizer')
+                                        ? 'border-pink-400 bg-pink-50 text-pink-700'
+                                        : 'border-slate-300 bg-white/90 text-slate-700 hover:bg-white'
+                                }`}
+                            >
+                                My Bookings
+                            </Link>
+                        )}
                         {user && isAdminUser && (
                             <Link
                                 to="/scheduling/ops"
@@ -256,6 +316,22 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                             </button>
                             {isMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-56 bg-white/95 rounded-xl shadow-lg border border-slate-100 py-1.5 z-50 backdrop-blur-md">
+                                    {/* Mobile search */}
+                                    <div className="md:hidden px-3 pt-2 pb-2">
+                                        <form onSubmit={(e) => { handleSearch(e); setIsMenuOpen(false); }} className="flex gap-2">
+                                            <input
+                                                type="search"
+                                                value={searchQuery}
+                                                onChange={e => setSearchQuery(e.target.value)}
+                                                placeholder="Search…"
+                                                className="flex-1 pl-3 pr-2 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                                            />
+                                            <button type="submit" className="px-3 py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold">
+                                                Go
+                                            </button>
+                                        </form>
+                                    </div>
+
                                     {/* Mobile nav links */}
                                     <div className="md:hidden border-b border-gray-100 pb-1.5 mb-1.5">
                                         {navLinks.map(link => (
@@ -273,7 +349,7 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                                         <Link
                                             to="/artists"
                                             className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                location.pathname === '/artists' ? 'text-gray-900 bg-gray-50' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                isActive('/artists') ? 'text-gray-900 bg-gray-50' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                             }`}
                                             onClick={() => setIsMenuOpen(false)}
                                         >
@@ -282,7 +358,7 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                                         <Link
                                             to="/tours"
                                             className={`block pl-7 pr-4 py-2.5 text-sm font-medium transition-colors ${
-                                                location.pathname === '/tours' ? 'text-gray-900 bg-gray-50' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                isActive('/tours') ? 'text-gray-900 bg-gray-50' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                             }`}
                                             onClick={() => setIsMenuOpen(false)}
                                         >
@@ -296,6 +372,58 @@ const Navbar = ({userProfileImageUrl, onLogout}) => {
                                             onClick={() => setIsMenuOpen(false)}
                                         >
                                             {myWorkspaceLabel}
+                                        </Link>
+                                    )}
+                                    {user && isProvider && (
+                                        <Link
+                                            to="/provider-dashboard"
+                                            className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                isActive('/provider-dashboard')
+                                                    ? 'text-pink-700 bg-pink-50'
+                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                            }`}
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            My Dashboard
+                                        </Link>
+                                    )}
+                                    {user && isProvider && (
+                                        <Link
+                                            to="/provider-availability"
+                                            className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                isActive('/provider-availability')
+                                                    ? 'text-pink-700 bg-pink-50'
+                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                            }`}
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            Availability
+                                        </Link>
+                                    )}
+                                    {user && !isProvider && activeRole === 'EVENT_ORGANIZER' && (
+                                        <Link
+                                            to="/dashboard/organizer"
+                                            className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                isActive('/dashboard/organizer')
+                                                    ? 'text-pink-700 bg-pink-50'
+                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                            }`}
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            My Bookings
+                                        </Link>
+                                    )}
+                                    {user && (
+                                        <Link
+                                            to="/scheduling"
+                                            className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                isActive('/scheduling')
+                                                    ? 'text-pink-700 bg-pink-50'
+                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                            }`}
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            Calendar
                                         </Link>
                                     )}
                                     {user && isAdminUser && (

@@ -1,121 +1,126 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Image, UploadCloud, Video, X } from 'lucide-react';
-import { useEventCreation } from './context/reactContext.jsx';
+import { useEventCreation, getStepProgress } from './context/reactContext.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
+import EventBookingSummaryButton from './components/booking/EventBookingSummaryDrawer.jsx';
+import { saveDraftAndExit } from './utils/wizardExit.js';
+
+const humanSize = (bytes) => {
+    if (!bytes && bytes !== 0) return '';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = bytes;
+    let idx = 0;
+    while (size >= 1024 && idx < units.length - 1) {
+        size /= 1024;
+        idx += 1;
+    }
+    return `${size.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
+};
 
 export default function ListingStep8_Event() {
     const navigate = useNavigate();
-    const { setCurrentStep, saveAndExit, event, setStepData, getStepData, saveStep, getNextStep } = useEventCreation();
+    const {
+        setCurrentStep,
+        saveAndExit,
+        event,
+        saveStep,
+        getNextStep,
+        uploadDraftAsset,
+        deleteDraftAsset,
+    } = useEventCreation();
     const { eventId } = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
+    const draftId = eventId || event?.id;
     const inputRef = useRef(null);
-    const [uploads, setUploads] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [removingAssetId, setRemovingAssetId] = useState(null);
     const [uploadError, setUploadError] = useState('');
-    const initializedRef = useRef(false);
+    const mediaDraftNotice = 'Uploads save to this draft immediately. Your first two uploaded images are used as the poster and banner when you publish.';
+    const mediaAssets = Array.isArray(event?.assets)
+        ? event.assets.filter((asset) => asset.asset_type === 'media')
+        : [];
 
     useEffect(() => {
         setCurrentStep('step8');
     }, [setCurrentStep]);
 
-    // Load saved upload metadata from context once when event loads
-    useEffect(() => {
-        if (event && !initializedRef.current) {
-            const stepData = getStepData('step8', {});
-            if (Array.isArray(stepData.uploads) && stepData.uploads.length > 0) {
-                setUploads(stepData.uploads);
-            }
-            initializedRef.current = true;
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [event]);
-
-    // Keep context in sync for Save & Exit (setStepData is stable, no loop)
-    useEffect(() => {
-        if (initializedRef.current) {
-            setStepData('step8', { uploads });
-        }
-    }, [uploads, setStepData]);
-
-    const handleFiles = (fileList) => {
+    const handleFiles = async (fileList) => {
         const pickedFiles = Array.from(fileList || []);
         if (!pickedFiles.length) return;
+        if (!draftId) {
+            setUploadError('Save this draft before uploading media.');
+            return;
+        }
 
-        const accepted = pickedFiles.filter((file) => file.type.startsWith('image/') || file.type.startsWith('video/'));
+        const accepted = pickedFiles.filter((file) => {
+            const type = file.type || '';
+            return type.startsWith('image/') || type.startsWith('video/');
+        });
         if (!accepted.length) {
             setUploadError('Only image and video files are supported.');
             return;
         }
 
         const skippedCount = pickedFiles.length - accepted.length;
-        setUploadError(skippedCount > 0 ? `${skippedCount} file(s) were skipped because they are not image/video.` : '');
-
-        const next = accepted.map((file) => ({
-                id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`,
-                file,
-                preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
-                isImage: file.type.startsWith('image/'),
-                isVideo: file.type.startsWith('video/'),
-                size: file.size,
-                name: file.name,
-            }));
-
-        if (next.length) {
-            setUploads((prev) => [...prev, ...next]);
-        }
-    };
-
-    const onDrop = (event) => {
-        event.preventDefault();
-        setIsDragging(false);
-        if (event.dataTransfer?.files?.length) {
-            handleFiles(event.dataTransfer.files);
-        }
-    };
-
-    const onRemove = (id) => {
-        setUploads((prev) => {
-            const target = prev.find((item) => item.id === id);
-            if (target?.preview) {
-                URL.revokeObjectURL(target.preview);
+        const failedNames = [];
+        setIsUploading(true);
+        setUploadError('');
+        for (const file of accepted) {
+            const result = await uploadDraftAsset(draftId, file, 'media', 'step8');
+            if (!result?.ok) {
+                failedNames.push(file.name);
             }
-            return prev.filter((item) => item.id !== id);
+        }
+        setIsUploading(false);
+
+        const messages = [];
+        if (skippedCount > 0) {
+            messages.push(`${skippedCount} file(s) were skipped because they are not image/video.`);
+        }
+        if (failedNames.length > 0) {
+            messages.push(`Could not upload: ${failedNames.join(', ')}.`);
+        }
+        setUploadError(messages.join(' '));
+    };
+
+    const onDrop = async (dropEvent) => {
+        dropEvent.preventDefault();
+        setIsDragging(false);
+        if (dropEvent.dataTransfer?.files?.length) {
+            await handleFiles(dropEvent.dataTransfer.files);
+        }
+    };
+
+    const onRemove = async (assetId) => {
+        if (!draftId) return;
+        setRemovingAssetId(assetId);
+        setUploadError('');
+        const result = await deleteDraftAsset(draftId, assetId);
+        if (!result?.ok) {
+            setUploadError('Could not remove that file right now.');
+        }
+        setRemovingAssetId(null);
+    };
+
+    const handleSaveAndExit = async () => {
+        await saveDraftAndExit({
+            saveAndExit,
+            draftId,
+            navigate,
         });
     };
 
-    // Revoke blob URLs only on unmount to prevent memory leaks
-    const uploadsRef = useRef(uploads);
-    useEffect(() => { uploadsRef.current = uploads; }, [uploads]);
-    useEffect(() => {
-        return () => {
-            uploadsRef.current.forEach((item) => {
-                if (item.preview) URL.revokeObjectURL(item.preview);
-            });
-        };
-    }, []);
-
-    const humanSize = (bytes) => {
-        if (!bytes && bytes !== 0) return '';
-        const units = ['B', 'KB', 'MB', 'GB'];
-        let size = bytes;
-        let idx = 0;
-        while (size >= 1024 && idx < units.length - 1) {
-            size /= 1024;
-            idx += 1;
-        }
-        return `${size.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
-    };
     return (
         <div className="bg-white min-h-screen font-sans flex flex-col">
-            {/* Header */}
             <header className="fixed top-0 left-0 right-0 bg-white z-20">
-                 <div className="flex items-center justify-between p-6">
+                <div className="flex items-center justify-between p-6">
                     <a href="/"><svg viewBox="0 0 1000 1000" role="presentation" aria-hidden="true" focusable="false" className="h-8 w-8 text-pink-600" style={{ display: 'block', fill: 'currentColor' }}><path d="m499.3 736.7c-51-64-81-120.1-91-168.1-10-39-6-70 11-93 18-21 41-32 72-32 31 0 54 11 72 32 17 23 21 54 11 93-11 49-41 105-91 168.1zm362.2 43.2c-11-12.9-25-23.9-40-31.9-50-23.9-92-42.9-123-58.9-32-16-56-28.9-73-38.9-17-9-29-15-37-19-21-10.9-35-18.9-44-24.9-7-5-13-9-20-13-102.1-59-183.1-131-242.1-215-30-42-52-84-65-127.1-14-44-19-87-19-129.1 0-78.1 21-148.1 63-210.1 42-62 101-111 176-147 24-12 50-21 77-28 10-2 19-5 28-7 8-2 17-4 25-6 2-1 3-1 4-2 11-4 22-7 33-9 12-2 24-4 36-4s24 2 36 4c11 2 22 5 33 9 1 1 2 1 4 2 8 2 17 4 25 6 10 2 19 5 28 7 27 7 53 16 77 28 75 36 134 85 176 147 42 62 63 132 63 210.1 0 42-5 85-19 129.1-13 43-35 85-65 127.1-59 84-140 156-242.1 215-7 4-13 8-20 13-9 6-23 14-44 25-8 4-20 10-37 19-17 10-41 23-73 39-31 16-73 35-123 59-15 8-29 19-40 32z"></path></svg></a>
                     <div className="flex items-center space-x-4">
-                        <button className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200">Questions?</button>
+                        <EventBookingSummaryButton eventDraftId={eventId} />
                         <button
                             className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gray-100 rounded-full hover:bg-gray-200"
-                            onClick={() => saveAndExit(eventId || event?.id)}
+                            onClick={handleSaveAndExit}
                         >
                             Save & exit
                         </button>
@@ -123,21 +128,22 @@ export default function ListingStep8_Event() {
                 </div>
             </header>
 
-            {/* Main Content */}
             <main className="flex-grow flex flex-col items-center justify-center pt-24 pb-28 text-center">
                 <div className="w-full max-w-2xl mx-auto px-4">
                     <h1 className="text-3xl font-bold text-gray-800 mb-2">Add photos & video for your event</h1>
-                    <p className="text-gray-600 mb-8">Start with a high-quality event poster or photos from past events. Videos are a great way to generate excitement.</p>
+                    <p className="text-gray-600 mb-4">Start with a high-quality event poster or photos from past events. Videos are a great way to generate excitement.</p>
+                    <div className="mb-8 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left text-sm text-emerald-800">
+                        {mediaDraftNotice}
+                    </div>
 
-                    {/* Media Upload Area */}
                     <div
                         className={`w-full h-96 rounded-xl border-2 border-dashed p-6 text-center transition-all duration-200 flex flex-col items-center justify-center ${isDragging ? 'border-black bg-gray-100' : 'border-gray-300 bg-gray-50'}`}
-                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragOver={(e) => { e.preventDefault(); if (!isUploading) setIsDragging(true); }}
                         onDragLeave={() => setIsDragging(false)}
                         onDrop={onDrop}
-                        onClick={() => inputRef.current?.click()}
+                        onClick={() => { if (!isUploading) inputRef.current?.click(); }}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
+                            if ((e.key === 'Enter' || e.key === ' ') && !isUploading) {
                                 e.preventDefault();
                                 inputRef.current?.click();
                             }
@@ -154,13 +160,16 @@ export default function ListingStep8_Event() {
                             <div className="flex flex-col items-center space-y-2">
                                 <button
                                     type="button"
+                                    disabled={isUploading}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        inputRef.current?.click();
+                                        if (!isUploading) {
+                                            inputRef.current?.click();
+                                        }
                                     }}
-                                    className="inline-flex items-center justify-center rounded-full bg-black px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:scale-[1.01] hover:bg-gray-800"
+                                    className="inline-flex items-center justify-center rounded-full bg-black px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:scale-[1.01] hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
-                                    Browse files
+                                    {isUploading ? 'Uploading...' : 'Browse files'}
                                 </button>
                                 <p className="text-xs text-gray-500">Images (JPG, PNG) or videos (MP4, MOV). Max 100MB each.</p>
                                 <input
@@ -168,10 +177,11 @@ export default function ListingStep8_Event() {
                                     type="file"
                                     accept="image/*,video/*"
                                     multiple
+                                    disabled={isUploading}
                                     className="hidden"
-                                    onChange={(e) => {
+                                    onChange={async (e) => {
                                         if (e.target.files?.length) {
-                                            handleFiles(e.target.files);
+                                            await handleFiles(e.target.files);
                                             e.target.value = '';
                                         }
                                     }}
@@ -182,34 +192,34 @@ export default function ListingStep8_Event() {
                     {uploadError && (
                         <p className="mt-3 text-sm font-medium text-amber-700">{uploadError}</p>
                     )}
-                    {/* Upload Preview */}
-                    {uploads.length > 0 && (
+                    {mediaAssets.length > 0 && (
                         <div className="mt-8 text-left space-y-3">
                             <div className="flex items-center justify-between">
-                                <p className="text-sm font-semibold text-gray-700">Uploads ({uploads.length})</p>
-                                <p className="text-xs text-gray-500">Temporarily stored — will save to your listing.</p>
+                                <p className="text-sm font-semibold text-gray-700">Uploads ({mediaAssets.length})</p>
+                                <p className="text-xs text-emerald-700">Saved to draft</p>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {uploads.map((item) => (
+                                {mediaAssets.map((item) => (
                                     <div key={item.id} className="relative rounded-xl border border-gray-200 bg-white shadow-sm p-3 flex items-center space-x-3">
                                         <div className="h-16 w-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-                                            {item.isImage && item.preview ? (
-                                                <img src={item.preview} alt={item.name} className="h-full w-full object-cover" />
+                                            {item.is_image && item.file_url ? (
+                                                <img src={item.file_url} alt={item.name} className="h-full w-full object-cover" />
                                             ) : (
                                                 <div className="flex h-full w-full items-center justify-center text-gray-500">
-                                                    {item.isVideo ? <Video className="h-6 w-6" /> : <Image className="h-6 w-6" />}
+                                                    {item.is_video ? <Video className="h-6 w-6" /> : <Image className="h-6 w-6" />}
                                                 </div>
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="truncate text-sm font-semibold text-gray-800">{item.name}</p>
-                                            <p className="text-xs text-gray-500">{item.isVideo ? 'Video' : 'Image'} • {humanSize(item.size)}</p>
+                                            <p className="text-xs text-gray-500">{item.is_video ? 'Video' : 'Image'} • {humanSize(item.size)}</p>
                                         </div>
                                         <button
                                             type="button"
+                                            disabled={removingAssetId === item.id}
                                             onClick={() => onRemove(item.id)}
                                             aria-label="Remove file"
-                                            className="absolute top-2 right-2 rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                                            className="absolute top-2 right-2 rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                                         >
                                             <X className="h-4 w-4" />
                                         </button>
@@ -221,19 +231,22 @@ export default function ListingStep8_Event() {
                 </div>
             </main>
 
-            {/* Footer with Progress Bar */}
             <footer className="fixed bottom-0 left-0 right-0 bg-white z-20">
-                <div className="w-full bg-gray-200 h-1.5"><div className="bg-black h-1.5" style={{ width: '80%' }}></div></div>
+                <div className="w-full bg-gray-200 h-1.5"><div className="bg-black h-1.5" style={{ width: `${getStepProgress('step8')}%` }}></div></div>
                 <div className="flex items-center justify-between p-4">
                     <button onClick={() => navigate(`${listingBase}/step7`)}
                             className="font-semibold text-gray-800 underline hover:text-black">Back
                     </button>
-                    <button onClick={async () => {
-                        const nextStep = getNextStep('step8');
-                        await saveStep(eventId || event?.id, 'step8', { uploads }, nextStep);
-                        navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
-                    }}
-                            className="px-8 py-3 text-white bg-gray-800 rounded-lg font-semibold hover:bg-black">Next
+                    <button
+                        disabled={isUploading || removingAssetId !== null}
+                        onClick={async () => {
+                            const nextStep = getNextStep('step8');
+                            await saveStep(draftId, 'step8', {}, nextStep);
+                            navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
+                        }}
+                        className="px-8 py-3 text-white bg-gray-800 rounded-lg font-semibold hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        Next
                     </button>
                 </div>
             </footer>

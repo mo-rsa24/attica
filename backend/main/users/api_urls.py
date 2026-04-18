@@ -12,6 +12,7 @@ from users.views import (
     SocialPostLikeToggleAPIView,
     SocialPostCommentListCreateAPIView,
     SocialPostShareAPIView,
+    PublicUserProfileAPIView,
 )
 
 urlpatterns = [
@@ -26,4 +27,5 @@ urlpatterns = [
     path('social-posts/<int:pk>/comments/', SocialPostCommentListCreateAPIView.as_view(), name='social_post_comments'),
     path('social-posts/<int:pk>/share/', SocialPostShareAPIView.as_view(), name='social_post_share'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('users/<int:pk>/', PublicUserProfileAPIView.as_view(), name='public_user_profile'),
 ]

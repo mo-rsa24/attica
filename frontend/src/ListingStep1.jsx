@@ -1,16 +1,15 @@
 import React, {useState, useEffect, useCallback, useMemo, useRef} from 'react';
 import {useNavigate, Link, useParams} from 'react-router-dom';
 import {motion, AnimatePresence} from 'framer-motion';
-import {FaChevronRight, FaTimes, FaTrash} from 'react-icons/fa';
-import {FiImage, FiUploadCloud, FiVideo} from 'react-icons/fi';
-import {useDropzone} from 'react-dropzone';
-import {useEventCreation} from './context/reactContext.jsx';
+import {FaChevronRight, FaTimes} from 'react-icons/fa';
+import {useEventCreation, getStepProgress} from './context/reactContext.jsx';
+import {saveDraftAndExit} from './utils/wizardExit.js';
 
 // Mock data and components
 const heroImages = [
     'https://images.pexels.com/photos/2263436/pexels-photo-2263436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     'https://images.pexels.com/photos/169198/pexels-photo-169198.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    'https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+    'https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
 ];
 const provinces = ['Gauteng', 'Western Cape', 'KwaZulu-Natal', 'Eastern Cape', 'Free State', 'Limpopo', 'Mpumalanga', 'North West', 'Northern Cape'];
 const eventTypes = [
@@ -82,100 +81,6 @@ const TagInput = ({label, tags, setTags, placeholder}) => {
     );
 };
 
-const ImageUploader = ({title, file, onFileChange}) => {
-    const onDrop = useCallback(acceptedFiles => {
-        const selectedFile = acceptedFiles[0];
-        if (selectedFile) {
-            onFileChange(Object.assign(selectedFile, {
-                preview: URL.createObjectURL(selectedFile)
-            }));
-        }
-    }, [onFileChange]);
-
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({
-        onDrop,
-        accept: 'image/*',
-        multiple: false
-    });
-
-    const removeFile = (e) => {
-        e.stopPropagation(); // Prevent triggering the dropzone
-        onFileChange(null);
-    };
-
-    return (
-        <div {...getRootProps()}
-             className={`relative p-6 border-2 border-dashed rounded-lg text-center flex flex-col items-center justify-center h-48 cursor-pointer transition-all duration-300 ${isDragActive ? 'border-pink-500 bg-pink-50' : 'border-gray-300 hover:border-pink-400'}`}>
-            <input {...getInputProps()} />
-            {file ? (
-                <>
-                    <img src={file.preview} alt="Preview" className="w-full h-full object-cover rounded-md"/>
-                    <button onClick={removeFile}
-                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 text-xs shadow-lg hover:bg-red-700 transition-colors">
-                        <FaTrash/>
-                    </button>
-                </>
-            ) : (
-                <div className="text-gray-500">
-                    <FiImage className="mx-auto text-4xl mb-2"/>
-                    <p className="text-sm font-semibold text-gray-700">{title}</p>
-                    <p className="text-xs mt-1">Drag & drop or click</p>
-                </div>
-            )}
-        </div>
-    );
-};
-
-const GalleryUploader = ({files, setFiles}) => {
-    const onDrop = useCallback(acceptedFiles => {
-        const newFiles = acceptedFiles.map(file => Object.assign(file, {
-            preview: URL.createObjectURL(file)
-        }));
-        setFiles(prev => [...prev, ...newFiles].slice(0, 10)); // Limit to 10 images
-    }, [setFiles]);
-
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: 'image/*'});
-    const removeFile = (fileToRemove, e) => {
-        e.stopPropagation();
-        setFiles(files.filter(file => file !== fileToRemove));
-    };
-
-    return (
-        <div className="space-y-4">
-            <label className="block text-sm font-semibold text-gray-700">🖼️ Drag & Drop Gallery</label>
-            <div {...getRootProps()}
-                 className={`p-8 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${isDragActive ? 'border-pink-500 bg-pink-50' : 'border-gray-300'}`}>
-                <input {...getInputProps()} />
-                <FiUploadCloud className="mx-auto text-4xl text-gray-400 mb-2"/>
-                <p>Drag & drop your gallery images here, or click to select files</p>
-            </div>
-            <AnimatePresence>
-                <motion.div className="grid grid-cols-3 md:grid-cols-5 gap-4">
-                    {files.map((file, index) => (
-                        <motion.div
-                            key={file.preview}
-                            initial={{opacity: 0, scale: 0.8}}
-                            animate={{opacity: 1, scale: 1}}
-                            exit={{opacity: 0, scale: 0.8}}
-                            transition={{type: "spring", stiffness: 300, damping: 20}}
-                            className="relative aspect-square group"
-                        >
-                            <img src={file.preview} alt={`preview ${index}`}
-                                 className="w-full h-full object-cover rounded-lg shadow-md"/>
-                            <div
-                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                <button onClick={(e) => removeFile(file, e)} className="text-white text-2xl">
-                                    <FaTrash/>
-                                </button>
-                            </div>
-                        </motion.div>
-                    ))}
-                </motion.div>
-            </AnimatePresence>
-        </div>
-    );
-};
-
 const EventTypeCard = ({type, icon, selected, onClick}) => (
     <motion.button whileHover={{scale: 1.05, y: -5, boxShadow: '0px 15px 25px -10px rgba(0,0,0,0.1)'}} onClick={onClick}
                    className={`p-6 rounded-2xl text-left transition-all duration-300 w-full h-full flex flex-col justify-between ${selected ? 'bg-pink-600 text-white shadow-lg ring-2 ring-offset-2 ring-pink-600' : 'bg-white text-gray-800 shadow-md hover:shadow-lg border border-gray-200'}`}>
@@ -188,7 +93,6 @@ const EventTypeCard = ({type, icon, selected, onClick}) => (
 const defaultFormState = {
     eventName: '', description: '', selectedEventType: null, region: '',
     genres: [], tags: [], theme: '',
-    mainImage: null, thumbnailImage: null, heroImage: null, gallery: [],
     startDate: '', startTime: '', endDate: '', endTime: '',
     capacity: '', videoUrl: '', additionalNotes: ''
 };
@@ -200,7 +104,6 @@ export default function ListingStep1() {
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const {
         event,
-        saving,
         getStepData,
         setStepData,
         getNextStep,
@@ -208,7 +111,6 @@ export default function ListingStep1() {
         saveStep,
         saveAndExit,
         loadEvent,
-        isStepValid,
         setEventDetails,
     } = useEventCreation();
     const [formData, setFormData] = useState(() => getStepData('step1', defaultFormState));
@@ -216,6 +118,8 @@ export default function ListingStep1() {
     const [saveError, setSaveError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const loadEventRef = useRef(loadEvent);
+    // Dirty-state tracking: snapshot of last-saved form data
+    const savedSnapshotRef = useRef(null);
     useEffect(() => { loadEventRef.current = loadEvent; }, [loadEvent]);
 
     useEffect(() => {
@@ -232,20 +136,18 @@ export default function ListingStep1() {
     // Sync form when event is hydrated from the server (event changes only on hydrate, not on local mergeStepData)
     useEffect(() => {
         if (event) {
-            setFormData(prev => ({...prev, ...getStepData('step1', defaultFormState)}));
+            const loaded = getStepData('step1', defaultFormState);
+            setFormData(prev => ({...prev, ...loaded}));
+            // Treat the server-loaded data as the "saved" baseline
+            if (savedSnapshotRef.current === null) {
+                savedSnapshotRef.current = loaded;
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [event]);
 
     useEffect(() => {
-        const {
-            mainImage: _MAIN_IMAGE,
-            thumbnailImage: _THUMBNAIL_IMAGE,
-            heroImage: _HERO_IMAGE,
-            gallery: _GALLERY,
-            ...persistable
-        } = formData;
-        setStepData('step1', persistable);
+        setStepData('step1', formData);
     }, [formData, setStepData]);
 
     const validationErrors = useMemo(() => {
@@ -265,21 +167,6 @@ export default function ListingStep1() {
         const {name, value} = e.target;
         setFormData(prev => ({...prev, [name]: value}));
     };
-
-    const setFileFor = (fieldName, file) => {
-        setFormData(prev => ({...prev, [fieldName]: file}));
-    }
-
-    const setGalleryFiles = useCallback((updater) => {
-        setFormData(prev => {
-            const currentGallery = Array.isArray(prev.gallery) ? prev.gallery : [];
-            const newGallery = typeof updater === 'function' ? updater(currentGallery) : updater;
-            return {
-                ...prev,
-                gallery: newGallery,
-            };
-        });
-    }, []);
 
     const syncStoreWithForm = useCallback((payloadFromApi = {}) => {
         setEventDetails(prev => ({
@@ -336,6 +223,7 @@ export default function ListingStep1() {
         }
 
         syncStoreWithForm(result.data || {});
+        savedSnapshotRef.current = formData;
 
         if (destination === 'continue') {
             const stepRoute = nextStep === 'review' ? 'review' : nextStep;
@@ -345,24 +233,15 @@ export default function ListingStep1() {
         }
     };
 
-
-    const handleNext = async () => {
-        const nextStep = getNextStep('step1');
-        const payload = {
-            name: formData.eventName,
-            notes: formData.description,
-            category: formData.selectedEventType,
-            theme: formData.theme,
-            start_date: formData.startDate,
-            end_date: formData.endDate,
-            start_time: formData.startTime,
-            end_time: formData.endTime,
-            date: formData.startDate,
-            guest_count: formData.capacity ? Number(formData.capacity) : undefined,
-        };
-        await saveStep(eventId || event?.id, 'step1', payload, nextStep);
-        navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
+    const handleSaveAndExit = async () => {
+        await saveDraftAndExit({
+            saveAndExit,
+            draftId: eventId || event?.id,
+            navigate,
+        });
     };
+
+
     return (
         <div className="min-h-screen bg-gray-50 font-sans">
             <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-20 shadow-sm">
@@ -387,7 +266,7 @@ export default function ListingStep1() {
                             {/*</button>*/}
                             <button
                                 className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full"
-                                onClick={() => saveAndExit(eventId || event?.id)}
+                                onClick={handleSaveAndExit}
                             >
                                 Save & exit
                             </button>
@@ -395,7 +274,7 @@ export default function ListingStep1() {
                     </div>
                     <div className="w-full bg-gray-200 h-1">
                         <motion.div className="bg-pink-600 h-1" style={{background: '#FF5A5F'}} initial={{width: 0}}
-                                    animate={{width: '10%'}} transition={{duration: 1, ease: 'easeInOut'}}/>
+                                    animate={{width: `${getStepProgress('step1')}%`}} transition={{duration: 1, ease: 'easeInOut'}}/>
                     </div>
                 </div>
             </header>
@@ -406,7 +285,7 @@ export default function ListingStep1() {
                         <motion.div className="w-full lg:w-2/5 space-y-6" initial={{opacity: 0, x: -50}}
                                     animate={{opacity: 1, x: 0}}
                                     transition={{duration: 0.8, delay: 0.2, ease: 'easeOut'}}>
-                            <p className="font-semibold text-pink-600" style={{color: '#FF5A5F'}}>Step 1 of 7</p>
+                            <p className="font-semibold text-pink-600" style={{color: '#FF5A5F'}}>Step 1 of 8</p>
                             <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">Tell us about
                                 your event</h1>
                             <p className="text-xl text-gray-600 leading-relaxed">Let's get the basics down. The more
@@ -500,21 +379,6 @@ export default function ListingStep1() {
                             </div>
                         </div>
 
-                        {/* Image Uploads */}
-                        <div className="p-8 bg-white rounded-2xl shadow-md space-y-8">
-                            <h2 className="text-3xl font-bold text-gray-800 border-b pb-4">Visuals</h2>
-                            <div className="grid md:grid-cols-3 gap-8">
-                                <ImageUploader title="Main Image" file={formData.mainImage}
-                                               onFileChange={(file) => setFileFor('mainImage', file)}/>
-                                <ImageUploader title="Thumbnail Image" file={formData.thumbnailImage}
-                                               onFileChange={(file) => setFileFor('thumbnailImage', file)}/>
-                                <ImageUploader title="Hero Image" file={formData.heroImage}
-                                               onFileChange={(file) => setFileFor('heroImage', file)}/>
-                            </div>
-                            <GalleryUploader files={formData.gallery} setFiles={setGalleryFiles}/>
-                        </div>
-
-
                         {/* Event Type Selection */}
                         <motion.div className="mt-24 text-center" initial="hidden" animate="visible"
                                     variants={{visible: {transition: {staggerChildren: 0.05}}}}>
@@ -541,18 +405,17 @@ export default function ListingStep1() {
             <footer
                 className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-sm border-t border-gray-200 z-20">
                 <div className="max-w-screen-2xl mx-auto flex justify-between items-center px-2">
-                    <button onClick={() => navigate('/events')}
-                            className="font-bold text-gray-800 underline hover:text-pink-600 transition">Back
+                    <button
+                        onClick={() => {
+                            const snapshot = savedSnapshotRef.current;
+                            const isDirty = snapshot !== null &&
+                                JSON.stringify(formData) !== JSON.stringify(snapshot);
+                            if (isDirty && !window.confirm('You have unsaved changes. Leave without saving?')) return;
+                            navigate('/events');
+                        }}
+                        className="font-bold text-gray-800 underline hover:text-pink-600 transition">Back
                     </button>
-                    <motion.button
-                        onClick={handleNext}
-                        disabled={!isStepValid('step1') || saving}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center space-x-3 px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg hover:bg-pink-600 hover:shadow-xl transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                        <span>Next</span><FaChevronRight/>
-                    </motion.button>
+                    
                     <div className="flex items-center space-x-4">
                         {saveError && <p className="text-sm text-red-600">{saveError}</p>}
                         <motion.button

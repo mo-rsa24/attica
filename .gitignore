@@ -51,6 +51,9 @@ coverage/
 **/.env
 **/.env.*
 
+# Local reference repositories for RAG context
+# templates/
+
 # --- Optional ---
 # Ignore static/media runtime folders (Django)
 staticfiles/

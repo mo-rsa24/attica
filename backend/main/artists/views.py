@@ -12,7 +12,7 @@ class ArtistViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for viewing and creating Artist profiles and related content.
     """
-    queryset = Artist.objects.all()
+    queryset = Artist.objects.select_related("user").all()
     serializer_class = ArtistSerializer
 
     # --- ENHANCEMENT: Added filtering capabilities ---
@@ -29,19 +29,65 @@ class ArtistViewSet(viewsets.ModelViewSet):
             return ArtistCreateSerializer
         return ArtistSerializer
 
+    def _sync_user_avatar_from_artist(self, artist):
+        profile_image = getattr(artist, "profile_image", None)
+        user = getattr(artist, "user", None)
+        if not profile_image or not user:
+            return
+
+        next_name = profile_image.name
+        current_name = getattr(getattr(user, "profile_picture", None), "name", "")
+        if current_name == next_name:
+            return
+
+        user.profile_picture = next_name
+        user.save(update_fields=["profile_picture"])
+
     def perform_create(self, serializer):
         from users.models import Role
         if not self.request.user.has_role(Role.Names.ARTIST):
             raise permissions.PermissionDenied("Only artists can create artist profiles.")
-        serializer.save(owner=self.request.user, user=self.request.user)
+        artist = serializer.save(owner=self.request.user, user=self.request.user)
+
+        if self.request.FILES.get("profile_image"):
+            self._sync_user_avatar_from_artist(artist)
+        elif self.request.user.profile_picture and not artist.profile_image:
+            artist.profile_image = self.request.user.profile_picture.name
+            artist.save(update_fields=["profile_image"])
+
+    def perform_update(self, serializer):
+        artist = serializer.save()
+        if self.request.FILES.get("profile_image"):
+            self._sync_user_avatar_from_artist(artist)
+
     filterset_fields = ['genres', 'user', 'owner']  # Allows filtering by genre and owner/user ids
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get', 'post'], permission_classes=[permissions.IsAuthenticatedOrReadOnly])
     def portfolio(self, request, pk=None):
         artist = self.get_object()
+        if request.method == 'POST':
+            if artist.owner != request.user:
+                return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+            serializer = ArtistPortfolioItemSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                serializer.save(artist=artist)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         portfolio_items = artist.portfolio_items.all()
         serializer = ArtistPortfolioItemSerializer(portfolio_items, many=True, context={'request': request})
         return Response(serializer.data)
+
+    @action(detail=True, url_path='portfolio/(?P<item_pk>[0-9]+)', methods=['delete'], permission_classes=[permissions.IsAuthenticated])
+    def portfolio_delete(self, request, pk=None, item_pk=None):
+        artist = self.get_object()
+        if artist.owner != request.user:
+            return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            item = artist.portfolio_items.get(pk=item_pk)
+        except artist.portfolio_items.model.DoesNotExist:
+            return Response({'error': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['get'])
     def availability(self, request, pk=None):
@@ -54,6 +100,12 @@ class ArtistViewSet(viewsets.ModelViewSet):
     def book(self, request, pk=None):
         artist = self.get_object()
         event_id = request.data.get('event_id')
+
+        if artist.owner_id == request.user.id or artist.user_id == request.user.id:
+            return Response(
+                {'error': 'Artists cannot book themselves.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         if not event_id:
             return Response({'error': 'Event ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -89,12 +141,30 @@ class ArtistViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def events(self, request, pk=None):
-        # Dummy data for demonstration
-        events_data = [
-            {'id': 1, 'name': 'Rocking the Daisies', 'date': '2025-10-04', 'location': 'Cape Town'},
-            {'id': 2, 'name': 'Afropunk', 'date': '2025-12-30', 'location': 'Johannesburg'},
-            {'id': 3, 'name': 'Afropunk 2', 'date': '2025-12-30', 'location': 'Johannesburg'},
-        ]
+        artist = self.get_object()
+        bookings = (
+            ArtistBooking.objects
+            .filter(artist=artist)
+            .select_related('event', 'event__location')
+            .order_by('-event__date', '-event__created_at')
+        )
+
+        events_data = []
+        for booking in bookings:
+            event = booking.event
+            location_name = (
+                event.location.name if getattr(event, 'location', None) else event.venue or 'Location TBA'
+            )
+            events_data.append(
+                {
+                    'id': event.id,
+                    'name': event.name,
+                    'date': event.date,
+                    'location': location_name,
+                    'booking_status': booking.status,
+                }
+            )
+
         return Response(events_data)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
@@ -105,10 +175,27 @@ class ArtistViewSet(viewsets.ModelViewSet):
         follow_instance, created = Follow.objects.get_or_create(user=user, artist=artist)
 
         if created:
-            return Response({'status': 'followed'}, status=status.HTTP_201_CREATED)
+            if artist.owner_id and artist.owner_id != user.id:
+                from notifications.models import Notification
+                Notification.objects.create(
+                    recipient_id=artist.owner_id,
+                    sender=user,
+                    notification_type=Notification.NotificationType.NEW_FOLLOWER,
+                    title=f'{user.username} is now following you',
+                    message=f'{user.first_name or user.username} started following your artist profile.',
+                    link_type='artist',
+                    link_id=artist.id,
+                )
+            return Response(
+                {'status': 'followed', 'follower_count': artist.followers.count()},
+                status=status.HTTP_201_CREATED,
+            )
         else:
             follow_instance.delete()
-            return Response({'status': 'unfollowed'}, status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {'status': 'unfollowed', 'follower_count': artist.followers.count()},
+                status=status.HTTP_204_NO_CONTENT,
+            )
 
 class ArtistPostViewSet(viewsets.ModelViewSet):
     """

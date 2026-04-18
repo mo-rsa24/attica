@@ -1,8 +1,10 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {motion} from 'framer-motion';
-import {FiPlus, FiTrash2, FiChevronDown, FiUpload, FiPaperclip} from 'react-icons/fi';
-import {useEventCreation} from './context/reactContext.jsx';
+import {motion as Motion} from 'framer-motion';
+import {FiChevronDown, FiUpload, FiPaperclip} from 'react-icons/fi';
+import {useEventCreation, getStepProgress} from './context/reactContext.jsx';
+import EventBookingSummaryButton from './components/booking/EventBookingSummaryDrawer.jsx';
+import {saveDraftAndExit} from './utils/wizardExit.js';
 // --- Reusable Components ---
 
 // Simple Counter from original file
@@ -43,8 +45,9 @@ const AccordionItem = ({title, children, isOpen, onClick}) => (
 
 export default function ListingStep5() {
     const navigate = useNavigate();
-    const {setCurrentStep, saveAndExit, event, getStepData, setStepData, saveStep, getNextStep} = useEventCreation();
+    const {setCurrentStep, saveAndExit, event, getStepData, setStepData, saveStep, getNextStep, uploadDraftAsset, deleteDraftAsset} = useEventCreation();
     const {eventId} = useParams();
+    const draftId = eventId || event?.id;
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const initialStepData = useMemo(() => getStepData('step5', {}), [getStepData]);
     const [basePrice, setBasePrice] = useState(initialStepData.base_price ?? 150.00);
@@ -55,7 +58,13 @@ export default function ListingStep5() {
     const [openTier, setOpenTier] = useState(null);
 
     const [isSeated, setIsSeated] = useState(initialStepData.is_seated ?? false);
-    const [seatingChart, setSeatingChart] = useState(initialStepData.seating_chart ?? null);
+    const [assetError, setAssetError] = useState('');
+    const [isUploadingSeatChart, setIsUploadingSeatChart] = useState(false);
+    const [isRemovingSeatChart, setIsRemovingSeatChart] = useState(false);
+    const seatingChartAsset = useMemo(
+        () => (Array.isArray(event?.assets) ? event.assets.find((asset) => asset.asset_type === 'seating_chart') || null : null),
+        [event?.assets],
+    );
 
     const [isAgeRestricted, setIsAgeRestricted] = useState(initialStepData.is_age_restricted ?? false);
     const [isInviteOnly, setIsInviteOnly] = useState(initialStepData.access_type === 'private');
@@ -73,7 +82,6 @@ export default function ListingStep5() {
             setRefundPolicy(next.refund_policy ?? 'full');
             setCustomPolicy(next.custom_policy ?? '');
             setIsSeated(next.is_seated ?? false);
-            setSeatingChart(next.seating_chart ?? null);
             setIsAgeRestricted(next.is_age_restricted ?? false);
             setIsInviteOnly((next.access_type || '') === 'private');
         }
@@ -87,11 +95,10 @@ export default function ListingStep5() {
             refund_policy: refundPolicy === 'custom' ? customPolicy : refundPolicy,
             custom_policy: refundPolicy === 'custom' ? customPolicy : null,
             is_seated: isSeated,
-            seating_chart: seatingChart,
             is_age_restricted: isAgeRestricted,
             access_type: isInviteOnly ? 'private' : 'public',
         });
-    }, [basePrice, currency, maxTickets, refundPolicy, customPolicy, isSeated, seatingChart, isAgeRestricted, isInviteOnly, setStepData]);
+    }, [basePrice, currency, maxTickets, refundPolicy, customPolicy, isSeated, isAgeRestricted, isInviteOnly, setStepData]);
 
     const handleNext = async () => {
         const payload = {
@@ -101,19 +108,49 @@ export default function ListingStep5() {
             refund_policy: refundPolicy === 'custom' ? customPolicy : refundPolicy,
             custom_policy: refundPolicy === 'custom' ? customPolicy : null,
             is_seated: isSeated,
-            seating_chart: seatingChart,
             is_age_restricted: isAgeRestricted,
             access_type: isInviteOnly ? 'private' : 'public',
         };
         const nextStep = getNextStep('step5');
-        await saveStep(eventId || event?.id, 'step5', payload, nextStep);
+        await saveStep(draftId, 'step5', payload, nextStep);
         navigate(nextStep === 'review' ? `${listingBase}/review` : `${listingBase}/${nextStep}`);
     };
 
-    const handleFileChange = (e) => {
-        if (e.target.files[0]) {
-            setSeatingChart(e.target.files[0]);
+    const handleFileChange = async (e) => {
+        const nextFile = e.target.files?.[0];
+        e.target.value = '';
+        if (!nextFile) return;
+        if (!draftId) {
+            setAssetError('Save this draft before uploading a seating chart.');
+            return;
         }
+
+        setIsUploadingSeatChart(true);
+        setAssetError('');
+        const result = await uploadDraftAsset(draftId, nextFile, 'seating_chart', 'step5');
+        if (!result?.ok) {
+            setAssetError('Could not upload the seating chart right now.');
+        }
+        setIsUploadingSeatChart(false);
+    };
+
+    const handleRemoveSeatChart = async () => {
+        if (!draftId || !seatingChartAsset?.id) return;
+        setIsRemovingSeatChart(true);
+        setAssetError('');
+        const result = await deleteDraftAsset(draftId, seatingChartAsset.id);
+        if (!result?.ok) {
+            setAssetError('Could not remove the seating chart right now.');
+        }
+        setIsRemovingSeatChart(false);
+    };
+
+    const handleSaveAndExit = async () => {
+        await saveDraftAndExit({
+            saveAndExit,
+            draftId,
+            navigate,
+        });
     };
 
     return (
@@ -125,15 +162,19 @@ export default function ListingStep5() {
                         <a href="/">
                             <div className="text-2xl font-bold text-pink-600">A</div>
                         </a>
-                        <button
-                            className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full"
-                            onClick={() => saveAndExit(eventId || event?.id)}
-                        >
-                            Save & exit
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <EventBookingSummaryButton eventDraftId={eventId} />
+                            <button
+                                className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full disabled:cursor-not-allowed disabled:opacity-60"
+                                disabled={isUploadingSeatChart || isRemovingSeatChart}
+                                onClick={handleSaveAndExit}
+                            >
+                                Save & exit
+                            </button>
+                        </div>
                     </div>
                     <div className="w-full bg-gray-200 h-1">
-                        <motion.div className="bg-pink-600 h-1" initial={{width: '40%'}} animate={{width: '60%'}}
+                        <Motion.div className="bg-pink-600 h-1" initial={{width: `${getStepProgress('step4')}%`}} animate={{width: `${getStepProgress('step5')}%`}}
                                     transition={{duration: 1, ease: 'easeInOut'}}/>
                     </div>
                 </div>
@@ -144,15 +185,15 @@ export default function ListingStep5() {
 
                     {/* Left Column: Form Sections */}
                     <div className="lg:col-span-7 space-y-10">
-                        <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
+                        <Motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
                                     transition={{duration: 0.7}}>
                             <h1 className="text-4xl font-bold text-gray-900">Set your ticket price and options</h1>
                             <p className="mt-2 text-lg text-gray-600">Configure pricing, seating, and access controls
                                 for your event.</p>
-                        </motion.div>
+                        </Motion.div>
 
                         {/* 1. Ticket Options */}
-                        <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
+                        <Motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
                                     transition={{duration: 0.7, delay: 0.2}}
                                     className="bg-white p-6 rounded-2xl shadow-lg">
                             <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">📦 Ticket Options</h2>
@@ -202,10 +243,10 @@ export default function ListingStep5() {
                                                   placeholder="Specify your custom refund policy..."/>}
                                 </div>
                             </div>
-                        </motion.div>
+                        </Motion.div>
 
                         {/* 2. Seating Options */}
-                        <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
+                        <Motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
                                     transition={{duration: 0.7, delay: 0.3}}
                                     className="bg-white p-6 rounded-2xl shadow-lg">
                             <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">🪑 Seating Options</h2>
@@ -218,22 +259,39 @@ export default function ListingStep5() {
                                     <div>
                                         <label className="block font-semibold text-gray-700 mb-2">Seating Chart
                                             (optional)</label>
+                                        <p className="mb-3 text-sm text-emerald-700">
+                                            Uploads save to this draft immediately and are carried into the published event.
+                                        </p>
                                         <label htmlFor="seating-chart-upload"
                                                className="w-full flex items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
-                                            {seatingChart ? <div className="flex items-center gap-2 text-green-600">
-                                                    <FiPaperclip/><span>{seatingChart.name}</span></div> :
-                                                <div className="flex items-center gap-2"><FiUpload/><span>Upload PDF or Image</span>
+                                            {seatingChartAsset ? <div className="flex items-center gap-2 text-green-600">
+                                                    <FiPaperclip/><span>{seatingChartAsset.name}</span></div> :
+                                                <div className="flex items-center gap-2"><FiUpload/><span>{isUploadingSeatChart ? 'Uploading...' : 'Upload PDF or Image'}</span>
                                                 </div>}
                                         </label>
                                         <input id="seating-chart-upload" type="file" className="hidden"
-                                               onChange={handleFileChange} accept=".pdf,.jpg,.jpeg,.png"/>
+                                               onChange={handleFileChange} accept=".pdf,.jpg,.jpeg,.png"
+                                               disabled={isUploadingSeatChart || isRemovingSeatChart}/>
+                                        {seatingChartAsset && (
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveSeatChart}
+                                                disabled={isRemovingSeatChart}
+                                                className="mt-3 text-sm font-semibold text-rose-600 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
+                                                {isRemovingSeatChart ? 'Removing...' : 'Remove seating chart'}
+                                            </button>
+                                        )}
+                                        {assetError && (
+                                            <p className="mt-3 text-sm font-medium text-amber-700">{assetError}</p>
+                                        )}
                                     </div>
                                 )}
                             </div>
-                        </motion.div>
+                        </Motion.div>
 
                         {/* 3. Audience & Access */}
-                        <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
+                        <Motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}}
                                     transition={{duration: 0.7, delay: 0.4}}
                                     className="bg-white p-6 rounded-2xl shadow-lg">
                             <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">🎟️ Audience & Access
@@ -253,7 +311,7 @@ export default function ListingStep5() {
                                     {/* Add logic here to manage custom questions */}
                                 </AccordionItem>
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     </div>
 
                     {/* Right Column: Hero Image & Dynamic Revenue */}
@@ -276,10 +334,12 @@ export default function ListingStep5() {
             <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
                 <div className="max-w-screen-2xl mx-auto flex justify-between items-center px-2">
                     <button onClick={() => navigate(`${listingBase}/step4`)}
-                            className="font-bold text-gray-800 underline">Back
+                            disabled={isUploadingSeatChart || isRemovingSeatChart}
+                            className="font-bold text-gray-800 underline disabled:cursor-not-allowed disabled:opacity-60">Back
                     </button>
                     <button onClick={handleNext}
-                            className="px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg">Next
+                            disabled={isUploadingSeatChart || isRemovingSeatChart}
+                            className="px-6 py-3 bg-gray-900 text-white font-bold rounded-lg shadow-lg disabled:cursor-not-allowed disabled:opacity-60">Next
                     </button>
                 </div>
             </footer>

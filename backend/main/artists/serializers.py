@@ -2,6 +2,30 @@ from rest_framework import serializers
 from .models import Artist, ArtistBooking, ArtistPortfolioItem, Follow, ArtistPost
 import json
 
+DEFAULT_PROFILE_PICTURE_NAMES = {
+    "default_profile.jpg",
+    "default_profile.jpeg",
+    "default_profile.png",
+}
+
+
+def _is_placeholder_profile_image(image_field):
+    if not image_field:
+        return True
+    name = (getattr(image_field, "name", "") or "").split("?")[0]
+    file_name = name.split("/")[-1].lower()
+    return file_name in DEFAULT_PROFILE_PICTURE_NAMES
+
+
+def _to_media_url(image_field, request):
+    if not image_field:
+        return None
+    try:
+        url = image_field.url
+    except Exception:
+        return None
+    return request.build_absolute_uri(url) if request else url
+
 
 class ArtistPortfolioItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,6 +33,7 @@ class ArtistPortfolioItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'caption', 'created_at']
 
 class ArtistSerializer(serializers.ModelSerializer):
+    profile_image = serializers.SerializerMethodField()
     follower_count = serializers.SerializerMethodField()
     is_following = serializers.SerializerMethodField()
     # Dummy stats for demonstration
@@ -31,6 +56,18 @@ class ArtistSerializer(serializers.ModelSerializer):
 
     def get_follower_count(self, obj):
         return obj.followers.count()
+
+    def get_profile_image(self, obj):
+        request = self.context.get("request")
+        artist_image = getattr(obj, "profile_image", None)
+        user_image = getattr(getattr(obj, "user", None), "profile_picture", None)
+
+        # Prefer a non-placeholder account avatar, then artist image, then any account avatar.
+        if user_image and not _is_placeholder_profile_image(user_image):
+            return _to_media_url(user_image, request)
+        if artist_image:
+            return _to_media_url(artist_image, request)
+        return _to_media_url(user_image, request)
 
     def get_is_following(self, obj):
         user = self.context.get('request').user
@@ -100,9 +137,22 @@ class ArtistCreateSerializer(serializers.ModelSerializer):
 
 
 class PopularArtistSerializer(serializers.ModelSerializer):
+    profile_image = serializers.SerializerMethodField()
+
     class Meta:
         model = Artist
         fields = ('id', 'name', 'profile_image', 'genres', 'rating')
+
+    def get_profile_image(self, obj):
+        request = self.context.get("request")
+        artist_image = getattr(obj, "profile_image", None)
+        user_image = getattr(getattr(obj, "user", None), "profile_picture", None)
+
+        if user_image and not _is_placeholder_profile_image(user_image):
+            return _to_media_url(user_image, request)
+        if artist_image:
+            return _to_media_url(artist_image, request)
+        return _to_media_url(user_image, request)
 
 class ArtistBookingSerializer(serializers.ModelSerializer):
     artist = ArtistSerializer(read_only=True)

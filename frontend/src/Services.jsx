@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { FaBolt, FaMapMarkerAlt, FaTags } from 'react-icons/fa';
 import ServiceCard from './ServiceCard.jsx';
 import { useAuth } from './AuthContext';
@@ -125,6 +126,8 @@ const sortServices = (items, sortKey, userCityTag) => {
 
 export default function Services() {
     const { tokens } = useAuth();
+    const [searchParams] = useSearchParams();
+    const eventId = searchParams.get('event') || null;
     const [services, setServices] = useState([]);
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -297,6 +300,17 @@ export default function Services() {
                 </div>
             </section>
 
+            {eventId && (
+                <div className="bg-pink-50 border-b border-pink-200">
+                    <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+                        <p className="text-sm font-semibold text-pink-700">
+                            Browsing providers for your event — any service you request will be linked to it.
+                        </p>
+                        <a href={`/events`} className="text-xs text-pink-500 hover:text-pink-700 underline ml-4 whitespace-nowrap">Back to my events</a>
+                    </div>
+                </div>
+            )}
+
             <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <div>
@@ -347,7 +361,7 @@ export default function Services() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredServices.map(service => (
-                            <ServiceCard key={service.id} service={service} />
+                            <ServiceCard key={service.id} service={service} eventId={eventId} />
                         ))}
                     </div>
                 )}

@@ -5,7 +5,7 @@ import {useContext, useMemo, useRef} from 'react';
 import AuthContext from '../AuthContext.js';
 
 const useAxios = () => {
-    const {tokens, setUser, setTokens} = useContext(AuthContext);
+    const {tokens, setTokens} = useContext(AuthContext);
     const refreshAttemptedRef = useRef(false);
     const baseURL = 'http://127.0.0.1:8000';
     const axiosInstance = useMemo(() => {
@@ -21,8 +21,8 @@ const useAxios = () => {
                 console.warn('No tokens. Skipping request.');
                 return req;
             }
-            const user = jwtDecode(tokens.access);
-            const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
+            const decodedAccessToken = jwtDecode(tokens.access);
+            const isExpired = dayjs.unix(decodedAccessToken.exp).diff(dayjs()) < 1;
 
             if (!isExpired) return req;
 
@@ -40,7 +40,6 @@ const useAxios = () => {
 
                 localStorage.setItem('tokens', JSON.stringify({...tokens, access: response.data.access}));
                 setTokens(prev => ({...prev, access: response.data.access}));
-                setUser(jwtDecode(response.data.access));
                 req.headers.Authorization = `Bearer ${response.data.access}`;
                 console.log('Token refreshed successfully in useAxios.');
             } catch (err) {
@@ -50,7 +49,7 @@ const useAxios = () => {
         });
 
         return instance;
-    }, [tokens, setTokens, setUser]);
+    }, [tokens, setTokens]);
 
     return axiosInstance;
 };

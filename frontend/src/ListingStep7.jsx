@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEventCreation } from './context/reactContext.jsx';
+import { useEventCreation, getStepProgress } from './context/reactContext.jsx';
+import EventBookingSummaryButton from './components/booking/EventBookingSummaryDrawer.jsx';
 import {
   Truck,
   Martini,
@@ -15,6 +16,7 @@ import {
   Camera,
   CheckCircle2
 } from 'lucide-react';
+import { saveDraftAndExit } from './utils/wizardExit.js';
 
 // Icon mapping for features
 const ICONS = {
@@ -31,12 +33,17 @@ const ICONS = {
     'Photo Booth': Camera
 };
 
+const haveSameFeatures = (left = [], right = []) => (
+    left.length === right.length && left.every((item, index) => item === right[index])
+);
+
 const ListingStep7 = () => {
     const navigate = useNavigate();
     const { setCurrentStep, getStepData, setStepData, saveStep, getNextStep, saveAndExit, event } = useEventCreation();
     const { eventId } = useParams();
     const listingBase = eventId ? `/listing/${eventId}` : '/createEvent';
     const [selectedFeatures, setSelectedFeatures] = useState(() => getStepData('step7', {}).features || []);
+    const initializedRef = useRef(false);
 
     // Scroll to top on mount
     useEffect(() => {
@@ -49,17 +56,29 @@ const ListingStep7 = () => {
 
     useEffect(() => {
         const stepData = getStepData('step7', {});
-        if (Array.isArray(stepData.features)) {
-            setSelectedFeatures(stepData.features);
-        }
-    }, [getStepData]);
+        const features = Array.isArray(stepData.features) ? stepData.features : [];
+        setSelectedFeatures((previous) => (haveSameFeatures(previous, features) ? previous : features));
+        initializedRef.current = true;
+        // Keep this tied to event loading/switching only to avoid sync loops.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [event?.id]);
 
     useEffect(() => {
-        setStepData('step7', { features: selectedFeatures });
+        if (initializedRef.current) {
+            setStepData('step7', { features: selectedFeatures });
+        }
     }, [selectedFeatures, setStepData]);
 
     const toggleFeature = (name) => {
         setSelectedFeatures((prev) => prev.includes(name) ? prev.filter(f => f !== name) : [...prev, name]);
+    };
+
+    const handleSaveAndExit = async () => {
+        await saveDraftAndExit({
+            saveAndExit,
+            draftId: eventId || event?.id,
+            navigate,
+        });
     };
 
     const commonFeatures = [
@@ -165,7 +184,7 @@ const ListingStep7 = () => {
                 <div className="w-full h-1.5 bg-gray-100">
                     <div
                         className="h-full bg-gradient-to-r from-violet-600 to-pink-600 transition-all duration-500 ease-out"
-                        style={{ width: '87.5%' }} // Step 7 of 8 approx
+                        style={{ width: `${getStepProgress('step7')}%` }}
                     />
                 </div>
 
@@ -178,8 +197,9 @@ const ListingStep7 = () => {
                     </button>
 
                     <div className="flex items-center gap-4">
+                        <EventBookingSummaryButton eventDraftId={eventId} />
                         <button
-                            onClick={() => saveAndExit(eventId || event?.id)}
+                            onClick={handleSaveAndExit}
                             className="px-6 py-2.5 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition-colors"
                         >
                             Save & exit

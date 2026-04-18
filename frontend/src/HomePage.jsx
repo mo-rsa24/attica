@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {FaCommentDots, FaHeart, FaImage, FaRegHeart, FaRetweet} from 'react-icons/fa';
 import {useAuth} from './AuthContext';
 import FloatingActionButton from './FloatingActionButton.jsx';
@@ -40,10 +40,18 @@ const roleToLabel = (role) => {
         .join(' ');
 };
 
+const toArtistList = (payload) => {
+    if (Array.isArray(payload?.results)) return payload.results;
+    if (Array.isArray(payload)) return payload;
+    return [];
+};
+
 function HomePage() {
     const {tokens, user} = useAuth();
     const api = useAxios();
+    const navigate = useNavigate();
 
+    const [feedTab, setFeedTab] = useState('for_you'); // 'for_you' | 'following'
     const [posts, setPosts] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -78,7 +86,7 @@ function HomePage() {
         setComposerPreview('');
     };
 
-    const loadFeedPage = useCallback(async ({offset, replace}) => {
+    const loadFeedPage = useCallback(async ({offset, replace, tab}) => {
         if (!tokens?.access) {
             setPosts([]);
             setIsInitialLoading(false);
@@ -95,9 +103,9 @@ function HomePage() {
         }
 
         try {
-            const {data} = await api.get('/api/accounts/social-posts/', {
-                params: {offset, limit: PAGE_SIZE},
-            });
+            const params = {offset, limit: PAGE_SIZE};
+            if ((tab ?? feedTab) === 'following') params.following = 'true';
+            const {data} = await api.get('/api/accounts/social-posts/', {params});
             const incoming = Array.isArray(data?.results) ? data.results : [];
 
             setPosts(prev => {
@@ -129,8 +137,8 @@ function HomePage() {
     }, [api, tokens?.access]);
 
     useEffect(() => {
-        loadFeedPage({offset: 0, replace: true});
-    }, [loadFeedPage]);
+        loadFeedPage({offset: 0, replace: true, tab: feedTab});
+    }, [loadFeedPage, feedTab]);
 
     useEffect(() => {
         const node = loadMoreRef.current;
@@ -214,6 +222,32 @@ function HomePage() {
         }
     };
 
+    const handleOpenArtistProfile = useCallback(async (event, feedUser) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const directArtistProfileId = feedUser?.artist_profile_id;
+        if (directArtistProfileId) {
+            navigate(`/artists/${directArtistProfileId}`);
+            return;
+        }
+
+        const userId = feedUser?.id;
+        if (!userId) return;
+
+        try {
+            const {data} = await api.get('/api/artists/artists/', {
+                params: {user: userId},
+            });
+            const matchedArtist = toArtistList(data)[0];
+            if (matchedArtist?.id) {
+                navigate(`/artists/${matchedArtist.id}`);
+            }
+        } catch (error) {
+            console.error('Failed to resolve artist profile', error);
+        }
+    }, [api, navigate]);
+
     const loadComments = async (postId) => {
         setLoadingCommentsByPost(prev => ({...prev, [postId]: true}));
         try {
@@ -287,6 +321,24 @@ function HomePage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.1fr)_minmax(260px,1fr)] gap-8 items-start">
                     <section className="space-y-5">
+                        {/* Feed tabs */}
+                        <div className="flex border-b border-slate-200">
+                            {[{key: 'for_you', label: 'For You'}, {key: 'following', label: 'Following'}].map(tab => (
+                                <button
+                                    key={tab.key}
+                                    type="button"
+                                    onClick={() => setFeedTab(tab.key)}
+                                    className={`px-5 py-3 text-sm font-semibold border-b-2 transition-colors ${
+                                        feedTab === tab.key
+                                            ? 'border-slate-900 text-slate-900'
+                                            : 'border-transparent text-slate-500 hover:text-slate-700'
+                                    }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <form
                             onSubmit={handleCreatePost}
                             className="bg-white/95 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-5"
@@ -344,10 +396,19 @@ function HomePage() {
                             </div>
                         ) : posts.length === 0 ? (
                             <div className="bg-white/95 rounded-2xl border border-slate-100 p-8 text-center">
-                                <h2 className="text-lg font-semibold text-slate-900">No posts in your feed yet</h2>
+                                <h2 className="text-lg font-semibold text-slate-900">
+                                    {feedTab === 'following' ? 'No posts from artists you follow' : 'No posts in your feed yet'}
+                                </h2>
                                 <p className="text-slate-500 mt-2 text-sm">
-                                    Be the first to share your latest portfolio update.
+                                    {feedTab === 'following'
+                                        ? 'Follow artists on their profile page to see their posts here.'
+                                        : 'Be the first to share your latest portfolio update.'}
                                 </p>
+                                {feedTab === 'following' && (
+                                    <a href="/artists" className="mt-4 inline-block px-5 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors">
+                                        Discover artists
+                                    </a>
+                                )}
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -357,20 +418,63 @@ function HomePage() {
                                     const comments = commentsByPost[post.id] || [];
                                     const commentsOpen = Boolean(expandedComments[post.id]);
                                     const userRole = roleToLabel(post?.user?.roles?.[0]);
+                                    const hasPostUserId = Boolean(post?.user?.id);
+                                    const postArtistProfilePath = post?.user?.artist_profile_id
+                                        ? `/artists/${post.user.artist_profile_id}`
+                                        : null;
 
                                     return (
                                         <article key={post.id} className="bg-white/95 backdrop-blur-sm border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
                                             <div className="px-5 pt-5 pb-4">
                                                 <div className="flex items-start gap-3 mb-3">
-                                                    <img
-                                                        src={profileImage || 'https://placehold.co/72x72/F1F5F9/64748B?text=U'}
-                                                        alt={post?.user?.username || 'User'}
-                                                        className="w-12 h-12 rounded-full object-cover ring-1 ring-slate-200"
-                                                    />
+                                                    {postArtistProfilePath ? (
+                                                        <Link to={postArtistProfilePath} className="inline-flex rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30">
+                                                            <img
+                                                                src={profileImage || 'https://placehold.co/72x72/F1F5F9/64748B?text=U'}
+                                                                alt={post?.user?.username || 'User'}
+                                                                className="w-12 h-12 rounded-full object-cover ring-1 ring-slate-200 transition hover:ring-slate-400"
+                                                            />
+                                                        </Link>
+                                                    ) : hasPostUserId ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(event) => handleOpenArtistProfile(event, post.user)}
+                                                            className="inline-flex rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30"
+                                                        >
+                                                            <img
+                                                                src={profileImage || 'https://placehold.co/72x72/F1F5F9/64748B?text=U'}
+                                                                alt={post?.user?.username || 'User'}
+                                                                className="w-12 h-12 rounded-full object-cover ring-1 ring-slate-200 transition hover:ring-slate-400"
+                                                            />
+                                                        </button>
+                                                    ) : (
+                                                        <img
+                                                            src={profileImage || 'https://placehold.co/72x72/F1F5F9/64748B?text=U'}
+                                                            alt={post?.user?.username || 'User'}
+                                                            className="w-12 h-12 rounded-full object-cover ring-1 ring-slate-200"
+                                                        />
+                                                    )}
                                                     <div className="min-w-0">
-                                                        <p className="font-semibold text-slate-900 leading-tight">
-                                                            {post?.user?.username || 'Unknown User'}
-                                                        </p>
+                                                        {postArtistProfilePath ? (
+                                                            <Link
+                                                                to={postArtistProfilePath}
+                                                                className="inline-block font-semibold text-slate-900 leading-tight hover:text-slate-700 transition-colors"
+                                                            >
+                                                                {post?.user?.username || 'Unknown User'}
+                                                            </Link>
+                                                        ) : hasPostUserId ? (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(event) => handleOpenArtistProfile(event, post.user)}
+                                                                className="inline-block font-semibold text-slate-900 leading-tight hover:text-slate-700 transition-colors text-left"
+                                                            >
+                                                                {post?.user?.username || 'Unknown User'}
+                                                            </button>
+                                                        ) : (
+                                                            <p className="font-semibold text-slate-900 leading-tight">
+                                                                {post?.user?.username || 'Unknown User'}
+                                                            </p>
+                                                        )}
                                                         <p className="text-xs text-slate-500 mt-0.5">
                                                             {userRole ? `${userRole} · ` : ''}{formatTimeAgo(post.created_at)} ago
                                                         </p>
@@ -443,15 +547,55 @@ function HomePage() {
                                                         <div className="space-y-2">
                                                             {comments.map(comment => {
                                                                 const commentAvatar = normalizeMediaUrl(comment?.user?.profile_picture);
+                                                                const hasCommentUserId = Boolean(comment?.user?.id);
+                                                                const commentArtistProfilePath = comment?.user?.artist_profile_id
+                                                                    ? `/artists/${comment.user.artist_profile_id}`
+                                                                    : null;
                                                                 return (
                                                                     <div key={comment.id} className="bg-white rounded-lg border border-slate-100 p-3">
                                                                         <div className="flex items-center gap-2 mb-1">
-                                                                            <img
-                                                                                src={commentAvatar || 'https://placehold.co/40x40/E2E8F0/64748B?text=U'}
-                                                                                alt={comment?.user?.username || 'User'}
-                                                                                className="w-7 h-7 rounded-full object-cover"
-                                                                            />
-                                                                            <p className="text-xs font-semibold text-slate-800">{comment?.user?.username || 'User'}</p>
+                                                                            {commentArtistProfilePath ? (
+                                                                                <Link to={commentArtistProfilePath} className="inline-flex rounded-full">
+                                                                                    <img
+                                                                                        src={commentAvatar || 'https://placehold.co/40x40/E2E8F0/64748B?text=U'}
+                                                                                        alt={comment?.user?.username || 'User'}
+                                                                                        className="w-7 h-7 rounded-full object-cover"
+                                                                                    />
+                                                                                </Link>
+                                                                            ) : hasCommentUserId ? (
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={(event) => handleOpenArtistProfile(event, comment.user)}
+                                                                                    className="inline-flex rounded-full"
+                                                                                >
+                                                                                    <img
+                                                                                        src={commentAvatar || 'https://placehold.co/40x40/E2E8F0/64748B?text=U'}
+                                                                                        alt={comment?.user?.username || 'User'}
+                                                                                        className="w-7 h-7 rounded-full object-cover"
+                                                                                    />
+                                                                                </button>
+                                                                            ) : (
+                                                                                <img
+                                                                                    src={commentAvatar || 'https://placehold.co/40x40/E2E8F0/64748B?text=U'}
+                                                                                    alt={comment?.user?.username || 'User'}
+                                                                                    className="w-7 h-7 rounded-full object-cover"
+                                                                                />
+                                                                            )}
+                                                                            {commentArtistProfilePath ? (
+                                                                                <Link to={commentArtistProfilePath} className="text-xs font-semibold text-slate-800 hover:text-slate-600 transition-colors">
+                                                                                    {comment?.user?.username || 'User'}
+                                                                                </Link>
+                                                                            ) : hasCommentUserId ? (
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={(event) => handleOpenArtistProfile(event, comment.user)}
+                                                                                    className="text-xs font-semibold text-slate-800 hover:text-slate-600 transition-colors text-left"
+                                                                                >
+                                                                                    {comment?.user?.username || 'User'}
+                                                                                </button>
+                                                                            ) : (
+                                                                                <p className="text-xs font-semibold text-slate-800">{comment?.user?.username || 'User'}</p>
+                                                                            )}
                                                                         </div>
                                                                         <p className="text-sm text-slate-700 whitespace-pre-wrap">{comment.content}</p>
                                                                     </div>
@@ -477,8 +621,8 @@ function HomePage() {
                         <div className="bg-white/90 border border-slate-100 rounded-2xl p-5">
                             <h2 className="text-sm uppercase tracking-wider text-slate-400 font-semibold">Quick Navigation</h2>
                             <div className="mt-3 space-y-2">
-                                <Link to="/offerings" className="block rounded-lg border border-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-                                    Browse offerings
+                                <Link to="/services" className="block rounded-lg border border-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                                    Browse services
                                 </Link>
                                 <Link to="/services" className="block rounded-lg border border-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
                                     Service marketplace

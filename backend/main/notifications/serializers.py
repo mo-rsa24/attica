@@ -31,4 +31,8 @@ class NotificationSerializer(serializers.ModelSerializer):
             return f'/dm/{obj.link_id}'
         elif obj.link_type == 'booking' and obj.link_id:
             return f'/bookings/{obj.link_id}'
+        elif obj.link_type == 'confirmed_booking' and obj.link_id:
+            return f'/booking-detail/{obj.link_id}'
+        elif obj.link_type == 'booking_request' and obj.link_id:
+            return f'/booking-request/{obj.link_id}'
         return None

@@ -6,17 +6,17 @@ export const ROLE_WORKSPACE_CONFIG = {
     },
     ARTIST: {
         myLabel: 'My Bookings',
-        createLabel: 'Create Gig Guide',
+        createLabel: 'Create tour guide',
         createRoute: '/create/artist',
     },
     SERVICE_PROVIDER: {
         myLabel: 'My Offering',
-        createLabel: 'Add Offering',
+        createLabel: 'Create offering',
         createRoute: '/create/service',
     },
     VENUE_MANAGER: {
         myLabel: 'My Venues',
-        createLabel: 'Add Venue',
+        createLabel: 'Provide new venue',
         createRoute: '/create/venue',
     },
     // Legacy aliases (for older seeded role names)
@@ -27,12 +27,12 @@ export const ROLE_WORKSPACE_CONFIG = {
     },
     VENDOR: {
         myLabel: 'My Offering',
-        createLabel: 'Add Offering',
+        createLabel: 'Create offering',
         createRoute: '/create/service',
     },
     VENUE: {
         myLabel: 'My Venues',
-        createLabel: 'Add Venue',
+        createLabel: 'Provide new venue',
         createRoute: '/create/venue',
     },
 };

@@ -80,6 +80,9 @@ class EventSerializer(serializers.ModelSerializer):
 
             # 3. Audience & Access Controls
             'is_age_restricted', 'access_type', 'custom_questions',
+
+            # 4. Event features / amenities
+            'features',
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'status', 'published_at']
 
@@ -133,6 +136,7 @@ class EventListSerializer(EventSerializer):
         fields = EventSerializer.Meta.fields + ['location_detail', 'distance_km']
 
 class EventDraftSerializer(serializers.ModelSerializer):
+    assets = serializers.SerializerMethodField()
     organizer_id = serializers.IntegerField(source="organizer.id", read_only=True)
 
     class Meta:
@@ -143,6 +147,7 @@ class EventDraftSerializer(serializers.ModelSerializer):
             "status",
             "current_step",
             "data",
+            "assets",
             "created_at",
             "updated_at",
             "published_at",
@@ -156,6 +161,49 @@ class EventDraftSerializer(serializers.ModelSerializer):
         if not isinstance(value, dict):
             raise serializers.ValidationError("Event data must be an object.")
         return value
+
+    def get_assets(self, obj):
+        serializer = EventDraftAssetSerializer(
+            obj.assets.all(),
+            many=True,
+            context=self.context,
+        )
+        return serializer.data
+
+
+class EventDraftAssetSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+    is_image = serializers.SerializerMethodField()
+    is_video = serializers.SerializerMethodField()
+
+    class Meta:
+        model = EventDraft._meta.get_field("assets").related_model
+        fields = [
+            "id",
+            "asset_type",
+            "name",
+            "mime_type",
+            "size",
+            "file_url",
+            "is_image",
+            "is_video",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+    def get_file_url(self, obj):
+        if not obj.file:
+            return None
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(obj.file.url)
+        return obj.file.url
+
+    def get_is_image(self, obj):
+        return bool(obj.mime_type and obj.mime_type.startswith("image/"))
+
+    def get_is_video(self, obj):
+        return bool(obj.mime_type and obj.mime_type.startswith("video/"))
 
 class MyEventSummarySerializer(serializers.Serializer):
     """

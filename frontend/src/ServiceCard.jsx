@@ -18,7 +18,7 @@ const StarRating = ({ rating }) => {
     );
 };
 
-function ServiceCard({ service }) {
+function ServiceCard({ service, eventId }) {
   const navigate = useNavigate();
   const { tokens } = useAuth();
   const [liked, setLiked] = useState(Boolean(service?.liked));
@@ -65,7 +65,7 @@ function ServiceCard({ service }) {
 
   return (
     <div
-      onClick={() => navigate(`/services/${service.id}`)}
+      onClick={() => navigate(eventId ? `/services/${service.id}?event=${eventId}` : `/services/${service.id}`)}
       className="group relative block cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
     >
       <div className="relative">

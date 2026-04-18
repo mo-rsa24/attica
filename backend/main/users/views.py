@@ -112,6 +112,10 @@ class UserProfileView(APIView):
                     request.user.profile_picture = uploaded_picture
                     request.user.save(update_fields=['profile_picture'])
 
+                    # Keep artist profile avatars aligned with the latest account avatar.
+                    from artists.models import Artist
+                    Artist.objects.filter(user=request.user).update(profile_image=request.user.profile_picture.name)
+
                 final_serializer = UserProfileSerializer(profile)
                 return Response(final_serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -125,16 +129,40 @@ class SocialPostListCreateAPIView(generics.ListCreateAPIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get_queryset(self):
-        return (
+        queryset = (
             SocialPost.objects
             .select_related("user")
-            .prefetch_related("user__roles", "likes")
+            .prefetch_related("user__roles", "user__artist_profile", "likes")
             .annotate(
                 likes_total=Count("likes", distinct=True),
                 comments_total=Count("comments", distinct=True),
             )
             .order_by("-created_at")
         )
+
+        artist_profile_id = self.request.query_params.get("artist_profile_id") or self.request.query_params.get("artist_id")
+        if artist_profile_id is not None:
+            try:
+                queryset = queryset.filter(user__artist_profile__id=int(artist_profile_id))
+            except (TypeError, ValueError):
+                return queryset.none()
+
+        user_id = self.request.query_params.get("user_id")
+        if user_id is not None:
+            try:
+                queryset = queryset.filter(user_id=int(user_id))
+            except (TypeError, ValueError):
+                return queryset.none()
+
+        # Filter to only posts from artists the current user follows
+        if self.request.query_params.get("following") == "true" and self.request.user.is_authenticated:
+            from artists.models import Follow
+            followed_artist_ids = Follow.objects.filter(
+                user=self.request.user
+            ).values_list('artist__user_id', flat=True)
+            queryset = queryset.filter(user_id__in=followed_artist_ids)
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
         try:
@@ -181,6 +209,18 @@ class SocialPostLikeToggleAPIView(APIView):
         else:
             post.likes.add(request.user)
             liked = True
+            # Notify the post author
+            if post.user_id != request.user.id:
+                from notifications.models import Notification
+                Notification.objects.create(
+                    recipient_id=post.user_id,
+                    sender=request.user,
+                    notification_type=Notification.NotificationType.POST_LIKED,
+                    title=f'{request.user.username} liked your post',
+                    message=(post.text or '')[:120],
+                    link_type='post',
+                    link_id=post.id,
+                )
 
         return Response(
             {
@@ -219,10 +259,32 @@ class SocialPostCommentListCreateAPIView(generics.ListCreateAPIView):
             SocialPostComment.objects
             .filter(post_id=post_id)
             .select_related("user", "post")
-            .prefetch_related("user__roles")
+            .prefetch_related("user__roles", "user__artist_profile")
             .order_by("-created_at")
         )
 
     def perform_create(self, serializer):
         post = get_object_or_404(SocialPost, pk=self.kwargs["pk"])
-        serializer.save(post=post, user=self.request.user)
+        comment = serializer.save(post=post, user=self.request.user)
+        # Notify the post author
+        if post.user_id != self.request.user.id:
+            from notifications.models import Notification
+            Notification.objects.create(
+                recipient_id=post.user_id,
+                sender=self.request.user,
+                notification_type=Notification.NotificationType.POST_COMMENTED,
+                title=f'{self.request.user.username} commented on your post',
+                message=(comment.text or '')[:120],
+                link_type='post',
+                link_id=post.id,
+            )
+
+
+class PublicUserProfileAPIView(generics.RetrieveAPIView):
+    """Public profile for any user (organizer, artist, etc.)."""
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = CustomUser.objects.prefetch_related('roles')
+
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), pk=self.kwargs['pk'])

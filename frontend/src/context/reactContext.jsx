@@ -5,11 +5,22 @@ import React, {
     useEffect,
     useMemo,
     useReducer,
-    useRef
+    useRef,
+    useState,
 } from 'react';
 import { useAuth } from '../AuthContext';
 const LOCAL_STORAGE_KEY = 'eventCreationStore';
 const STEP_SEQUENCE = ['step1', 'step3', 'step4', 'step5', 'step6', 'step7', 'step8', 'review'];
+
+/**
+ * Returns the wizard progress as a percentage (0–100) for the given step key.
+ * All step components import this to render a consistent progress bar.
+ */
+export function getStepProgress(step) {
+    const idx = STEP_SEQUENCE.indexOf(step);
+    if (idx === -1) return 0;
+    return Math.round(((idx + 1) / STEP_SEQUENCE.length) * 100);
+}
 
 const initialState = {
     event: null,
@@ -34,19 +45,19 @@ const STEP_VALIDATORS = {
         data?.eventDetails?.eventName ||
         data?.event?.name
     ),
-    step3: (data) => (data?.selectedLocations?.length || data?.steps?.step3?.selectedLocations?.length),
+    step3: () => true, // Step 3 always valid — booking requests can be pending
     step4: (data) => Boolean(data?.eventDetails?.location || data?.steps?.step4?.location),
     step5: (data) => Boolean(data?.steps?.step5),
 };
 
 const STEP_FIELD_WHITELIST = {
     step1: ['name', 'notes', 'category', 'theme', 'start_date', 'end_date', 'start_time', 'end_time', 'guest_count', 'date'],
-    step3: ['location'],
+    step3: ['location', 'bookingRequestIds'],
     step4: ['location'],
     step5: ['budget', 'guest_count'],
     step6: ['base_price', 'currency', 'tiered_prices'],
     step7: ['refund_policy', 'access_type', 'is_age_restricted', 'custom_questions'],
-    step8: ['image_url', 'banner_image', 'uploads'],
+    step8: ['image_url', 'banner_image'],
 };
 
 const mergeStepMaps = (...maps) => maps.reduce((acc, map) => {
@@ -182,9 +193,12 @@ export const EventCreationProvider = ({ children }) => {
     }, [state]);
 
     const authFetch = useCallback((url, options = {}) => {
+        const requestHeaders = { ...(options.headers || {}) };
+        const hasContentType = Object.keys(requestHeaders).some((key) => key.toLowerCase() === 'content-type');
+        const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
         const headers = {
-            'Content-Type': 'application/json',
-            ...(options.headers || {}),
+            ...(!isFormData && !hasContentType ? { 'Content-Type': 'application/json' } : {}),
+            ...requestHeaders,
         };
         if (tokens?.access) {
             headers.Authorization = `Bearer ${tokens.access}`;
@@ -271,6 +285,24 @@ export const EventCreationProvider = ({ children }) => {
         [setStepData],
     );
 
+    // Booking requests for the current draft — shared across wizard steps.
+    const [bookingRequests, setBookingRequests] = useState([]);
+    const bookingRequestsLoadedForRef = useRef(null);
+
+    const refreshBookingRequests = useCallback(async (draftId) => {
+        if (!draftId || !tokens?.access) return;
+        try {
+            const res = await authFetch(`/api/scheduling/requests/?event_draft_id=${draftId}`);
+            if (!res.ok) return;
+            const payload = await res.json();
+            const list = Array.isArray(payload) ? payload : (payload?.results || []);
+            setBookingRequests(list);
+            bookingRequestsLoadedForRef.current = draftId;
+        } catch {
+            // non-fatal
+        }
+    }, [authFetch, tokens?.access]);
+
     const loadEvent = useCallback(async (id) => {
         if (!id) return null;
         dispatch({ type: 'setLoading', payload: true });
@@ -308,6 +340,66 @@ export const EventCreationProvider = ({ children }) => {
             dispatch({ type: 'setLoading', payload: false });
         }
     }, [authFetch]);
+
+    const uploadDraftAsset = useCallback(async (draftId, file, assetType, currentStep = state.current_step) => {
+        if (!draftId || !file || !assetType) {
+            return { ok: false, error: 'Missing draft id, file, or asset type.' };
+        }
+
+        dispatch({ type: 'setSaving', payload: true });
+        dispatch({ type: 'setError', payload: null });
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('asset_type', assetType);
+            if (currentStep) {
+                formData.append('current_step', currentStep);
+            }
+
+            const response = await authFetch(`/api/events/event-drafts/${draftId}/assets/`, {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                throw new Error('Failed to upload draft asset.');
+            }
+
+            const refreshedDraft = await loadEvent(draftId);
+            return { ok: true, data: refreshedDraft };
+        } catch (error) {
+            console.error(error);
+            dispatch({ type: 'setError', payload: 'Upload failed. Try again.' });
+            return { ok: false, error: error.message };
+        } finally {
+            dispatch({ type: 'setSaving', payload: false });
+        }
+    }, [authFetch, loadEvent, state.current_step]);
+
+    const deleteDraftAsset = useCallback(async (draftId, assetId) => {
+        if (!draftId || !assetId) {
+            return { ok: false, error: 'Missing draft id or asset id.' };
+        }
+
+        dispatch({ type: 'setSaving', payload: true });
+        dispatch({ type: 'setError', payload: null });
+        try {
+            const response = await authFetch(`/api/events/event-drafts/${draftId}/assets/${assetId}/`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error('Failed to delete draft asset.');
+            }
+
+            const refreshedDraft = await loadEvent(draftId);
+            return { ok: true, data: refreshedDraft };
+        } catch (error) {
+            console.error(error);
+            dispatch({ type: 'setError', payload: 'Could not remove that file.' });
+            return { ok: false, error: error.message };
+        } finally {
+            dispatch({ type: 'setSaving', payload: false });
+        }
+    }, [authFetch, loadEvent]);
 
     const saveStep = useCallback(async (id, step, payload, nextStep) => {
         const normalizedStep = step || state.current_step;
@@ -440,6 +532,8 @@ export const EventCreationProvider = ({ children }) => {
         getStepData,
         setStepData,
         loadEvent,
+        uploadDraftAsset,
+        deleteDraftAsset,
         saveStep,
         saveAndExit,
         publish,
@@ -447,6 +541,9 @@ export const EventCreationProvider = ({ children }) => {
         getNextStep,
         getPreviousStep,
         setCurrentStep,
+        bookingRequests,
+        setBookingRequests,
+        refreshBookingRequests,
     };
 
     return (

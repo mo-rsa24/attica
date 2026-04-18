@@ -21,6 +21,24 @@ const normalizeMediaUrl = (url) => {
     }
     return `/media/${url.replace(/^\/+/, '')}`;
 };
+const DEFAULT_PROFILE_PICTURE_NAMES = new Set([
+    'default_profile.jpg',
+    'default_profile.jpeg',
+    'default_profile.png',
+]);
+const isPlaceholderProfilePicture = (url) => {
+    if (!url || typeof url !== 'string') return true;
+    const trimmed = url.trim();
+    if (!trimmed) return true;
+    if (trimmed.includes('placehold.co/')) return true;
+    const withoutQuery = trimmed.split('?')[0];
+    const fileName = withoutQuery.split('/').pop()?.toLowerCase() || '';
+    return DEFAULT_PROFILE_PICTURE_NAMES.has(fileName);
+};
+const pickBestProfilePicture = (...candidates) => {
+    const valid = candidates.find((candidate) => !isPlaceholderProfilePicture(candidate));
+    return valid ?? candidates.find((candidate) => typeof candidate === 'string' && candidate.trim()) ?? null;
+};
 const withCacheBust = (url) => {
     if (!url) return url;
     if (url.startsWith('blob:') || url.startsWith('data:')) return url;
@@ -150,10 +168,10 @@ const ProfilePage = () => {
                 const last_name = data?.last_name ?? data?.user?.last_name ?? '';
                 const email = data?.email ?? data?.user?.email ?? '';
                 const bio = data?.bio ?? '';
-                const profile_picture =
-                    data?.profile_picture ??
-                    data?.user?.profile_picture ??
-                    null;
+                const profile_picture = pickBestProfilePicture(
+                    data?.user?.profile_picture,
+                    data?.profile_picture,
+                );
                 const normalizedPicture = normalizeMediaUrl(profile_picture);
                 const bustedPicture = withCacheBust(normalizedPicture);
 
@@ -247,7 +265,7 @@ const ProfilePage = () => {
         };
 
         fetchProfile();
-    }, [tokens, isArtistRole, isVenueRole, user?.id]);
+    }, [tokens, isArtistRole, isVenueRole, user?.id, setUser]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -496,11 +514,12 @@ const ProfilePage = () => {
             const last_name = data?.last_name ?? data?.user?.last_name ?? profileData.last_name;
             const email = data?.email ?? data?.user?.email ?? profileData.email;
             const bio = data?.bio ?? profileData.bio;
-            const profile_picture =
-                data?.profile_picture ??
-                data?.user?.profile_picture ??
-                profileData.profile_picture ??
-                null;
+            const profile_picture = pickBestProfilePicture(
+                data?.user?.profile_picture,
+                data?.profile_picture,
+                profileData.profile_picture,
+                user?.profile_picture,
+            );
             const normalizedPicture = normalizeMediaUrl(profile_picture);
             const bustedPicture = withCacheBust(normalizedPicture);
             // Keep the freshly selected local image visible immediately after save.

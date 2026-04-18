@@ -146,7 +146,23 @@ export default function EventListingPage() {
                         </div>
                     </section>
 
-                     <section id="faqs">
+                     {event.features && event.features.length > 0 && (
+                        <section id="features" className="mb-12">
+                            <h2 className="text-3xl font-bold mb-6">What's Included</h2>
+                            <div className="flex flex-wrap gap-3">
+                                {event.features.map((feature) => (
+                                    <span
+                                        key={feature}
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-pink-50 border border-pink-200 text-pink-800 text-sm font-semibold rounded-full"
+                                    >
+                                        {feature}
+                                    </span>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    <section id="faqs">
                         <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
                         <div className="space-y-2">
                            {faqs.map((faq, index) => (

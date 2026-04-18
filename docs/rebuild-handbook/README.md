@@ -26,6 +26,7 @@ The system behind this handbook is a role-based marketplace and event platform b
 12. [12 JavaScript ES6 and Async Patterns](./12-javascript-es6-and-async-patterns.md) — **NEW**
 13. [13 Design Patterns and Architectural Decisions](./13-design-patterns-and-architectural-decisions.md) — **NEW**
 14. [14 Python Patterns and Django Specifics](./14-python-patterns-and-django-specifics.md) — **NEW**
+15. [15 Operations and Production Concerns](./15-operations-and-production-concerns.md) — **NEW**
 
 ## How To Use This Handbook
 - Read chapters `01` and `02` first to build a system-wide map.
@@ -34,7 +35,7 @@ The system behind this handbook is a role-based marketplace and event platform b
 - Use [08](./08-realtime-and-user-feedback.md) and [09](./09-full-stack-integration-patterns.md) to connect the frontend and backend into a working whole.
 - Use [10](./10-minimal-learning-path.md) if you need the smallest viable curriculum.
 - Finish with [11](./11-reconstruction-mental-models.md) to convert understanding into engineering judgment.
-- Reference [12 JavaScript ES6 and Async Patterns](./12-javascript-es6-and-async-patterns.md), [13 Design Patterns and Architectural Decisions](./13-design-patterns-and-architectural-decisions.md), and [14 Python Patterns and Django Specifics](./14-python-patterns-and-django-specifics.md) as deep dives into language-specific and architectural concepts that appear throughout the codebase.
+- Reference [12 JavaScript ES6 and Async Patterns](./12-javascript-es6-and-async-patterns.md), [13 Design Patterns and Architectural Decisions](./13-design-patterns-and-architectural-decisions.md), [14 Python Patterns and Django Specifics](./14-python-patterns-and-django-specifics.md), and [15 Operations and Production Concerns](./15-operations-and-production-concerns.md) as deep dives into language-specific, architectural, and operational concepts.
 
 ## Pedagogical Table of Contents
 
@@ -116,5 +117,6 @@ The system behind this handbook is a role-based marketplace and event platform b
 - If React patterns feel weak, go directly to [03 Frontend Foundations](./03-frontend-foundations.md), then [12 JavaScript ES6 and Async Patterns](./12-javascript-es6-and-async-patterns.md).
 - If Django or DRF patterns feel weak, go directly to [04 Backend Foundations](./04-backend-foundations.md), then [14 Python Patterns and Django Specifics](./14-python-patterns-and-django-specifics.md).
 - If you want to understand the architectural reasoning behind decisions, read [13 Design Patterns and Architectural Decisions](./13-design-patterns-and-architectural-decisions.md).
+- If you're planning to deploy to production, read [15 Operations and Production Concerns](./15-operations-and-production-concerns.md) and [TECHNOLOGY-GAPS-AND-PRODUCTION-READINESS.md](../TECHNOLOGY-GAPS-AND-PRODUCTION-READINESS.md).
 - If the current work is booking-related, pair [06 Event Creation and Draft Workflows](./06-event-creation-and-draft-workflows.md) with [07 Scheduling and Booking Engine](./07-scheduling-and-booking-engine.md).
 - If the current work is messaging or alerts, pair [08 Realtime and User Feedback](./08-realtime-and-user-feedback.md) with [09 Full-Stack Integration Patterns](./09-full-stack-integration-patterns.md).

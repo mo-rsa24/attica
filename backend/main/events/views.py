@@ -1,15 +1,18 @@
 from rest_framework import viewsets, permissions, generics, status
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from .models import Event, PromoCode, EventDraft
 from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSerializer, PromoCodeSerializer, \
-    EventListSerializer, EventDraftSerializer, MyEventSummarySerializer
+    EventListSerializer, EventDraftSerializer, EventDraftAssetSerializer, MyEventSummarySerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.db import transaction
 from django.db.models.functions import Cos, Sin, Radians
 from django.db.models import F, Q
 from rest_framework.generics import get_object_or_404
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 def _enforce_published_guard(instance, validated_data):
     """Ensure published events stay published and keep their publish timestamp."""
@@ -229,8 +232,12 @@ class EventDraftViewSet(viewsets.ModelViewSet):
     queryset = EventDraft.objects.all()
     FIRST_STEP = "step1"
 
+    @staticmethod
+    def _draft_asset_model():
+        return EventDraft._meta.get_field("assets").related_model
+
     def get_queryset(self):
-        return self.queryset.filter(organizer=self.request.user)
+        return self.queryset.filter(organizer=self.request.user).prefetch_related("assets")
 
     def perform_create(self, serializer):
         serializer.save(
@@ -239,7 +246,7 @@ class EventDraftViewSet(viewsets.ModelViewSet):
         )
 
     def get_object(self):
-        obj = get_object_or_404(EventDraft, pk=self.kwargs["pk"])
+        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
         if obj.organizer != self.request.user:
             raise PermissionDenied("You do not have permission to access this event.")
         return obj
@@ -288,19 +295,238 @@ class EventDraftViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data)
 
+    @staticmethod
+    def _draft_steps(draft):
+        payload = draft.data if isinstance(draft.data, dict) else {}
+        steps = payload.get("steps")
+        if isinstance(steps, dict):
+            return steps
+        return {}
+
+    @staticmethod
+    def _draft_step(draft, step_key):
+        payload = draft.data if isinstance(draft.data, dict) else {}
+        steps = EventDraftViewSet._draft_steps(draft)
+        step_payload = steps.get(step_key)
+        if isinstance(step_payload, dict):
+            return step_payload
+        direct_payload = payload.get(step_key)
+        return direct_payload if isinstance(direct_payload, dict) else {}
+
+    @staticmethod
+    def _first_truthy(*values):
+        for value in values:
+            if value not in (None, ""):
+                return value
+        return None
+
+    @staticmethod
+    def _draft_assets(draft, asset_type=None):
+        queryset = draft.assets.all()
+        if asset_type:
+            queryset = queryset.filter(asset_type=asset_type)
+        return queryset.order_by("created_at", "id")
+
+    def _asset_url(self, asset, request=None):
+        if not asset or not asset.file:
+            return None
+        if request:
+            return request.build_absolute_uri(asset.file.url)
+        return asset.file.url
+
+    def _build_event_payload(self, draft, request=None):
+        from locations.models import Location
+
+        draft_asset_model = self._draft_asset_model()
+        step1 = self._draft_step(draft, "step1")
+        step3 = self._draft_step(draft, "step3")
+        step4 = self._draft_step(draft, "step4")
+        step5 = self._draft_step(draft, "step5")
+        step6 = self._draft_step(draft, "step6")
+        step7 = self._draft_step(draft, "step7")
+        step8 = self._draft_step(draft, "step8")
+        payload = draft.data if isinstance(draft.data, dict) else {}
+
+        start_dt = parse_datetime(str(self._first_truthy(step1.get("start_date"), payload.get("start_date")) or ""))
+        end_dt = parse_datetime(str(self._first_truthy(step1.get("end_date"), payload.get("end_date")) or ""))
+        date_value = self._first_truthy(step1.get("date"), payload.get("date"))
+        parsed_date = parse_date(str(date_value)) if date_value else None
+        event_date = parsed_date or (start_dt.date() if start_dt else timezone.localdate())
+
+        end_time_value = self._first_truthy(step1.get("end_time"), payload.get("end_time"))
+        parsed_end_time = None
+        if end_time_value:
+            parsed_end_time = parse_time(str(end_time_value))
+            if parsed_end_time is None:
+                parsed_end_dt = parse_datetime(str(end_time_value))
+                parsed_end_time = parsed_end_dt.time() if parsed_end_dt else None
+
+        location_id = self._first_truthy(
+            step3.get("location"),
+            step4.get("location_id"),
+            (step4.get("location") or {}).get("id") if isinstance(step4.get("location"), dict) else None,
+        )
+        location = None
+        if location_id:
+            location = Location.objects.filter(id=location_id).first()
+
+        media_assets = [
+            asset for asset in self._draft_assets(draft, draft_asset_model.AssetType.MEDIA)
+            if asset.mime_type.startswith("image/")
+        ]
+        primary_image_url = self._asset_url(media_assets[0], request) if media_assets else None
+        banner_image_url = self._asset_url(media_assets[1], request) if len(media_assets) > 1 else primary_image_url
+        seating_chart_asset = self._draft_assets(draft, draft_asset_model.AssetType.SEATING_CHART).last()
+        is_seated = bool(self._first_truthy(step5.get("is_seated"), payload.get("is_seated"), False))
+        seating_chart_name = seating_chart_asset.file.name if is_seated and seating_chart_asset and seating_chart_asset.file else None
+
+        event_payload = {
+            "location": location,
+            "name": self._first_truthy(step1.get("name"), step1.get("eventName"), payload.get("name"), payload.get("eventName"), "Untitled event"),
+            "date": event_date,
+            "start_date": start_dt,
+            "end_date": end_dt.date() if end_dt else None,
+            "start_time": start_dt or timezone.now(),
+            "end_time": parsed_end_time,
+            "venue": self._first_truthy((step4.get("location") or {}).get("name") if isinstance(step4.get("location"), dict) else None, payload.get("venue")),
+            "budget": self._first_truthy(step5.get("budget"), payload.get("budget")),
+            "guest_count": self._first_truthy(step1.get("guest_count"), step1.get("capacity"), payload.get("guest_count")),
+            "theme": self._first_truthy(step1.get("theme"), payload.get("theme")),
+            "notes": self._first_truthy(step1.get("notes"), step1.get("description"), payload.get("notes"), payload.get("description")),
+            "image_url": primary_image_url or self._first_truthy(step8.get("image_url"), payload.get("image_url")),
+            "banner_image": banner_image_url or self._first_truthy(step8.get("banner_image"), payload.get("banner_image")),
+            "category": self._first_truthy(step1.get("category"), step1.get("selectedEventType"), payload.get("category")),
+            "is_draft": False,
+            "status": "published",
+            "base_price": self._first_truthy(step5.get("base_price"), step6.get("base_price"), payload.get("base_price"), 0),
+            "currency": self._first_truthy(step5.get("currency"), step6.get("currency"), payload.get("currency"), "ZAR"),
+            "tiered_prices": self._first_truthy(step6.get("tiered_prices"), payload.get("tiered_prices")),
+            "refund_policy": self._first_truthy(step5.get("refund_policy"), step7.get("refund_policy"), payload.get("refund_policy")) or "",
+            "max_tickets_per_buyer": self._first_truthy(step5.get("max_tickets_per_buyer"), payload.get("max_tickets_per_buyer"), 10),
+            "is_seated": is_seated,
+            "is_age_restricted": bool(self._first_truthy(step5.get("is_age_restricted"), step7.get("is_age_restricted"), payload.get("is_age_restricted"), False)),
+            "access_type": self._first_truthy(step5.get("access_type"), step7.get("access_type"), payload.get("access_type"), "public"),
+            "custom_questions": self._first_truthy(step7.get("custom_questions"), payload.get("custom_questions")),
+            "features": step7.get("features") or payload.get("features") or None,
+        }
+        return event_payload, seating_chart_name
+
+    def _upsert_event_from_draft(self, draft, request=None, event=None):
+        event_payload, seating_chart_name = self._build_event_payload(draft, request=request)
+
+        if event is None:
+            if seating_chart_name:
+                event_payload["seating_chart"] = seating_chart_name
+            return Event.objects.create(
+                user=draft.organizer,
+                organizer=draft.organizer,
+                published_at=timezone.now(),
+                **event_payload,
+            )
+
+        for field, value in event_payload.items():
+            setattr(event, field, value)
+
+        event.seating_chart = seating_chart_name or None
+        if not event.published_at:
+            event.published_at = timezone.now()
+        event.save()
+        return event
+
+    @action(detail=True, methods=["post"], url_path="assets", parser_classes=[MultiPartParser, FormParser])
+    def upload_asset(self, request, *args, **kwargs):
+        draft = self.get_object()
+        draft_asset_model = self._draft_asset_model()
+        upload = request.FILES.get("file")
+        asset_type = request.data.get("asset_type")
+        current_step = request.data.get("current_step")
+
+        if upload is None:
+            raise ValidationError({"file": "A file is required."})
+        if asset_type not in draft_asset_model.AssetType.values:
+            raise ValidationError({"asset_type": "Unsupported asset type."})
+
+        mime_type = getattr(upload, "content_type", "") or ""
+        if asset_type == draft_asset_model.AssetType.MEDIA:
+            is_allowed_media = mime_type.startswith("image/") or mime_type.startswith("video/")
+            if not is_allowed_media:
+                raise ValidationError({"file": "Only image and video files are supported for media uploads."})
+        if asset_type == draft_asset_model.AssetType.SEATING_CHART:
+            is_allowed_seating_chart = mime_type == "application/pdf" or mime_type.startswith("image/")
+            if not is_allowed_seating_chart:
+                raise ValidationError({"file": "Seating charts must be a PDF or image file."})
+            draft.assets.filter(asset_type=draft_asset_model.AssetType.SEATING_CHART).delete()
+
+        draft_asset_model.objects.create(
+            draft=draft,
+            asset_type=asset_type,
+            name=upload.name,
+            file=upload,
+            mime_type=mime_type,
+            size=getattr(upload, "size", 0) or 0,
+        )
+
+        draft.updated_at = timezone.now()
+        update_fields = ["updated_at"]
+        if current_step:
+            draft.current_step = current_step
+            update_fields.append("current_step")
+        draft.save(update_fields=update_fields)
+
+        serializer = self.get_serializer(draft)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["delete"], url_path=r"assets/(?P<asset_id>[^/.]+)")
+    def delete_asset(self, request, asset_id=None, *args, **kwargs):
+        draft = self.get_object()
+        asset = get_object_or_404(draft.assets.all(), pk=asset_id)
+        asset.delete()
+        draft.updated_at = timezone.now()
+        draft.save(update_fields=["updated_at"])
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=True, methods=["post"], url_path="publish")
     def publish(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.organizer != request.user:
             return Response({"detail": "You do not have permission to publish this event."}, status=status.HTTP_403_FORBIDDEN)
 
-        if instance.status == EventDraft.Status.PUBLISHED:
-            return Response(self.get_serializer(instance).data)
+        with transaction.atomic():
+            instance.status = EventDraft.Status.PUBLISHED
+            if instance.published_at is None:
+                instance.published_at = timezone.now()
 
-        instance.status = EventDraft.Status.PUBLISHED
-        instance.published_at = timezone.now()
-        instance.save(update_fields=["status", "published_at", "updated_at"])
-        return Response(self.get_serializer(instance).data)
+            draft_payload = instance.data if isinstance(instance.data, dict) else {}
+            published_event_id = draft_payload.get("published_event_id")
+            event_id = request.data.get("event_id") or published_event_id
+
+            if event_id:
+                try:
+                    published_event = Event.objects.select_for_update().get(id=event_id, organizer=request.user)
+                    published_event = self._upsert_event_from_draft(instance, request=request, event=published_event)
+                except Event.DoesNotExist:
+                    published_event = self._upsert_event_from_draft(instance, request=request)
+            else:
+                published_event = self._upsert_event_from_draft(instance, request=request)
+
+            if not isinstance(draft_payload, dict):
+                draft_payload = {}
+            draft_payload["published_event_id"] = published_event.id
+            instance.data = draft_payload
+            instance.save(update_fields=["status", "published_at", "data", "updated_at"])
+
+            from scheduling.services import finalize_draft_bookings
+
+            finalize_summary = finalize_draft_bookings(
+                draft=instance,
+                published_event=published_event,
+                organizer=request.user,
+            )
+
+        response_payload = self.get_serializer(instance).data
+        response_payload["published_event_id"] = published_event.id
+        response_payload["booking_publish_summary"] = finalize_summary
+        return Response(response_payload)
 
 class MyEventsAPIView(generics.GenericAPIView):
     """

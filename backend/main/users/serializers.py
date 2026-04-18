@@ -103,6 +103,7 @@ class SocialPostUserSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field="name",
     )
+    artist_profile_id = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -111,7 +112,16 @@ class SocialPostUserSerializer(serializers.ModelSerializer):
             "username",
             "profile_picture",
             "roles",
+            "artist_profile_id",
         ]
+
+    def get_artist_profile_id(self, obj):
+        prefetched_artist_profiles = getattr(obj, "_prefetched_objects_cache", {}).get("artist_profile")
+        if prefetched_artist_profiles is not None:
+            return prefetched_artist_profiles[0].id if prefetched_artist_profiles else None
+
+        artist_profile_id = obj.artist_profile.order_by("id").values_list("id", flat=True).first()
+        return artist_profile_id
 
 
 class SocialPostCommentSerializer(serializers.ModelSerializer):

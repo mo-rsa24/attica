@@ -21,10 +21,12 @@ from .models import (
     BookingConflictIncident,
     Booking,
     BookingRequest,
+    CheckoutSession,
     MarketplaceResource,
     OutboxDeadLetter,
     OutboxEvent,
     ResourcePolicy,
+    Review,
     WebhookTarget,
 )
 from .permissions import IsSchedulingAdmin, can_manage_event, can_manage_resource, is_admin
@@ -38,27 +40,46 @@ from .serializers import (
     BookingSerializer,
     CalendarQuerySerializer,
     CancelBookingSerializer,
+    CheckoutSessionSerializer,
+    CompleteMockDepositSerializer,
+    CounterProposalSerializer,
     CreateBookingSerializer,
     CreateRequestSerializer,
+    EnrichedAvailabilitySearchQuerySerializer,
     MarketplaceResourceSerializer,
     OutboxDeadLetterSerializer,
     OutboxEventSerializer,
+    RefreshCheckoutSerializer,
+    ReleaseCheckoutSerializer,
     RequestReviewSerializer,
     ResourcePolicySerializer,
     RescheduleBookingSerializer,
+    ReviewSerializer,
+    StartCheckoutSerializer,
     WebhookTargetSerializer,
 )
 from .services import (
+    accept_counter,
     approve_request,
     build_calendar_view,
     cancel_booking,
+    complete_booking,
+    complete_checkout_mock_deposit,
+    counter_propose,
     create_booking,
     create_request,
     decline_request,
     get_scheduling_ops_summary,
+    nudge_organizer_checkout,
+    refresh_checkout_session,
+    reject_counter,
+    release_checkout_session,
     replay_dead_letter,
     reschedule_booking,
     search_availability,
+    search_availability_enriched,
+    start_checkout_session,
+    withdraw_request,
 )
 
 
@@ -86,10 +107,21 @@ class MarketplaceResourceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = self.queryset
         if is_admin(self.request.user):
-            return qs
-        if self.action in {"list", "retrieve"}:
-            return qs.filter(is_active=True)
-        return qs.filter(owner=self.request.user)
+            pass  # admins see all; apply optional filters below
+        elif self.action in {"list", "retrieve"}:
+            qs = qs.filter(is_active=True)
+        else:
+            qs = qs.filter(owner=self.request.user)
+
+        owner_id = self.request.query_params.get("owner_id")
+        if owner_id:
+            qs = qs.filter(owner_id=owner_id)
+
+        resource_type = self.request.query_params.get("resource_type")
+        if resource_type:
+            qs = qs.filter(resource_type=resource_type)
+
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -200,7 +232,18 @@ class AvailabilitySlotViewSet(viewsets.ModelViewSet):
 class BookingRequestViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = BookingRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = BookingRequest.objects.all().select_related("resource", "event", "organizer")
+    queryset = BookingRequest.objects.all().select_related(
+        "resource",
+        "resource__owner",
+        "resource__artist",
+        "resource__vendor",
+        "resource__venue",
+        "event",
+        "event__location",
+        "event_draft",
+        "organizer",
+        "checkout_session",
+    )
 
     def get_queryset(self):
         user = self.request.user
@@ -213,6 +256,7 @@ class BookingRequestViewSet(viewsets.ReadOnlyModelViewSet):
 
         status_filter = self.request.query_params.get("status")
         event_id = self.request.query_params.get("event")
+        event_draft_id = self.request.query_params.get("event_draft_id") or self.request.query_params.get("event_draft")
         resource_id = self.request.query_params.get("resource")
         role = self.request.query_params.get("role")
 
@@ -220,6 +264,8 @@ class BookingRequestViewSet(viewsets.ReadOnlyModelViewSet):
             qs = qs.filter(status=status_filter)
         if event_id:
             qs = qs.filter(event_id=event_id)
+        if event_draft_id:
+            qs = qs.filter(event_draft_id=event_draft_id)
         if resource_id:
             qs = qs.filter(resource_id=resource_id)
         if role == "organizer":
@@ -232,7 +278,7 @@ class BookingRequestViewSet(viewsets.ReadOnlyModelViewSet):
 class BookingViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Booking.objects.all().select_related("resource", "event", "organizer")
+    queryset = Booking.objects.all().select_related("resource", "resource__owner", "event", "organizer")
 
     def get_queryset(self):
         user = self.request.user
@@ -411,9 +457,24 @@ class CreateRequestAPIView(BaseSchedulingAPIView):
         serializer.is_valid(raise_exception=True)
         payload = serializer.validated_data
 
-        event = get_object_or_404(Event, id=payload["event_id"])
-        if not can_manage_event(request.user, event):
-            raise PermissionDenied("You do not have permission to create a request for this event.")
+        event = None
+        event_draft = None
+
+        if payload.get("event_id"):
+            from events.models import Event as EventModel
+            event = get_object_or_404(EventModel, id=payload["event_id"])
+            if not can_manage_event(request.user, event):
+                raise PermissionDenied("You do not have permission to create a request for this event.")
+        elif payload.get("event_draft_id"):
+            from events.models import EventDraft
+            event_draft = get_object_or_404(EventDraft, id=payload["event_draft_id"])
+            if event_draft.organizer_id != request.user.id:
+                raise PermissionDenied("You do not have permission to create a request for this event draft.")
+        else:
+            return Response(
+                {"detail": "Either event_id or event_draft_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         resource = get_object_or_404(MarketplaceResource, id=payload["resource_id"], is_active=True)
         idempotency_key = request.headers.get("Idempotency-Key")
@@ -422,6 +483,7 @@ class CreateRequestAPIView(BaseSchedulingAPIView):
             booking_request, created = create_request(
                 organizer=request.user,
                 event=event,
+                event_draft=event_draft,
                 resource=resource,
                 start_at=payload["start_at"],
                 end_at=payload["end_at"],
@@ -436,6 +498,150 @@ class CreateRequestAPIView(BaseSchedulingAPIView):
         return Response(output, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 
+class CheckoutSessionDetailAPIView(BaseSchedulingAPIView):
+    """GET /checkout-sessions/<id>/ — retrieve a session the caller owns or is a participant of."""
+
+    def get(self, request, checkout_session_id: int):
+        session = get_object_or_404(CheckoutSession, id=checkout_session_id)
+        if session.organizer_id != request.user.id and not is_admin(request.user):
+            raise PermissionDenied("You do not have permission to view this checkout session.")
+        output = CheckoutSessionSerializer(
+            CheckoutSession.objects.prefetch_related("booking_requests__resource").get(id=session.id)
+        ).data
+        return Response(output)
+
+
+class CheckoutSessionListAPIView(BaseSchedulingAPIView):
+    """GET /checkout-sessions/?event_draft_id=<id> — list sessions for a draft."""
+
+    def get(self, request):
+        event_draft_id = request.query_params.get("event_draft_id")
+        if not event_draft_id:
+            return Response({"detail": "event_draft_id query param is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        from events.models import EventDraft
+
+        event_draft = get_object_or_404(EventDraft, id=event_draft_id)
+        if event_draft.organizer_id != request.user.id and not is_admin(request.user):
+            raise PermissionDenied("You do not have permission to view sessions for this draft.")
+
+        sessions = (
+            CheckoutSession.objects.prefetch_related("booking_requests__resource")
+            .filter(event_draft=event_draft)
+            .order_by("-created_at")
+        )
+        return Response(CheckoutSessionSerializer(sessions, many=True).data)
+
+
+class StartCheckoutAPIView(BaseSchedulingAPIView):
+    def post(self, request):
+        serializer = StartCheckoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payload = serializer.validated_data
+
+        from events.models import EventDraft
+
+        event_draft = get_object_or_404(EventDraft, id=payload["event_draft_id"])
+        if event_draft.organizer_id != request.user.id:
+            raise PermissionDenied("You do not have permission to start checkout for this draft.")
+
+        idempotency_key = request.headers.get("Idempotency-Key")
+        try:
+            checkout_session, created = start_checkout_session(
+                organizer=request.user,
+                event_draft=event_draft,
+                request_ids=payload["request_ids"],
+                idempotency_key=idempotency_key,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        output = CheckoutSessionSerializer(
+            CheckoutSession.objects.prefetch_related("booking_requests__resource").get(id=checkout_session.id)
+        ).data
+        return Response(output, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+class RefreshCheckoutAPIView(BaseSchedulingAPIView):
+    def post(self, request, checkout_session_id: int):
+        serializer = RefreshCheckoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        checkout_session = get_object_or_404(CheckoutSession, id=checkout_session_id)
+        if checkout_session.organizer_id != request.user.id:
+            raise PermissionDenied("You do not have permission to refresh this checkout session.")
+
+        idempotency_key = request.headers.get("Idempotency-Key")
+        try:
+            refreshed = refresh_checkout_session(
+                organizer=request.user,
+                checkout_session=checkout_session,
+                idempotency_key=idempotency_key,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        output = CheckoutSessionSerializer(
+            CheckoutSession.objects.prefetch_related("booking_requests__resource").get(id=refreshed.id)
+        ).data
+        return Response(output)
+
+
+class CompleteMockDepositAPIView(BaseSchedulingAPIView):
+    def post(self, request, checkout_session_id: int):
+        serializer = CompleteMockDepositSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        checkout_session = get_object_or_404(CheckoutSession, id=checkout_session_id)
+        if checkout_session.organizer_id != request.user.id:
+            raise PermissionDenied("You do not have permission to pay for this checkout session.")
+
+        idempotency_key = request.headers.get("Idempotency-Key")
+        try:
+            updated = complete_checkout_mock_deposit(
+                organizer=request.user,
+                checkout_session=checkout_session,
+                card_brand=serializer.validated_data["card_brand"],
+                card_last4=serializer.validated_data["card_last4"],
+                card_expiry_month=serializer.validated_data["card_expiry_month"],
+                card_expiry_year=serializer.validated_data["card_expiry_year"],
+                mock_payment_reference=serializer.validated_data.get("mock_payment_reference"),
+                idempotency_key=idempotency_key,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        output = CheckoutSessionSerializer(
+            CheckoutSession.objects.prefetch_related("booking_requests__resource").get(id=updated.id)
+        ).data
+        return Response(output)
+
+
+class ReleaseCheckoutAPIView(BaseSchedulingAPIView):
+    def post(self, request, checkout_session_id: int):
+        serializer = ReleaseCheckoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        checkout_session = get_object_or_404(CheckoutSession, id=checkout_session_id)
+        if checkout_session.organizer_id != request.user.id:
+            raise PermissionDenied("You do not have permission to release this checkout session.")
+
+        idempotency_key = request.headers.get("Idempotency-Key")
+        try:
+            updated = release_checkout_session(
+                actor=request.user,
+                checkout_session=checkout_session,
+                idempotency_key=idempotency_key,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        output = CheckoutSessionSerializer(
+            CheckoutSession.objects.prefetch_related("booking_requests__resource").get(id=updated.id)
+        ).data
+        return Response(output)
+
+
 class ApproveRequestAPIView(BaseSchedulingAPIView):
     def post(self, request, request_id: int):
         booking_request = get_object_or_404(BookingRequest.objects.select_related("resource"), id=request_id)
@@ -445,11 +651,13 @@ class ApproveRequestAPIView(BaseSchedulingAPIView):
         serializer = RequestReviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        idempotency_key = request.headers.get("Idempotency-Key")
         try:
             updated_request, booking = approve_request(
                 reviewer=request.user,
                 booking_request=booking_request,
                 provider_message=serializer.validated_data["provider_message"],
+                idempotency_key=idempotency_key,
             )
         except Exception as exc:
             return self._error_response(exc)
@@ -457,7 +665,7 @@ class ApproveRequestAPIView(BaseSchedulingAPIView):
         return Response(
             {
                 "request": BookingRequestSerializer(updated_request).data,
-                "booking": BookingSerializer(booking).data,
+                "booking": BookingSerializer(booking).data if booking else None,
             }
         )
 
@@ -471,11 +679,13 @@ class DeclineRequestAPIView(BaseSchedulingAPIView):
         serializer = RequestReviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        idempotency_key = request.headers.get("Idempotency-Key")
         try:
             updated_request = decline_request(
                 reviewer=request.user,
                 booking_request=booking_request,
                 provider_message=serializer.validated_data["provider_message"],
+                idempotency_key=idempotency_key,
             )
         except Exception as exc:
             return self._error_response(exc)
@@ -506,11 +716,13 @@ class CancelBookingAPIView(BaseSchedulingAPIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+        idempotency_key = request.headers.get("Idempotency-Key")
         try:
             updated_booking = cancel_booking(
                 actor=request.user,
                 booking=booking,
                 reason=serializer.validated_data["reason"],
+                idempotency_key=idempotency_key,
             )
         except Exception as exc:
             return self._error_response(exc)
@@ -550,6 +762,111 @@ class RescheduleBookingAPIView(BaseSchedulingAPIView):
         return Response(BookingSerializer(updated_booking).data)
 
 
+class CounterProposalAPIView(BaseSchedulingAPIView):
+    """Provider submits a counter-proposal (revised time/rate) on a PENDING request."""
+
+    def post(self, request, request_id: int):
+        booking_request = get_object_or_404(BookingRequest.objects.select_related("resource"), id=request_id)
+        if not can_manage_resource(request.user, booking_request.resource):
+            raise PermissionDenied("You do not have permission to counter-propose on this request.")
+
+        serializer = CounterProposalSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        idempotency_key = request.headers.get("Idempotency-Key")
+        try:
+            updated_request = counter_propose(
+                reviewer=request.user,
+                booking_request=booking_request,
+                counter_start_at=serializer.validated_data["counter_start_at"],
+                counter_end_at=serializer.validated_data["counter_end_at"],
+                counter_rate=serializer.validated_data.get("counter_rate"),
+                counter_message=serializer.validated_data.get("counter_message", ""),
+                idempotency_key=idempotency_key,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        return Response(BookingRequestSerializer(updated_request).data)
+
+
+class AcceptCounterAPIView(BaseSchedulingAPIView):
+    """Organizer accepts a counter-proposal; creates a confirmed Booking using counter times."""
+
+    def post(self, request, request_id: int):
+        booking_request = get_object_or_404(
+            BookingRequest.objects.select_related("resource", "organizer"), id=request_id
+        )
+        if booking_request.organizer_id != request.user.id:
+            raise PermissionDenied("Only the organizer who made this request can accept a counter.")
+
+        try:
+            updated_request, booking = accept_counter(
+                organizer=request.user,
+                booking_request=booking_request,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        return Response(
+            {
+                "request": BookingRequestSerializer(updated_request).data,
+                "booking": BookingSerializer(booking).data if booking else None,
+            }
+        )
+
+
+class RejectCounterAPIView(BaseSchedulingAPIView):
+    """Organizer rejects a counter-proposal; transitions the request to DECLINED."""
+
+    def post(self, request, request_id: int):
+        booking_request = get_object_or_404(
+            BookingRequest.objects.select_related("resource", "organizer"), id=request_id
+        )
+        if booking_request.organizer_id != request.user.id:
+            raise PermissionDenied("Only the organizer who made this request can reject a counter.")
+
+        message = request.data.get("message", "")
+        try:
+            updated_request = reject_counter(
+                organizer=request.user,
+                booking_request=booking_request,
+                message=message,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        return Response(BookingRequestSerializer(updated_request).data)
+
+
+class AvailabilitySearchEnrichedAPIView(BaseSchedulingAPIView):
+    """
+    Enriched availability search that returns provider profile data
+    (rating, image, price, bio, distance) sorted by distance → rating → price.
+    """
+
+    def get(self, request):
+        serializer = EnrichedAvailabilitySearchQuerySerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        payload = serializer.validated_data
+
+        data = search_availability_enriched(
+            start_at=payload["start_at"],
+            end_at=payload["end_at"],
+            resource_type=payload.get("resource_type"),
+            city=payload.get("city"),
+            attendee_count=payload.get("attendee_count", 1),
+            lat=payload.get("lat"),
+            lng=payload.get("lng"),
+            min_rating=payload.get("min_rating"),
+            max_price=payload.get("max_price"),
+            name=payload.get("name"),
+            limit=payload.get("limit", 20),
+            offset=payload.get("offset", 0),
+        )
+        return Response({"results": data, "count": len(data)})
+
+
 class CalendarViewAPIView(BaseSchedulingAPIView):
     def get(self, request):
         serializer = CalendarQuerySerializer(data=request.query_params)
@@ -578,3 +895,131 @@ class CalendarViewAPIView(BaseSchedulingAPIView):
             return self._error_response(exc)
 
         return Response({"results": events})
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    """
+    Two-way reviews: organizers review providers, providers review organizers.
+    POST /reviews/ with { booking, rating, comment, reviewer_type }
+    GET  /reviews/?resource=<id>  — reviews of a resource (for public profile)
+    GET  /reviews/?resource_owner_id=<id>  — all reviews for a provider's resources
+    GET  /reviews/?booking=<id>  — reviews for a specific booking (both sides)
+    GET  /reviews/?reviewee_id=<id>  — reviews written about a user (organizer profile)
+    """
+
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Review.objects.all().select_related("reviewer", "reviewee", "resource", "booking")
+
+    def get_queryset(self):
+        qs = self.queryset
+        resource_id = self.request.query_params.get("resource")
+        booking_id = self.request.query_params.get("booking")
+        resource_owner_id = self.request.query_params.get("resource_owner_id")
+        reviewee_id = self.request.query_params.get("reviewee_id")
+        reviewer_type = self.request.query_params.get("reviewer_type")
+        if resource_id:
+            qs = qs.filter(resource_id=resource_id)
+        if booking_id:
+            qs = qs.filter(booking_id=booking_id)
+        if resource_owner_id:
+            qs = qs.filter(resource__owner_id=resource_owner_id)
+        if reviewee_id:
+            qs = qs.filter(reviewee_id=reviewee_id)
+        if reviewer_type:
+            qs = qs.filter(reviewer_type=reviewer_type)
+        return qs.order_by("-created_at")
+
+    def perform_create(self, serializer):
+        from rest_framework.exceptions import ValidationError
+
+        booking_id = self.request.data.get("booking")
+        booking = get_object_or_404(
+            Booking.objects.select_related("resource", "resource__owner", "organizer"),
+            id=booking_id,
+        )
+        user = self.request.user
+
+        if booking.status != Booking.Status.COMPLETED:
+            raise PermissionDenied("Reviews can only be submitted for completed bookings.")
+
+        is_organizer = booking.organizer_id == user.id
+        is_provider = booking.resource and booking.resource.owner_id == user.id
+
+        if not is_organizer and not is_provider:
+            raise PermissionDenied("Only the organizer or the resource provider can leave a review.")
+
+        reviewer_type = Review.ReviewerType.ORGANIZER if is_organizer else Review.ReviewerType.PROVIDER
+
+        if Review.objects.filter(booking=booking, reviewer_type=reviewer_type).exists():
+            raise ValidationError(f"You have already submitted a review for this booking.")
+
+        if is_organizer:
+            reviewee = booking.resource.owner if booking.resource else None
+            resource = booking.resource
+        else:
+            reviewee = booking.organizer
+            resource = None  # provider-to-organizer reviews don't belong to a resource
+
+        serializer.save(
+            reviewer=user,
+            reviewee=reviewee,
+            reviewer_type=reviewer_type,
+            resource=resource,
+        )
+
+
+class CompleteBookingAPIView(BaseSchedulingAPIView):
+    """Provider marks a confirmed/in-progress booking as COMPLETED."""
+
+    def post(self, request, booking_id: int):
+        booking = get_object_or_404(Booking.objects.select_related("resource", "organizer"), id=booking_id)
+        if not can_manage_resource(request.user, booking.resource):
+            raise PermissionDenied("Only the resource provider can mark a booking as complete.")
+
+        try:
+            updated_booking = complete_booking(actor=request.user, booking=booking)
+        except Exception as exc:
+            return self._error_response(exc)
+
+        return Response(BookingSerializer(updated_booking).data)
+
+
+class WithdrawRequestAPIView(BaseSchedulingAPIView):
+    """Organizer withdraws a pending or counter-proposed booking request."""
+
+    def post(self, request, request_id: int):
+        booking_request = get_object_or_404(BookingRequest, id=request_id)
+        if booking_request.organizer_id != request.user.id:
+            raise PermissionDenied("Only the organizer can withdraw a request.")
+
+        idempotency_key = request.headers.get("Idempotency-Key")
+        try:
+            updated_request = withdraw_request(
+                organizer=request.user,
+                booking_request=booking_request,
+                idempotency_key=idempotency_key,
+            )
+        except Exception as exc:
+            return self._error_response(exc)
+
+        return Response(BookingRequestSerializer(updated_request).data)
+
+
+class NudgeRequestAPIView(BaseSchedulingAPIView):
+    """Provider nudges the organizer to complete checkout for an accepted draft request."""
+
+    def post(self, request, request_id: int):
+        booking_request = get_object_or_404(
+            BookingRequest.objects.select_related("resource", "resource__owner"),
+            id=request_id,
+        )
+        if not can_manage_resource(request.user, booking_request.resource):
+            raise PermissionDenied("Only the resource provider can send a checkout nudge.")
+
+        try:
+            nudge_organizer_checkout(provider=request.user, booking_request=booking_request)
+        except Exception as exc:
+            return self._error_response(exc)
+
+        return Response({"detail": "Nudge sent to organizer."}, status=status.HTTP_200_OK)
