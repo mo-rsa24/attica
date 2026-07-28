@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from datetime import timedelta
+from decouple import Csv, config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent  # = lobola/backend/main
 PROJECT_ROOT = BASE_DIR.parent                    # = lobola/backend
@@ -22,13 +23,13 @@ templates = BASE_DIR / 'templates'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v&1=56oqenqty_#!r^jwogxwq7_)3%y5+s1muw7tw4t@+5dmmk'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# Reads from BASE_DIR/.env in dev; falls through to real env vars in prod.
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-v&1=56oqenqty_#!r^jwogxwq7_)3%y5+s1muw7tw4t@+5dmmk",
+)
+DEBUG = config("DEBUG", default=True, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
 
 # Application definition
@@ -136,10 +137,12 @@ TEMPLATES = [
         },
     },
 ]
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:3000",  # Allow React development server
-]
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="http://localhost:5173,http://localhost:3000",
+    cast=Csv(),
+)
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'main.urls'
 
@@ -217,12 +220,16 @@ SIMPLE_JWT = {
 }
 
 
-CORS_ALLOW_ALL_ORIGINS = True
-
 AUTH_USER_MODEL = 'users.CustomUser'
 
 MEDIA_URL = '/media/'  # URL to access media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Directory to store media files
+
+# Upload caps — enforced both globally (Django) and per-asset (events.upload_asset).
+# Override via env if you need to change without a code release.
+MAX_UPLOAD_SIZE_BYTES = config("MAX_UPLOAD_SIZE_BYTES", default=50 * 1024 * 1024, cast=int)
+DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE_BYTES
+FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE_BYTES
 
 # Scheduling outbox + webhook worker settings
 SCHEDULING_OUTBOX_MAX_ATTEMPTS = 5
@@ -235,3 +242,18 @@ SCHEDULING_WEBHOOK_TIMEOUT_SECONDS = 5
 SCHEDULING_WEBHOOK_CIRCUIT_FAILURE_THRESHOLD = 5
 SCHEDULING_WEBHOOK_CIRCUIT_OPEN_SECONDS = 120
 SCHEDULING_WEBHOOK_METRICS_TTL_SECONDS = 86400
+
+
+# Sentry — opt-in via SENTRY_DSN env var. Skipped silently when unset so dev keeps working.
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "").strip()
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment=os.environ.get("SENTRY_ENVIRONMENT", "development"),
+        traces_sample_rate=float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.1")),
+        send_default_pii=False,
+    )

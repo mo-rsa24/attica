@@ -78,3 +78,34 @@ The chat system uses REST-first architecture where the database is the source of
 - `backend/main/main/asgi.py` - ASGI app with WebSocket routing
 - `backend/main/main/routing.py` - WebSocket URL patterns
 - `frontend/vite.config.js` - Dev server proxies and HMR config
+
+## E2E Testing (Playwright)
+
+Baseline regression net for the create-event flow. Located in `frontend/tests/e2e/`. Tests assume the **backend is already running on :8000** and the deterministic organizer fixture has been seeded.
+
+```bash
+# Once per setup (or whenever the dev DB is reset):
+cd backend/main && python manage.py seed_e2e
+
+# Make sure backend is up (Daphne preferred; runserver works too):
+daphne -b 0.0.0.0 -p 8000 main.asgi:application
+
+# Then run the suite (Playwright auto-starts Vite):
+cd frontend
+npm run test:e2e          # headless run
+npm run test:e2e:ui       # interactive Playwright UI
+```
+
+The fixture is `e2e-organizer` / `E2eOrganizerPass!23` (defined in `backend/main/events/management/commands/seed_e2e.py`).
+
+Tests marked with `test.fail(...)` document **known broken invariants** (past-date validation, autosave, idempotent publish, etc.) — they pass today *because* they fail as expected. Each fix flips one from `test.fail` to `test`. See plan: `~/.claude/plans/let-s-start-with-the-iridescent-bunny.md`.
+
+## Available MCPs
+
+- **Playwright MCP** — drives a real browser to verify create-event end-to-end. Use to walk the wizard and report breakages with screenshots.
+- **Sentry MCP** — query unresolved issues, pull stack traces. Wired into Django via `SENTRY_DSN` env var (no-op when unset).
+- **Stripe MCP** — test-mode product/price/webhook tooling for the eventual ticketing work (Phase 5).
+- **Figma MCP** (preconfigured) — `get_design_context` for any Figma URL; reference React+Tailwind output, adapt to MUI.
+- **Postgres MCP** — *not yet installed*. Will be added when we migrate off SQLite.
+
+Install commands and required API keys are listed in `.env.example`.

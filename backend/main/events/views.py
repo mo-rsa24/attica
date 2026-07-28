@@ -6,6 +6,7 @@ from .serializer import EventSerializer, SimilarEventSerializer, EventDetailSeri
     EventListSerializer, EventDraftSerializer, EventDraftAssetSerializer, MyEventSummarySerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.conf import settings
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.db import transaction
@@ -445,6 +446,13 @@ class EventDraftViewSet(viewsets.ModelViewSet):
             raise ValidationError({"file": "A file is required."})
         if asset_type not in draft_asset_model.AssetType.values:
             raise ValidationError({"asset_type": "Unsupported asset type."})
+
+        max_size = getattr(settings, "MAX_UPLOAD_SIZE_BYTES", 50 * 1024 * 1024)
+        upload_size = getattr(upload, "size", 0) or 0
+        if upload_size > max_size:
+            raise ValidationError(
+                {"file": f"File too large. Max size is {max_size // (1024 * 1024)}MB."}
+            )
 
         mime_type = getattr(upload, "content_type", "") or ""
         if asset_type == draft_asset_model.AssetType.MEDIA:

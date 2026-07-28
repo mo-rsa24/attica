@@ -31,6 +31,12 @@ pyvenv.cfg
 .DS_Store
 desktop.ini
 
+# Claude Code session/tool config (local, not shared project config)
+.claude/
+
+# Windows Zone.Identifier files (leaked from Windows->WSL file copies)
+*:Zone.Identifier
+
 # --- Node.js / React ---
 node_modules/
 npm-debug.log*
