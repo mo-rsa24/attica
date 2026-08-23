@@ -24,7 +24,13 @@ seven plan files, and four of the seven are startable the moment `getting-in` la
 counting, deciding, and writing named values into a config file, and they need only the Vite dev
 server. Its later three drive real screens as real roles, which is why the scope waits on step 6.
 
-The remaining six sub-scopes are named below and not yet decomposed.
+A seventh, [getting-it-out](plans/getting-it-out/MASTER_PLAN.md), has its master plan and no plan
+files yet. Its row in the running order says it waits on `one-booking-truth`; its own text says the
+deployment decision is worth taking before that. Both are kept, because the decision needs no answer
+to D1. What it does need is an answer nothing in this repository holds: where a deployed Attica would
+run. That is a question for a person and it is the first thing the scope's first plan has to ask.
+
+The remaining five sub-scopes are named below and not yet decomposed.
 
 ## Running order
 
@@ -61,6 +67,7 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 26 | [The components that own the styles](plans/the-design-system/plans/05-the-components-that-own-the-styles.md) | The button, the one card skeleton replacing four, and explicit status text for actions in flight | ⚠️ not started | 23, 24, 25 |
 | 27 | [Cards that answer to their container](plans/the-design-system/plans/06-cards-that-answer-to-their-container.md) | Container queries where the space decides, breakpoints where the viewport does, and mobile as its own layout | ⚠️ not started | 26 |
 | 28 | [Prove it and write it down](plans/the-design-system/plans/07-prove-it-and-write-it-down.md) | The check that catches an invented style, the five dead class names, and the runbook pair that does not exist | ⚠️ not started | 27 |
+| 29 | [getting-it-out](plans/getting-it-out/MASTER_PLAN.md) | Take the deployment decision, build what it chooses, and make one machine reproducible enough that a second one is a copy rather than an archaeology exercise | ⚠️ plans not authored yet | `one-booking-truth` |
 
 Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
@@ -84,6 +91,15 @@ step 22 and not on each other. They sit at the bottom because inserting them at 
 renumber every row from 7 to 21, and those numbers are written into eleven existing plan files and
 one diagram map. The `Waits on` column carries the dependency; the reasoning is in
 [that scope's decisions](plans/the-design-system/decisions-taken-here.md#the-rows-are-appended-to-the-parents-running-order-as-22-to-28-not-inserted-at-7).
+
+Step 29 is a placeholder for a whole sub-scope rather than a plan. It is one row because
+`getting-it-out` has a master plan and no plan files yet; `populate-plans` replaces this row with its
+real plans, interleaved at the step numbers they belong at. Its "Waits on" cell names
+`one-booking-truth` in words because that scope is not decomposed, so there is no step number to
+point at. It sits at the bottom for the same reason steps 22 to 28 do: its true position is directly
+after the `one-booking-truth` rows that do not exist yet, and inserting it there would renumber every
+row above it. That scope's own text says the deployment decision is worth taking earlier than this
+row implies, and the `Waits on` column rather than the number carries what actually gates it.
 
 Steps 7 to 10 are grouped after the two blockers in this table rather than interleaved through them,
 because nothing in either direction gates the other: the layers scope needs no login and no green
@@ -180,14 +196,14 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 | 10 | [one-client-truth](plans/one-client-truth/MASTER_PLAN.md) | experience | 6 |
 | 11 | `the-event-workspace` | experience | 8, 10 |
 | 12 | [the-design-system](plans/the-design-system/MASTER_PLAN.md) | experience | 2 |
-| 13 | `getting-it-out` | cross | 4 |
+| 13 | [getting-it-out](plans/getting-it-out/MASTER_PLAN.md) | cross | 4 |
 
 Scopes 1, 2, 3 and 12 start immediately. After 8 lands, the performance and experience planes run in
 parallel.
 
 `fixing-create-event`, `getting-in`, `the-system-in-layers`, `running-the-workers`,
-`one-client-truth` and `the-design-system` have plan files. The other six are named here and not yet
-decomposed.
+`one-client-truth` and `the-design-system` have plan files. `getting-it-out` has a master plan and no
+plan files yet. The other five are named here and not yet decomposed.
 
 ---
 

@@ -115,6 +115,10 @@ rather than being drawn twice.
 **build** Whatever that decision produces, with the topology logically separable from day one even
 while it runs on one machine.
 
+The continuous integration that exists has never passed. It has run twice, on 2026-07-28 and
+2026-08-23, and both runs failed in both jobs, so it is not yet a gate a release could be built on.
+The frontend build it produces is discarded at the end of the job.
+
 Positioned late in the table and worth starting early, because nothing above is real until it can be
 deployed.
 

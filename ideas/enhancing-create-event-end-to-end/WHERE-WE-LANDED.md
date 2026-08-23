@@ -95,7 +95,13 @@ the eight step files. Three components open their own WebSocket with three diffe
 policies, one of which is no reconnect at all, and none of the three refetches after a reconnect, so
 whatever changed during a gap is simply absent. Four live representations of a booking, of which the
 chat one is the most referenced. An outbox event claimed into `processing` is stranded for good, because the dispatcher
-only ever selects `pending` and `failed` and no reaper returns it.
+only ever selects `pending` and `failed` and no reaper returns it. Continuous integration has failed
+on both of the two runs in its history, and its frontend job dies before installing anything because
+`frontend/package-lock.json` is excluded by `.gitignore:45` and has never been committed, while
+`ci.yml` asks the Node setup step to cache against it. The database engine, the Redis host, the cache
+location and the media root are literals in `settings.py`, so none of them can move without a code
+change. The client reads no environment variable anywhere: 142 relative call sites resolve only
+through the Vite dev proxy, and two more hardcode `127.0.0.1:8000`.
 
 ## 3. Open decisions
 
@@ -127,8 +133,9 @@ decision, not three.
 **D8. Media.** Direct-to-storage upload with derived variants, versus the current synchronous path
 to local disk.
 
-**D9. Deployment.** Continuous integration exists. There is no deployment mechanism, so no rollout
-strategy is currently expressible.
+**D9. Deployment.** Continuous integration exists and has never passed: two runs, on 2026-07-28 and
+2026-08-23, both failing in both jobs, and the frontend build it produces is discarded at the end of
+the job. There is no deployment mechanism, so no rollout strategy is currently expressible.
 
 **D10. Frontend stack.** Cheaper than it reads: Material UI appears in 10 of 110 files, the data
 layer is 9 files, and the motion library is already installed. Tailwind is on 3.4.17, so v4 is a
