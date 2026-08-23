@@ -289,3 +289,36 @@ and doing it unattended would have filed images nobody compared against their no
 
 **No plan file was authored.** `populate-plans` owns that, and running it here would have written the
 work breakdown for a scope whose one real decision is still open.
+
+## The two untracked images were committed, and the map they belong to was made true
+
+**Decision.** The two rendered PNGs sitting untracked under `fixing-create-event/diagrams/` are
+committed, and the five stale status marks in that scope's map are corrected against the images.
+
+**Why they were left out of the decomposition commit.** They predate this run and belong to a
+different scope, so sweeping them into a commit about `one-client-truth` would have mixed two
+unrelated changes under one message. Holding them back was right for that commit and wrong as a final
+answer, because it left two rendered diagrams outside version control.
+
+**Why committing is the right call rather than leaving them alone.** They sit at exactly the paths
+that scope's map names in its own `Save as` lines, and the three other diagrams in that folder are
+already tracked, so the convention is settled. Adding a file to git is reversible and destroys
+nothing; the caution that applied here was about deletion, which this is the opposite of.
+
+**Why the map had to move in the same act.** All six of that scope's prompts were marked
+`⏳ not rendered` while five of the six had images on disk. Committing two images under a map that
+denies they exist would have replaced one wrong state with a different wrong state. So each of the
+five was read back against its own faithfulness note before its mark was flipped, which is the same
+standard this scope's own map is held to.
+
+**What the read-back found.** Three are faithful with nothing outstanding. Two carry a fix waiting on
+a re-render: `subject-02` puts badge 1 on the create-event wizard where the defect is the organizer
+dashboard's fetch, and it contradicts the subject capstone, which places the same badge correctly;
+and the process capstone draws the runbook twice, breaking its own prompt's "no duplicated
+components" rule, and labels stage one with two words that appear in no text list. Both prompts were
+corrected so the next render does not repeat them, and both discrepancies are recorded beside the
+prompts rather than quietly fixed.
+
+**What was deliberately not done.** The missing sixth image was not generated. Rendering unattended is
+the thing this run already declined to do for its own map, and doing it for somebody else's scope
+would be worse.

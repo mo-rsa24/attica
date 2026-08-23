@@ -3,7 +3,7 @@
 The six defects in Attica's event-creation path, where each one sits, and the three-step order that
 closes them. Pictures for [this scope's plans](MASTER_PLAN.md), not for the domain.
 
-6 prompts · 0 rendered · 6 waiting
+6 prompts · 5 rendered · 1 waiting
 
 ## Table of contents
 
@@ -99,8 +99,14 @@ Navigation: ⬅️ [Subject lane](#subject-lane) | 📋 [TOC](#table-of-contents
 This is the picture of [Unblock the truth](plans/01-unblock-the-truth.md)'s
 [what happens (visual)](plans/01-unblock-the-truth.md#what-happens-visual) ASCII.
 
-[traced] ⏳ not rendered
+[traced] ✅ rendered
 Save as: `diagrams/subject-01-two-wrong-strings.png`
+
+Rendered to [the image](diagrams/subject-01-two-wrong-strings.png), 1536x1024, 2026-08-23. Reads
+correctly, including both halves of its faithfulness note: bug 1's red arrow stops at the badge short
+of the server, and the two keys are separate objects that never touch. The amber return arrow ends at
+an open circle rather than at the browser, which is what "nothing asks for it" needed. Nothing
+outstanding.
 
 ```
 Style: premium system-design infographic. Clean white or very light gray background. Glossy semi-3D icons with soft drop shadows, one icon per component, sitting on subtle rounded platforms. Flows drawn as vivid color-coded directional arrows, each color meaning exactly one kind of traffic, with a small legend inside the image. Solid lines are actual transfers; dashed lines are reserved for control, acknowledgement, retry, and optional paths. Related components grouped inside rounded soft-tinted panels with a short title on the panel. A bold title banner across the top. Official product logos only on components that ARE that product; every other component gets a clean generic glyph. Small cartoon figures or vehicles for external actors (users, clients). Clean sans-serif labels under every icon, short and lowercase-friendly. Depth is relative: only the primary component icons carry dimensionality, containers stay flat and low contrast, and arrows are flat vector overlays above everything. Shadows are soft and directly beneath their object, never dramatic or angled. No glassmorphism, no neon glow, no photorealism, no heavy bevelling, no gradients except subtle material shading inside an icon. Generous spacing, no clutter, no watermark.
@@ -132,15 +138,24 @@ The scope's whole subject: the six defects positioned on the surface they break,
 that [Close the gaps](plans/02-close-the-gaps.md)'s four are all server-side while
 [01](plans/01-unblock-the-truth.md)'s two straddle the boundary.
 
-[traced] ⏳ not rendered
+[traced] ✅ rendered
 Save as: `diagrams/subject-02-where-the-six-sit.png`
+
+Rendered to [the image](diagrams/subject-02-where-the-six-sit.png), 1693x929, 2026-08-23. Reads
+correctly on the claim the faithfulness note protects: badges 1 and 2 sit in the browser band and 3
+to 6 all sit in the backend band, so plan 02's work reads as entirely server-side.
+
+One thing to fix on the next render, and the prompt below already says it. Badge 1 sits on an arrow
+leaving the create-event wizard, where the defect is the organizer dashboard's fetch. The subject
+capstone places the same badge correctly on the dashboard's outgoing arrow, so the two images
+currently disagree about where bug 1 lives, and this is the one that is wrong.
 
 ```
 Style: premium system-design infographic. Clean white or very light gray background. Glossy semi-3D icons with soft drop shadows, one icon per component, sitting on subtle rounded platforms. Flows drawn as vivid color-coded directional arrows, each color meaning exactly one kind of traffic, with a small legend inside the image. Solid lines are actual transfers; dashed lines are reserved for control, acknowledgement, retry, and optional paths. Related components grouped inside rounded soft-tinted panels with a short title on the panel. A bold title banner across the top. Official product logos only on components that ARE that product; every other component gets a clean generic glyph. Small cartoon figures or vehicles for external actors (users, clients). Clean sans-serif labels under every icon, short and lowercase-friendly. Depth is relative: only the primary component icons carry dimensionality, containers stay flat and low contrast, and arrows are flat vector overlays above everything. Shadows are soft and directly beneath their object, never dramatic or angled. No glassmorphism, no neon glow, no photorealism, no heavy bevelling, no gradients except subtle material shading inside an icon. Generous spacing, no clutter, no watermark.
 
 Scene: one wide image split into two horizontal bands by a faint dividing line. The upper band is a tinted panel titled for the browser side; the lower band is a tinted panel titled for the backend side. A cartoon organizer with a clipboard stands at the far left, spanning both bands, with amber arrows leaving them into the upper band. Six red cross badges, numbered 1 to 6, are placed on the components they break.
 
-Upper band cast, left to right: a browser window showing a wizard step, a second browser window showing a dashboard, and a beaker icon for the test suite. Badge 1 sits on the arrow leaving the dashboard window. Badge 2 sits on a small key icon beside the beaker.
+Upper band cast, left to right: a browser window showing a wizard step, a second browser window showing a dashboard, and a beaker icon for the test suite. Badge 1 sits on the arrow leaving the SECOND browser window, the dashboard one, and must not touch the wizard window or its arrows. Badge 2 sits on a small key icon beside the beaker.
 
 Lower band cast, left to right: a Django server platform, then three small artifact icons on their own rounded platforms: a broken shield labelled for date validation, a second broken shield labelled for price validation, and a card with a paper-clip drawn detached and falling away. At the far right of the lower band, two small server icons side by side with mismatched status chips, meaning two paths that disagree. Badge 3 on the first broken shield, badge 4 on the second, badge 5 on the detached paper-clip, badge 6 on the mismatched pair.
 
@@ -159,8 +174,14 @@ in the wrong band misroutes whoever reads it.
 
 Navigation: ⬅️ [Prompt 2 (Subject): Where all six defects sit](#prompt-2-subject-where-all-six-defects-sit) | 📋 [TOC](#table-of-contents) | [Next](#process-lane) ➡️
 
-[traced] ⏳ not rendered
+[traced] ✅ rendered
 Save as: `diagrams/subject-capstone-the-whole-surface.png`
+
+Rendered to [the image](diagrams/subject-capstone-the-whole-surface.png), 1693x929, 2026-08-23.
+Reads correctly, including both halves of its faithfulness note: the final calendar card is gray and
+captioned as not reliably reachable, and all six badges appear exactly once on the components prompt
+2 assigns them. Badge 1 sits on the dashboard's outgoing arrow here, which is the placement prompt 2's
+render got wrong. Nothing outstanding.
 
 ```
 Style: premium system-design infographic. Clean white or very light gray background. Glossy semi-3D icons with soft drop shadows, one icon per component, sitting on subtle rounded platforms. Flows drawn as vivid color-coded directional arrows, each color meaning exactly one kind of traffic, with a small legend inside the image. Solid lines are actual transfers; dashed lines are reserved for control, acknowledgement, retry, and optional paths. Related components grouped inside rounded soft-tinted panels with a short title on the panel. A bold title banner across the top. Clean sans-serif labels under every icon. Generous spacing, no clutter, no watermark.
@@ -232,8 +253,17 @@ Navigation: ⬅️ [Prompt 1 (Process): Unblock, then re-classify](#prompt-1-pro
 The whole [running order](MASTER_PLAN.md#running-order), with each plan's engagement gate drawn as
 the thing it actually checks.
 
-[traced] ⏳ not rendered
+[traced] ✅ rendered
 Save as: `diagrams/process-02-three-plans-three-gates.png`
+
+Rendered to [the image](diagrams/process-02-three-plans-three-gates.png), 1693x929, 2026-08-23.
+Reads correctly on what its faithfulness note protects: all three gates are drawn as vertical bars of
+equal height and weight, so the runbook gate does not read as paperwork beside the other two. The
+dashed grey return arrow is labelled and lands inside panel two.
+
+One cosmetic thing, and it is this prompt's fault rather than the render's. Each panel carries a
+numbered badge and a title that repeats the number, so every panel says its number twice. The panel
+titles below have had the number removed.
 
 ```
 Style: premium system-design infographic. Clean white or very light gray background. Glossy semi-3D icons with soft drop shadows, one icon per component, sitting on subtle rounded platforms. Flows drawn as vivid color-coded directional arrows, each color meaning exactly one kind of traffic, with a small legend inside the image. Solid lines are actual transfers; dashed lines are reserved for control, acknowledgement, retry, and optional paths. Related components grouped inside rounded soft-tinted panels with a short title on the panel. A bold title banner across the top. Clean sans-serif labels under every icon. Generous spacing, no clutter, no watermark.
@@ -248,7 +278,7 @@ Panel three, step 3: a beaker with a green check, and an open book icon represen
 
 Flows: one thick amber route line running left to right through all three panels and their gates. Two thin amber arrows arcing from panels one and two into the book in panel three, meaning findings being written down. One dashed gray arrow from panel one's gate back into panel two, labelled as the case where a verdict adds work.
 
-Text in the image: title banner "THREE PLANS, THREE GATES". Panel titles "1 UNBLOCK THE TRUTH", "2 CLOSE THE GAPS", "3 WRITE IT DOWN". Gate captions "SEVEN ROWS ON SCREEN", "TRIED IT AS AN ORGANIZER", "FOUND IN THIRTY SECONDS". Legend rows: "AMBER: THE ROUTE", "GREEN: NOW HOLDS", "DASHED: ONLY IF".
+Text in the image: title banner "THREE PLANS, THREE GATES". Panel titles "UNBLOCK THE TRUTH", "CLOSE THE GAPS", "WRITE IT DOWN", carrying no number, because each panel already has a numbered step badge in its corner. Gate captions "SEVEN ROWS ON SCREEN", "TRIED IT AS AN ORGANIZER", "FOUND IN THIRTY SECONDS". Legend rows: "AMBER: THE ROUTE", "GREEN: NOW HOLDS", "DASHED: ONLY IF".
 
 Exclusions: no fourth panel, no code, no checklist text, no duplicated components, no orphan arrows, no arrow terminating in whitespace, no color used without a legend entry, no decorative circuitry or filigree, no invented or misapplied brand logos, no paragraphs of text, no illegible pseudo-code, no crossing arrows where routing could avoid it, no untitled containers, no icon without a label, no perspective distortion applied to arrows, no visual metaphor that contradicts the system's actual semantics, no watermark.
 ```
@@ -261,19 +291,31 @@ rather than the scope's deliverable.
 
 Navigation: ⬅️ [Prompt 2 (Process): Three plans, and what each gate proves](#prompt-2-process-three-plans-and-what-each-gate-proves) | 📋 [TOC](#table-of-contents)
 
-[traced] ⏳ not rendered
+[traced] ✅ rendered
 Save as: `diagrams/process-capstone-bugs-to-runbook.png`
+
+Rendered to [the image](diagrams/process-capstone-bugs-to-runbook.png), 1693x929, 2026-08-23.
+Reads correctly on the whole argument of the scope: six red badges start loose and uncontained under
+"RECORDED NOWHERE", and end as six green entries inside the book. The calendar card is full gold, and
+there is no seventh badge and no fourth stage.
+
+Two things the render gets wrong, both fixed in the prompt below and waiting on the next render. The
+book is drawn twice, once being written into inside stage three and once again at the far right
+holding the six entries, which breaks the prompt's own "no duplicated components" rule and makes a
+reader work out that the two are one book at two moments; the prompt now places one book only. And
+stage one carries the invented labels "Correct Cause" and "Correct System", which appear in no text
+list; the prompt now names what those two corrections are.
 
 ```
 Style: premium system-design infographic. Clean white or very light gray background. Glossy semi-3D icons with soft drop shadows, one icon per component, sitting on subtle rounded platforms. Flows drawn as vivid color-coded directional arrows, each color meaning exactly one kind of traffic, with a small legend inside the image. Solid lines are actual transfers; dashed lines are reserved for control, acknowledgement, retry, and optional paths. Related components grouped inside rounded soft-tinted panels with a short title on the panel. A bold title banner across the top. Clean sans-serif labels under every icon. Generous spacing, no clutter, no watermark.
 
-Scene: one continuous left-to-right journey. At the far left, six red cross badges numbered 1 to 6 float loose with no container around them, deliberately unorganised, above a caption saying they are recorded nowhere. The route line gathers them into three tinted stage panels in the middle, matching the three plans. At the far right sits a large open book icon with six small green entries visible on its pages, and beside it a gold calendar card now drawn in full gold rather than gray.
+Scene: one continuous left-to-right journey. At the far left, six red cross badges numbered 1 to 6 float loose with no container around them, deliberately unorganised, above a caption saying they are recorded nowhere. The route line gathers them into three tinted stage panels in the middle, matching the three plans. At the far right sits one large open book icon with six small green entries visible on its pages, and beside it a gold calendar card now drawn in full gold rather than gray. There is exactly one book in the image: stage three shows the route arriving at that same book rather than drawing a second one.
 
-Middle stages, left to right: stage one shows two corrections and a beaker turning from gray to amber. Stage two shows four badges turning from red to green. Stage three shows the book being written into, with four thin arrows entering it.
+Middle stages, left to right: stage one shows two corrections, one labelled "API PATH" and one labelled "STORAGE KEY", and a beaker turning from gray to amber. Stage two shows four badges turning from red to green. Stage three shows the route reaching the one book at the far right, with four thin arrows entering its pages.
 
 Beneath the book, a small cartoon organizer figure with a clipboard stands reading it, meaning the next person who meets one of these symptoms.
 
-Flows: one thick amber route line from the loose badges through all three stages into the book. Six thin red lines, one from each loose badge, converging into the route as it enters stage one. Six thin green lines leaving stage three into the book's pages.
+Flows: one thick amber route line from the loose badges through all three stages into the single book at the far right. Six thin red lines, one from each loose badge, converging into the route as it enters stage one. Six thin green lines leaving stage three into the book's pages.
 
 Text in the image: title banner "SIX BUGS, ONE RUNBOOK". Caption above the loose badges "RECORDED NOWHERE". Stage captions "UNBLOCK", "FIX", "WRITE DOWN". Caption under the book "RECOGNISED, NOT REDISCOVERED". Caption under the gold calendar card "REACHABLE". Legend rows: "RED: A DEFECT", "AMBER: THE WORK", "GREEN: WRITTEN DOWN".
 

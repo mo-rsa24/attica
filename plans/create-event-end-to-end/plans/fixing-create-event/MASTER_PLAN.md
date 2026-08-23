@@ -112,9 +112,11 @@ records them and each one costs an afternoon to rediscover.
 
 ## Diagram Prompts
 
-The scope's illustrated map is [the illustrated map](diagram-prompts.md): six prompts, none rendered
-yet. Three subject pieces draw the create-event surface and where the six defects sit; three process
-pieces draw the three plans and what each gate proves.
+The scope's illustrated map is [the illustrated map](diagram-prompts.md): six prompts, five of them
+rendered and read back against their notes. Three subject pieces draw the create-event surface and
+where the six defects sit; three process pieces draw the three plans and what each gate proves. The
+one still waiting is the first process piece, and two of the five rendered carry a fix waiting on a
+re-render, both recorded beside their prompts.
 
 Its art direction is Vivid circuit, and it says in its own opening why that differs from the context
 folder's map. Rendered images land in `diagrams/`.
