@@ -243,3 +243,36 @@ that matters.
 **Decision.** `plans/.gitkeep` is gone, as the earlier entry said it would be.
 
 **Why.** Four real plan files now hold the folder open.
+
+## Populating this scope again adds nothing
+
+**Decision.** The scope's `plans/` folder is finished at four files, and a further populating pass
+verifies them rather than adding a fifth. Nothing here was renumbered, overwritten or duplicated.
+
+**Why.** `populate-plans` is incremental: it adds to an existing set and never rewrites one. The four
+plans already cover every Definition-of-Done item, so a fifth file would either repeat work already
+owned by one of them or invent scope the master plan does not ask for. Authoring a plan nobody needs
+is worse than authoring none, because `sync-plan-tree` then tracks it forever and every reader has to
+work out why it exists.
+
+**What was checked, and what it found.**
+
+Each of the eleven Definition-of-Done items resolves to at least one task line. The environment map
+and the layers prompt are plan 02 tasks 1.1 to 1.4 and 2.1; the five briefs checked against code are
+plan 01 in full and plan 03 tasks 1.1 to 1.4; the `onboarding-docs` reconciliation is plan 03 tasks
+2.1 to 2.3; the three human items (rendering, reading each image back against its faithfulness note,
+and checking the layers map against four processes started by hand) are plan 04 instructions 4, 5 and
+6; the artifact card is plan 03 task 1.5; the runbook pair is plan 04 tasks 2.1 to 2.3; and the close
+out running `/env-pulse` is in plans 02 and 04.
+
+Every relative link in the master plan, the four plans, the map and the decisions file resolves to a
+file that exists. The one apparent exception is the `diagram-prompts.md` link inside plan 02's task
+2.1, which sits in a fenced block destined for `environment/overview.md`, where it resolves as a
+sibling. Every in-file `▶ Next` and `◀ Needs` anchor resolves to a heading in its own file.
+
+The parent capstone already carries the glyph this scope zooms into, labelled "the system in layers"
+in the alongside column, so no amendment to it is owed. The parent's running order carries steps 7 to
+10 and its `Do this next` names plan 01 as startable now.
+
+**What this leaves open.** D1, D2 and D3 are still unanswered, and the plans are written for that: no
+picture here waits on them and none guesses at them.
