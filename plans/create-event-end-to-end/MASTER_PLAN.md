@@ -19,7 +19,12 @@ plan files, but the work itself waits on `one-booking-truth`.
 A fifth, [one-client-truth](plans/one-client-truth/MASTER_PLAN.md), has its master plan and its six
 plan files. The work itself waits on `running-the-workers`.
 
-The remaining seven sub-scopes are named below and not yet decomposed.
+A sixth, [the-design-system](plans/the-design-system/MASTER_PLAN.md), has its master plan and its
+seven plan files, and four of the seven are startable the moment `getting-in` lands: they are
+counting, deciding, and writing named values into a config file, and they need only the Vite dev
+server. Its later three drive real screens as real roles, which is why the scope waits on step 6.
+
+The remaining six sub-scopes are named below and not yet decomposed.
 
 ## Running order
 
@@ -49,6 +54,13 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 19 | [Build the one cache](plans/one-client-truth/plans/04-build-the-one-cache.md) | One cache the reads go through, the apply rule as a tested pure function, and the badge derived from the list | ⚠️ not started | 17 |
 | 20 | [One transport that recovers](plans/one-client-truth/plans/05-one-transport-that-recovers.md) | One socket, one reconnect policy, a fresh token per connect, and a reconnect that refetches | ⚠️ not started | 18, 19 |
 | 21 | [Prove it and write it down](plans/one-client-truth/plans/06-prove-it-and-write-it-down.md) | The duplicate, gap and refresh tests by hand, the two runbook recipes, and the word this scope introduced | ⚠️ not started | 20 |
+| 22 | [Measure it and take the stack decision](plans/the-design-system/plans/01-measure-it-and-take-the-stack-decision.md) | Pin eight counting commands, take the frontend stack decision with the candidates that lost | ⚠️ not started | 6 |
+| 23 | [Name the colours and the spacing](plans/the-design-system/plans/02-name-the-colours-and-the-spacing.md) | Colour, spacing, radius and elevation as named tokens in one file, with every counted value mapped onto one | ⚠️ not started | 22 |
+| 24 | [Give type its roles](plans/the-design-system/plans/03-give-type-its-roles.md) | Eleven sizes and six weights become a handful of named roles, each saying what it is for | ⚠️ not started | 22 |
+| 25 | [Say what moves and what does not](plans/the-design-system/plans/04-say-what-moves-and-what-does-not.md) | Duration bands, the rule for which motion system to use, the list of what does not animate, one reduced-motion rule | ⚠️ not started | 22 |
+| 26 | [The components that own the styles](plans/the-design-system/plans/05-the-components-that-own-the-styles.md) | The button, the one card skeleton replacing four, and explicit status text for actions in flight | ⚠️ not started | 23, 24, 25 |
+| 27 | [Cards that answer to their container](plans/the-design-system/plans/06-cards-that-answer-to-their-container.md) | Container queries where the space decides, breakpoints where the viewport does, and mobile as its own layout | ⚠️ not started | 26 |
+| 28 | [Prove it and write it down](plans/the-design-system/plans/07-prove-it-and-write-it-down.md) | The check that catches an invented style, the five dead class names, and the runbook pair that does not exist | ⚠️ not started | 27 |
 
 Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
@@ -64,6 +76,14 @@ Steps 16 to 21 are `one-client-truth`. They sit directly after step 15 because t
 sub-scope order will push them down when they are decomposed. Steps 18 and 19 are the server half and
 the client half of one contract, so they wait on step 17 and not on each other, and they run at the
 same time.
+
+Steps 22 to 28 are `the-design-system`, and their position in this table is the one place where the
+number is an identifier rather than a claim about when. That scope waits on step 6 and on nothing
+else, so its plans can run alongside anything from step 7 onward, and steps 23, 24 and 25 wait on
+step 22 and not on each other. They sit at the bottom because inserting them at step 7 would
+renumber every row from 7 to 21, and those numbers are written into eleven existing plan files and
+one diagram map. The `Waits on` column carries the dependency; the reasoning is in
+[that scope's decisions](plans/the-design-system/decisions-taken-here.md#the-rows-are-appended-to-the-parents-running-order-as-22-to-28-not-inserted-at-7).
 
 Steps 7 to 10 are grouped after the two blockers in this table rather than interleaved through them,
 because nothing in either direction gates the other: the layers scope needs no login and no green
@@ -159,14 +179,15 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 | 9 | `performance-architecture` | performance | 7, 8 |
 | 10 | [one-client-truth](plans/one-client-truth/MASTER_PLAN.md) | experience | 6 |
 | 11 | `the-event-workspace` | experience | 8, 10 |
-| 12 | `the-design-system` | experience | 2 |
+| 12 | [the-design-system](plans/the-design-system/MASTER_PLAN.md) | experience | 2 |
 | 13 | `getting-it-out` | cross | 4 |
 
 Scopes 1, 2, 3 and 12 start immediately. After 8 lands, the performance and experience planes run in
 parallel.
 
-`fixing-create-event`, `getting-in`, `the-system-in-layers`, `running-the-workers` and
-`one-client-truth` have plan files. The other seven are named here and not yet decomposed.
+`fixing-create-event`, `getting-in`, `the-system-in-layers`, `running-the-workers`,
+`one-client-truth` and `the-design-system` have plan files. The other six are named here and not yet
+decomposed.
 
 ---
 
