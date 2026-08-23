@@ -1,0 +1,548 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - heading "Attica's event wizard, as a state machine" [level=1] [ref=f3e5]
+    - generic [ref=f3e6]: every Next writes the whole draft to the server, so the wizard survives a closed tab
+    - button "tour" [ref=f3e7] [cursor=pointer]
+  - navigation [ref=f3e8]:
+    - button "0the problem" [ref=f3e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=f3e10] [cursor=pointer]
+    - button "2the machine" [ref=f3e11] [cursor=pointer]
+    - button "3where it costs you" [ref=f3e12] [cursor=pointer]
+    - button "4build it" [ref=f3e13] [cursor=pointer]
+  - generic [ref=f3e15]:
+    - generic [ref=f3e16]:
+      - img [ref=f3e17]:
+        - 'generic "saveStep(id, ''step1'', payload, ''step3''): PATCH with the whole steps map, then current_step moves" [ref=f3e18] [cursor=pointer]': Next
+        - generic "the schedule was already written into step1's bucket by setStepData" [ref=f3e22] [cursor=pointer]: Next
+        - 'generic "saveStep(id, ''step4'', {location: selectedLocation}, ''step5'')" [ref=f3e26] [cursor=pointer]': Next
+        - generic "saves the ticketing payload, which the field whitelist would have thrown away if it were live" [ref=f3e30] [cursor=pointer]: Next
+        - 'generic "saveStep(id, ''step6'', {}, ''step7''): an empty payload, purely to move current_step" [ref=f3e34] [cursor=pointer]': Next
+        - 'generic "saveStep(id, ''step7'', {features: selectedFeatures}, ''step8'')" [ref=f3e38] [cursor=pointer]': Next
+        - 'generic "saveStep(draftId, ''step8'', {}, ''review''): also empty. The photos went up separately." [ref=f3e42] [cursor=pointer]': Next
+        - generic "_build_event_payload projects data.steps onto Event columns, then upserts. Nothing validates first." [ref=f3e46] [cursor=pointer]: Publish
+        - generic "the route itself is a Navigate. ListingStep2.jsx is never rendered." [ref=f3e50] [cursor=pointer]: redirect
+        - generic [ref=f3e577] [cursor=pointer]: close the tab
+        - generic "name, description, event type, region, dates, capacity. The largest form in the wizard, and the only one that validates before saving." [ref=f3e54] [cursor=pointer]:
+          - generic [ref=f3e56]: step1
+          - generic [ref=f3e582]: saved
+        - generic "an event-type picker, in a useState called selectedEventType. Its Next button calls navigate and nothing else." [ref=f3e57] [cursor=pointer]:
+          - generic [ref=f3e59]: step2
+          - generic [ref=f3e60]: excised
+        - generic "the calendar, booking requests to artists and vendors, and the schedule. It writes the schedule into step1." [ref=f3e61] [cursor=pointer]: step3
+        - generic "the venue, chosen on a map. Saved as a whole location object under step4." [ref=f3e64] [cursor=pointer]:
+          - generic [ref=f3e66]: step4
+          - generic [ref=f3e584]: saved
+        - generic "ticket price, currency, refund policy, max per buyer, and whether the event is seated. The seating chart is an asset upload." [ref=f3e67] [cursor=pointer]: step5
+        - generic "nothing. Eighty-nine lines of layout, and its Next saves an empty object." [ref=f3e70] [cursor=pointer]:
+          - generic [ref=f3e72]: step6
+          - generic [ref=f3e73]: saves nothing
+        - generic "amenities, as a list of feature names. The only step whose payload maps one-to-one onto its Event column." [ref=f3e74] [cursor=pointer]: step7
+        - 'generic "photos. Its Next also saves an empty object: the files go through the multipart asset endpoint instead." [ref=f3e77] [cursor=pointer]':
+          - generic [ref=f3e79]: step8
+          - generic [ref=f3e80]: files only
+        - generic "a read-only summary and the Publish button, behind a readiness modal that lists booking requests without blocking on them." [ref=f3e81] [cursor=pointer]:
+          - generic [ref=f3e83]: review
+          - generic [ref=f3e84]: saves nothing
+        - generic "EventDraft.status flips to published and an Event row exists. The draft is kept, with published_event_id written into its data." [ref=f3e85] [cursor=pointer]: published
+        - generic "the reducer is gone. localStorage and the EventDraft row are not." [ref=f3e88] [cursor=pointer]: tab closed
+      - generic [ref=f3e91]:
+        - generic [ref=f3e92]:
+          - generic [ref=f3e93]: where you are
+          - generic [ref=f3e94]: step5
+        - generic [ref=f3e95]:
+          - generic [ref=f3e96]: a resume lands on
+          - generic [ref=f3e97]: step5
+        - generic [ref=f3e98]:
+          - generic [ref=f3e99]: typed but never saved
+          - generic [ref=f3e100]: ticket price
+        - generic [ref=f3e101]:
+          - generic [ref=f3e102]: waiting for a save
+          - generic [ref=f3e103]: nothing
+      - generic [ref=f3e104]:
+        - generic [ref=f3e105]:
+          - generic [ref=f3e106]: field
+          - generic [ref=f3e107]: form
+          - generic [ref=f3e108]: reducer + localStorage
+          - generic [ref=f3e109]: EventDraft.data
+        - generic [ref=f3e110]:
+          - generic [ref=f3e111]:
+            - text: event name
+            - emphasis [ref=f3e112]: step1 → steps.step1
+          - generic [ref=f3e113]: ○
+          - generic [ref=f3e114]: ●
+          - generic [ref=f3e115]: ●
+        - generic [ref=f3e116]:
+          - generic [ref=f3e117]:
+            - text: event type
+            - emphasis [ref=f3e118]: step1 → steps.step1
+          - generic [ref=f3e119]: ○
+          - generic [ref=f3e120]: ○
+          - generic [ref=f3e121]: ○
+        - generic [ref=f3e122]:
+          - generic [ref=f3e123]:
+            - text: dates and times
+            - emphasis [ref=f3e124]: step3 → steps.step1
+          - generic [ref=f3e125]: ○
+          - generic [ref=f3e126]: ○
+          - generic [ref=f3e127]: ○
+        - generic [ref=f3e128]:
+          - generic [ref=f3e129]:
+            - text: venue
+            - emphasis [ref=f3e130]: step4 → steps.step4
+          - generic [ref=f3e131]: ○
+          - generic [ref=f3e132]: ●
+          - generic [ref=f3e133]: ●
+        - generic [ref=f3e134]:
+          - generic [ref=f3e135]:
+            - text: ticket price
+            - emphasis [ref=f3e136]: step5 → steps.step5
+          - generic [ref=f3e137]: ○
+          - generic [ref=f3e138]: ○
+          - generic [ref=f3e139]: ○
+        - generic [ref=f3e140]:
+          - generic [ref=f3e141]:
+            - text: amenities
+            - emphasis [ref=f3e142]: step7 → steps.step7
+          - generic [ref=f3e143]: ○
+          - generic [ref=f3e144]: ○
+          - generic [ref=f3e145]: ○
+        - generic [ref=f3e146]:
+          - generic [ref=f3e147]:
+            - text: photos
+            - emphasis [ref=f3e148]: step8 → steps.step8
+          - generic [ref=f3e149]: ○
+          - generic [ref=f3e150]: ○
+          - 'generic "never: files go up separately" [ref=f3e151]': —
+      - paragraph [ref=f3e152]: Something you typed only ever reached a component useState. The moment you navigated it was gone, and no save call was ever made.
+    - generic [ref=f3e153]:
+      - generic [ref=f3e154]:
+        - generic [ref=f3e155]: the organizer
+        - button "start a draft" [disabled] [ref=f3e156]
+        - button "type the ticket price" [ref=f3e587] [cursor=pointer]
+      - generic [ref=f3e157]:
+        - generic [ref=f3e158]: navigation
+        - button "Back" [ref=f3e159] [cursor=pointer]
+        - button "Next" [ref=f3e160] [cursor=pointer]
+        - button "Save & exit" [ref=f3e161] [cursor=pointer]
+        - button "Publish" [disabled] [ref=f3e162]
+      - generic [ref=f3e163]:
+        - generic [ref=f3e164]: life happens
+        - button "close the tab" [ref=f3e165] [cursor=pointer]
+        - button "come back" [disabled] [ref=f3e166]
+        - generic [ref=f3e168]: or run one
+        - button "fill it in and publish" [ref=f3e169] [cursor=pointer]
+        - button "interrupted at step 5" [active] [ref=f3e170] [cursor=pointer]
+        - button "the step 2 path" [ref=f3e171] [cursor=pointer]
+        - button "publish an empty draft" [ref=f3e172] [cursor=pointer]
+        - button "reset" [ref=f3e173] [cursor=pointer]
+    - generic [ref=f3e174]:
+      - generic [ref=f3e175]:
+        - heading "what you did" [level=3] [ref=f3e176]
+        - generic [ref=f3e177]: 9 of 9 events
+      - generic [ref=f3e588]:
+        - button "1" [ref=f3e589] [cursor=pointer]
+        - button "2" [ref=f3e592] [cursor=pointer]
+        - button "3" [ref=f3e595] [cursor=pointer]
+        - button "4" [ref=f3e598] [cursor=pointer]
+        - button "5" [ref=f3e601] [cursor=pointer]
+        - button "6" [ref=f3e604] [cursor=pointer]
+        - button "7" [ref=f3e607] [cursor=pointer]
+        - button "8" [ref=f3e610] [cursor=pointer]
+        - button "9" [ref=f3e613] [cursor=pointer]
+      - generic [ref=f3e617]:
+        - generic [ref=f3e618]: "setStepData('step4', {location}) -> reducer + localStorage"
+        - generic [ref=f3e619]: "PATCH /api/events/event-drafts/1/ {data: {steps: {step1, step4}}, current_step: 'step5'} 200"
+        - generic [ref=f3e620]: "setStepData('step5', {price}) -> reducer + localStorage"
+        - generic [ref=f3e621]: tab closed. no beforeunload handler, no flush
+        - generic [ref=f3e622]: GET /api/events/event-drafts/1/ 200
+        - generic [ref=f3e623]: resolveStepPath('step5') -> 'step5'. navigate(replace) to it.
+    - generic [ref=f3e624]:
+      - 'heading "ran the scenario: interrupted at step 5" [level=3] [ref=f3e625]'
+      - generic [ref=f3e626]:
+        - generic [ref=f3e627]:
+          - generic [ref=f3e628]: outcome
+          - generic [ref=f3e629]: nothing-yet
+          - generic [ref=f3e630]: →
+          - generic [ref=f3e631]: lost-on-navigate
+        - generic [ref=f3e632]:
+          - generic [ref=f3e633]: where you are
+          - generic [ref=f3e634]: nowhere
+          - generic [ref=f3e635]: →
+          - generic [ref=f3e636]: step5
+        - generic [ref=f3e637]:
+          - generic [ref=f3e638]: current_step on the row
+          - generic [ref=f3e639]: no row
+          - generic [ref=f3e640]: →
+          - generic [ref=f3e641]: step5
+        - generic [ref=f3e642]:
+          - generic [ref=f3e643]: a resume would land on
+          - generic [ref=f3e644]: no draft yet
+          - generic [ref=f3e645]: →
+          - generic [ref=f3e646]: step5
+        - generic [ref=f3e647]:
+          - generic [ref=f3e648]: data.steps on the server
+          - generic [ref=f3e649]: empty
+          - generic [ref=f3e650]: →
+          - generic [ref=f3e651]: step1:1 step4:1
+        - generic [ref=f3e652]:
+          - generic [ref=f3e653]: steps in the reducer
+          - generic [ref=f3e654]: empty
+          - generic [ref=f3e655]: →
+          - generic [ref=f3e656]: step1:1 step4:1
+        - generic [ref=f3e657]:
+          - generic [ref=f3e658]: typed but never saved
+          - generic [ref=f3e659]: "0"
+          - generic [ref=f3e660]: →
+          - generic [ref=f3e661]: "1"
+        - generic [ref=f3e662]:
+          - generic [ref=f3e663]: progress bar
+          - generic [ref=f3e664]: 0%
+          - generic [ref=f3e665]: →
+          - generic [ref=f3e666]: 50%
+        - generic [ref=f3e667]:
+          - generic [ref=f3e668]: draft status
+          - generic [ref=f3e669]: none
+          - generic [ref=f3e670]: →
+          - generic [ref=f3e671]: draft
+      - group [ref=f3e672]:
+        - generic "why?" [ref=f3e673] [cursor=pointer]
+    - generic [ref=f3e229]:
+      - heading "Six ways this goes wrong" [level=2] [ref=f3e230]
+      - paragraph [ref=f3e231]: Each card leads with what you would actually see, because that is what you meet first. Every one is reachable from the controls above, so predict, then reproduce it and watch the chart.
+    - generic [ref=f3e232]:
+      - generic [ref=f3e233]: WHAT YOU SEE
+      - heading "An organizer swears they picked an event type. The published event has no category, and the draft has no record that anyone ever chose one." [level=3] [ref=f3e234]
+      - generic [ref=f3e235]: "<Route path=\"step2\" element={<Navigate to=\"step1\" replace/>}/>"
+      - generic [ref=f3e237]: WHY
+      - heading "They picked it on a screen that never saved" [level=4] [ref=f3e238]
+      - paragraph [ref=f3e239]: "ListingStep2 holds the choice in a useState called selectedEventType, and its Next button calls navigate and nothing else. There is no saveStep, no setStepData, no request. Today the route redirects past it, so the screen cannot be reached at all and step 1 collects the event type instead. The backend still carries the old shape as a fallback: _first_truthy(step1.get('category'), step1.get('selectedEventType'), ...)."
+      - generic [ref=f3e240]:
+        - generic [ref=f3e241]:
+          - generic [ref=f3e242]: frontend/src/ListingStep2.jsx
+          - generic [ref=f3e243]: lines 113–119 · running line 119
+        - code [ref=f3e675]:
+          - generic [ref=f3e676]: <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
+          - generic [ref=f3e677]: <div className="max-w-screen-2xl mx-auto flex justify-between items-center px-2">
+          - generic [ref=f3e678]: "<button onClick={() => navigate(`${listingBase}/step1`)} className=\"font-bold text-gray-800 underline hover:text-black transition\">"
+          - generic [ref=f3e679]: Back
+          - generic [ref=f3e680]: </button>
+          - generic [ref=f3e681]: <motion.button
+          - generic [ref=f3e682]: "onClick={() => navigate(`${listingBase}/step3`)}"
+      - paragraph [ref=f3e254]: Both halves of this are worth holding at once. As shipped, nothing is lost, because you cannot reach the screen. What is left behind is a 130-line component that looks live to anyone reading the folder.
+      - generic [ref=f3e255]:
+        - generic [ref=f3e256]: The step 2 route is about to go live, and the organizer picks an event type there and presses Next. What becomes of that answer?
+        - generic [ref=f3e257]:
+          - button "it survives the value is in EventDraft.data and comes back on resume" [ref=f3e258] [cursor=pointer]:
+            - strong [ref=f3e259]: it survives
+            - generic [ref=f3e260]: the value is in EventDraft.data and comes back on resume
+          - button "lost the moment you navigate it only ever reached component useState" [ref=f3e261] [cursor=pointer]:
+            - strong [ref=f3e262]: lost the moment you navigate
+            - generic [ref=f3e263]: it only ever reached component useState
+          - button "lost when the tab closes it reached the reducer but no save ran" [ref=f3e264] [cursor=pointer]:
+            - strong [ref=f3e265]: lost when the tab closes
+            - generic [ref=f3e266]: it reached the reducer but no save ran
+          - button "on this browser only localStorage has it, the server does not" [ref=f3e267] [cursor=pointer]:
+            - strong [ref=f3e268]: on this browser only
+            - generic [ref=f3e269]: localStorage has it, the server does not
+          - button "published, with defaults filled in publish succeeded and the projection supplied what was missing" [ref=f3e270] [cursor=pointer]:
+            - strong [ref=f3e271]: published, with defaults filled in
+            - generic [ref=f3e272]: publish succeeded and the projection supplied what was missing
+      - button "reproduce it on the chart" [ref=f3e273] [cursor=pointer]
+    - generic [ref=f3e274]:
+      - generic [ref=f3e275]: WHAT YOU SEE
+      - heading "The organizer keeps working and everything looks normal. Later, the wizard reopens several steps earlier than where they stopped, and recent answers are missing." [level=3] [ref=f3e276]
+      - generic [ref=f3e277]: Save failed, stored locally until you are back online.
+      - generic [ref=f3e279]: WHY
+      - heading "A save failed and the wizard advanced anyway" [level=4] [ref=f3e280]
+      - paragraph [ref=f3e281]: saveStep catches the failure, sets an error string and a status, and returns. The step component does not check the result before navigating, so the browser moves to the next step while current_step on the row stays where it was. The reducer and localStorage keep the answers, so on that same browser it looks fine. On any other one it does not.
+      - generic [ref=f3e282]:
+        - generic [ref=f3e283]:
+          - generic [ref=f3e284]: frontend/src/context/reactContext.jsx
+          - generic [ref=f3e285]: lines 404–422 · running line 418
+        - code [ref=f3e684]:
+          - generic [ref=f3e685]: "const saveStep = useCallback(async (id, step, payload, nextStep) => {"
+          - generic [ref=f3e686]: const normalizedStep = step || state.current_step;
+          - generic [ref=f3e687]: const sanitizedPayload = sanitizePayload(payload);
+          - generic [ref=f3e688]: const filteredPayload = filterPayloadForStep(normalizedStep, sanitizedPayload);
+          - generic [ref=f3e689]: const eventId = id || state.event?.id;
+          - generic [ref=f3e690]: "const mergedSteps = mergeStepMaps(state.data.steps, { [normalizedStep]: sanitizedPayload });"
+          - generic [ref=f3e691]: "const mergedData = applyStepsToData({ ...state.data, steps: mergedSteps }, mergedSteps);"
+          - generic [ref=f3e692]: "dispatch({ type: 'setSaving', payload: true });"
+          - generic [ref=f3e693]: "dispatch({ type: 'mergeStepData', step: normalizedStep, payload: sanitizedPayload });"
+          - generic [ref=f3e694]: "const body = {"
+          - generic [ref=f3e695]: "data: { ...mergedData, ...((filteredPayload && Object.keys(filteredPayload).length) ? { steps: mergedSteps } : { steps: mergedSteps }) },"
+          - generic [ref=f3e696]: "current_step: nextStep || normalizedStep,"
+          - generic [ref=f3e697]: "};"
+          - generic [ref=f3e698]: "const endpoint = eventId ? `/api/events/event-drafts/${eventId}/` : '/api/events/event-drafts/';"
+          - generic [ref=f3e699]: "const method = eventId ? 'PATCH' : 'POST';"
+      - paragraph [ref=f3e304]: "There is no retry anywhere. \"Stored locally until you are back online\" describes what happened, not something the code will act on: the next successful save is what pushes it, and only if the reducer still holds it."
+      - generic [ref=f3e305]:
+        - generic [ref=f3e306]: The save call is about to start failing. The organizer types a venue and presses Next. What becomes of the venue?
+        - generic [ref=f3e307]:
+          - button "it survives the value is in EventDraft.data and comes back on resume" [ref=f3e308] [cursor=pointer]:
+            - strong [ref=f3e309]: it survives
+            - generic [ref=f3e310]: the value is in EventDraft.data and comes back on resume
+          - button "lost the moment you navigate it only ever reached component useState" [ref=f3e311] [cursor=pointer]:
+            - strong [ref=f3e312]: lost the moment you navigate
+            - generic [ref=f3e313]: it only ever reached component useState
+          - button "lost when the tab closes it reached the reducer but no save ran" [ref=f3e314] [cursor=pointer]:
+            - strong [ref=f3e315]: lost when the tab closes
+            - generic [ref=f3e316]: it reached the reducer but no save ran
+          - button "on this browser only localStorage has it, the server does not" [ref=f3e317] [cursor=pointer]:
+            - strong [ref=f3e318]: on this browser only
+            - generic [ref=f3e319]: localStorage has it, the server does not
+          - button "published, with defaults filled in publish succeeded and the projection supplied what was missing" [ref=f3e320] [cursor=pointer]:
+            - strong [ref=f3e321]: published, with defaults filled in
+            - generic [ref=f3e322]: publish succeeded and the projection supplied what was missing
+      - button "reproduce it on the chart" [ref=f3e323] [cursor=pointer]
+    - generic [ref=f3e324]:
+      - generic [ref=f3e325]: WHAT YOU SEE
+      - heading "An organizer opens a draft and finds a field already filled in with something from a different event." [level=3] [ref=f3e326]
+      - generic [ref=f3e327]: const LOCAL_STORAGE_KEY = 'eventCreationStore';
+      - generic [ref=f3e329]: WHY
+      - heading "One localStorage key for every draft" [level=4] [ref=f3e330]
+      - paragraph [ref=f3e331]: The whole reducer, including data.steps, is written to a fixed key on every state change. Nothing about that key mentions which draft it belongs to. When the next draft loads, mergeStepMaps puts the cached steps over the fetched ones, so the previous draft wins wherever they overlap.
+      - generic [ref=f3e332]:
+        - generic [ref=f3e333]:
+          - generic [ref=f3e334]: frontend/src/context/reactContext.jsx
+          - generic [ref=f3e335]: lines 185–193 · running line 192
+        - code [ref=f3e701]:
+          - generic [ref=f3e702]: "useEffect(() => {"
+          - generic [ref=f3e703]: "const toCache = sanitizePayload({"
+          - generic [ref=f3e704]: ...state,
+          - generic [ref=f3e705]: "loading: false,"
+          - generic [ref=f3e706]: "saving: false,"
+          - generic [ref=f3e707]: "error: null,"
+          - generic [ref=f3e708]: "});"
+          - generic [ref=f3e709]: localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(toCache));
+          - generic [ref=f3e710]: "}, [state]);"
+      - generic [ref=f3e348]:
+        - generic [ref=f3e349]: localStorage still holds the previous draft they were editing. They open this one and resume. What do they see?
+        - generic [ref=f3e350]:
+          - button "it survives the value is in EventDraft.data and comes back on resume" [ref=f3e351] [cursor=pointer]:
+            - strong [ref=f3e352]: it survives
+            - generic [ref=f3e353]: the value is in EventDraft.data and comes back on resume
+          - button "lost the moment you navigate it only ever reached component useState" [ref=f3e354] [cursor=pointer]:
+            - strong [ref=f3e355]: lost the moment you navigate
+            - generic [ref=f3e356]: it only ever reached component useState
+          - button "lost when the tab closes it reached the reducer but no save ran" [ref=f3e357] [cursor=pointer]:
+            - strong [ref=f3e358]: lost when the tab closes
+            - generic [ref=f3e359]: it reached the reducer but no save ran
+          - button "on this browser only localStorage has it, the server does not" [ref=f3e360] [cursor=pointer]:
+            - strong [ref=f3e361]: on this browser only
+            - generic [ref=f3e362]: localStorage has it, the server does not
+          - button "published, with defaults filled in publish succeeded and the projection supplied what was missing" [ref=f3e363] [cursor=pointer]:
+            - strong [ref=f3e364]: published, with defaults filled in
+            - generic [ref=f3e365]: publish succeeded and the projection supplied what was missing
+      - button "reproduce it on the chart" [ref=f3e366] [cursor=pointer]
+    - generic [ref=f3e367]:
+      - generic [ref=f3e368]: WHAT YOU SEE
+      - heading "A draft opens to a blank page. No error, no redirect, no wizard." [level=3] [ref=f3e369]
+      - generic [ref=f3e370]: current_step = models.CharField(max_length=100)
+      - generic [ref=f3e372]: WHY
+      - heading "current_step holds something the lookup does not recognise" [level=4] [ref=f3e373]
+      - paragraph [ref=f3e374]: "resolveStepPath returns null for anything outside its table, and the layout treats null as \"nothing to do\": it stops loading and renders the outlet with no step matched. Nothing prevents this from happening, because current_step is a CharField with no choices, the serializer does not constrain it, and the client sends whatever getNextStep produced."
+      - generic [ref=f3e375]:
+        - generic [ref=f3e376]:
+          - generic [ref=f3e377]: frontend/src/ListingWizardLayout.jsx
+          - generic [ref=f3e378]: lines 79–94 · running line 88
+        - code [ref=f3e712]:
+          - generic [ref=f3e713]: // If the URL already targets a recognized step, stay there.
+          - generic [ref=f3e714]: // Only redirect to the saved current_step when the URL has no step (index route).
+          - generic [ref=f3e715]: const urlStep = getUrlStep(locationRef.current.pathname);
+          - generic [ref=f3e716]: "if (urlStep) {"
+          - generic [ref=f3e717]: setIsLoading(false);
+          - generic [ref=f3e718]: return;
+          - generic [ref=f3e719]: "}"
+          - generic [ref=f3e720]: // No step in the URL — redirect to wherever the user left off.
+          - generic [ref=f3e721]: const stepPath = resolveStepPath(draft.current_step);
+          - generic [ref=f3e722]: "if (stepPath) {"
+          - generic [ref=f3e723]: "navigate(`/listing/${eventId}/${stepPath}`, {replace: true});"
+          - generic [ref=f3e724]: return;
+          - generic [ref=f3e725]: "}"
+          - generic [ref=f3e726]: setIsLoading(false);
+      - generic [ref=f3e396]:
+        - generic [ref=f3e397]: current_step on the row is about to hold a value the lookup does not recognise. They open /listing/1 with no step in the URL. Where do they land?
+        - generic [ref=f3e398]:
+          - button "it survives the value is in EventDraft.data and comes back on resume" [ref=f3e399] [cursor=pointer]:
+            - strong [ref=f3e400]: it survives
+            - generic [ref=f3e401]: the value is in EventDraft.data and comes back on resume
+          - button "lost the moment you navigate it only ever reached component useState" [ref=f3e402] [cursor=pointer]:
+            - strong [ref=f3e403]: lost the moment you navigate
+            - generic [ref=f3e404]: it only ever reached component useState
+          - button "lost when the tab closes it reached the reducer but no save ran" [ref=f3e405] [cursor=pointer]:
+            - strong [ref=f3e406]: lost when the tab closes
+            - generic [ref=f3e407]: it reached the reducer but no save ran
+          - button "on this browser only localStorage has it, the server does not" [ref=f3e408] [cursor=pointer]:
+            - strong [ref=f3e409]: on this browser only
+            - generic [ref=f3e410]: localStorage has it, the server does not
+          - button "published, with defaults filled in publish succeeded and the projection supplied what was missing" [ref=f3e411] [cursor=pointer]:
+            - strong [ref=f3e412]: published, with defaults filled in
+            - generic [ref=f3e413]: publish succeeded and the projection supplied what was missing
+      - button "reproduce it on the chart" [ref=f3e414] [cursor=pointer]
+    - generic [ref=f3e415]:
+      - generic [ref=f3e416]: WHAT YOU SEE
+      - heading "An organizer with a bookmarked link keeps landing on step 5, no matter how far past it they have got." [level=3] [ref=f3e417]
+      - generic [ref=f3e418]: "if (urlStep) { setIsLoading(false); return; }"
+      - generic [ref=f3e420]: WHY
+      - heading "A step in the URL wins over the saved one" [level=4] [ref=f3e421]
+      - paragraph [ref=f3e422]: The layout looks for a known step segment anywhere in the path and returns early if it finds one. current_step is fetched and then never consulted. This is deliberate, and it is what makes a deep link work at all, but it means the URL and the row can disagree indefinitely.
+      - generic [ref=f3e423]:
+        - generic [ref=f3e424]:
+          - generic [ref=f3e425]: frontend/src/ListingWizardLayout.jsx
+          - generic [ref=f3e426]: lines 79–94 · running line 82
+        - code [ref=f3e728]:
+          - generic [ref=f3e729]: // If the URL already targets a recognized step, stay there.
+          - generic [ref=f3e730]: // Only redirect to the saved current_step when the URL has no step (index route).
+          - generic [ref=f3e731]: const urlStep = getUrlStep(locationRef.current.pathname);
+          - generic [ref=f3e732]: "if (urlStep) {"
+          - generic [ref=f3e733]: setIsLoading(false);
+          - generic [ref=f3e734]: return;
+          - generic [ref=f3e735]: "}"
+          - generic [ref=f3e736]: // No step in the URL — redirect to wherever the user left off.
+          - generic [ref=f3e737]: const stepPath = resolveStepPath(draft.current_step);
+          - generic [ref=f3e738]: "if (stepPath) {"
+          - generic [ref=f3e739]: "navigate(`/listing/${eventId}/${stepPath}`, {replace: true});"
+          - generic [ref=f3e740]: return;
+          - generic [ref=f3e741]: "}"
+          - generic [ref=f3e742]: setIsLoading(false);
+      - button "reproduce it on the chart" [ref=f3e444] [cursor=pointer]
+    - generic [ref=f3e445]:
+      - generic [ref=f3e446]: WHAT YOU SEE
+      - heading "An event appears on the site called \"Untitled event\", dated today, with no venue." [level=3] [ref=f3e447]
+      - generic [ref=f3e448]:
+        - generic [ref=f3e449]: "\"name\": self._first_truthy(..., \"Untitled event\")"
+        - generic [ref=f3e450]: event_date = parsed_date or ... or timezone.localdate()
+      - generic [ref=f3e451]: WHY
+      - heading "Publishing an empty draft succeeds" [level=4] [ref=f3e452]
+      - paragraph [ref=f3e453]: Nothing between the wizard and the Event table checks that anything was filled in. The review screen has a readiness modal, but it lists booking requests and its confirm button is wired straight to handlePublish. _build_event_payload then fills every missing column from a fallback chain ending in a literal.
+      - generic [ref=f3e454]:
+        - generic [ref=f3e455]:
+          - generic [ref=f3e456]: frontend/src/ListingReview.jsx
+          - generic [ref=f3e457]: lines 260–265 · running line 263
+        - code [ref=f3e744]:
+          - generic [ref=f3e745]: "{showReadinessModal && ("
+          - generic [ref=f3e746]: <ReadinessModal
+          - generic [ref=f3e747]: "requests={bookingRequests}"
+          - generic [ref=f3e748]: "onConfirm={handlePublish}"
+          - generic [ref=f3e749]: "onClose={() => setShowReadinessModal(false)}"
+          - generic [ref=f3e750]: "isPublishing={isPublishing}"
+      - paragraph [ref=f3e467]: This is the price of the design rather than an oversight in it. Persisting a partial draft at every step means the server must accept a partial draft at every step, so there is no moment before publish when refusing an incomplete one would be possible without inventing a separate schema for "complete".
+      - generic [ref=f3e468]:
+        - generic [ref=f3e469]: A draft with nothing typed into it at all reaches review, and the organizer presses Publish. What happens?
+        - generic [ref=f3e470]:
+          - button "it survives the value is in EventDraft.data and comes back on resume" [ref=f3e471] [cursor=pointer]:
+            - strong [ref=f3e472]: it survives
+            - generic [ref=f3e473]: the value is in EventDraft.data and comes back on resume
+          - button "lost the moment you navigate it only ever reached component useState" [ref=f3e474] [cursor=pointer]:
+            - strong [ref=f3e475]: lost the moment you navigate
+            - generic [ref=f3e476]: it only ever reached component useState
+          - button "lost when the tab closes it reached the reducer but no save ran" [ref=f3e477] [cursor=pointer]:
+            - strong [ref=f3e478]: lost when the tab closes
+            - generic [ref=f3e479]: it reached the reducer but no save ran
+          - button "on this browser only localStorage has it, the server does not" [ref=f3e480] [cursor=pointer]:
+            - strong [ref=f3e481]: on this browser only
+            - generic [ref=f3e482]: localStorage has it, the server does not
+          - button "published, with defaults filled in publish succeeded and the projection supplied what was missing" [ref=f3e483] [cursor=pointer]:
+            - strong [ref=f3e484]: published, with defaults filled in
+            - generic [ref=f3e485]: publish succeeded and the projection supplied what was missing
+      - button "reproduce it on the chart" [ref=f3e486] [cursor=pointer]
+    - generic [ref=f3e487]:
+      - heading "Prove there is a fourth way" [level=2] [ref=f3e488]
+      - paragraph [ref=f3e489]: The scene knows three ways an organizer loses work that are not the step 2 screen. Go and find one of them, or a fourth.
+      - generic [ref=f3e490]:
+        - heading "VS Code" [level=4] [ref=f3e491]
+        - generic [ref=f3e492]:
+          - generic [ref=f3e493]: where
+          - paragraph [ref=f3e494]: VS Code, at frontend/src/context/reactContext.jsx lines 404 to 419
+          - generic [ref=f3e495]: do
+          - paragraph [ref=f3e496]: "Read saveStep. Find where filteredPayload is used in the request body, and look carefully at the two branches of that ternary. Then answer: of the five fields step 5 actually sends, how many would STEP_FIELD_WHITELIST have dropped if it were wired up?"
+          - generic [ref=f3e497]: bring back
+          - paragraph [ref=f3e498]: type the count. The scene computes the same answer from the whitelist and the step payload.
+          - generic [ref=f3e499]: what it means
+          - paragraph [ref=f3e500]: "If the number surprises you, that is the point: the whitelist reads like a constraint on what each step may persist, and step 5 is the step where its idea of the payload and the real payload have almost nothing in common."
+        - generic [ref=f3e501]:
+          - textbox "how many of step 5's fields" [ref=f3e502]
+          - button "check it" [ref=f3e503] [cursor=pointer]
+      - generic [ref=f3e504]:
+        - heading "Find another way to lose work" [level=4] [ref=f3e505]
+        - generic [ref=f3e506]:
+          - generic [ref=f3e507]: where
+          - paragraph [ref=f3e508]: this page, with the controls and the event log
+          - generic [ref=f3e509]: do
+          - paragraph [ref=f3e510]: Find a run where the organizer types something and it never reaches EventDraft.data, without touching the step 2 control. There is more than one way. Copy the link from the address bar when you have one.
+          - generic [ref=f3e511]: bring back
+          - paragraph [ref=f3e512]: paste it back here. The scene decodes the configuration and the whole event log and folds them through the same run() it uses everywhere else.
+          - generic [ref=f3e513]: what it means
+          - paragraph [ref=f3e514]: Every way you find is a real way an organizer loses work in this wizard today. The scene knows of three; if you find a fourth, the model is missing something.
+        - generic [ref=f3e515]:
+          - textbox "paste the link, or the part after s=" [ref=f3e516]
+          - button "check it" [ref=f3e517] [cursor=pointer]
+      - generic [ref=f3e518]:
+        - heading "a terminal" [level=4] [ref=f3e519]
+        - generic [ref=f3e520]:
+          - generic [ref=f3e521]: where
+          - paragraph [ref=f3e522]: a terminal, in backend/main, with the venv active
+          - generic [ref=f3e523]: do
+          - paragraph [ref=f3e524]: "Run: python manage.py shell -c \"from events.models import EventDraft; from collections import Counter; print(Counter(EventDraft.objects.values_list('current_step', flat=True)))\""
+          - generic [ref=f3e525]: bring back
+          - paragraph [ref=f3e526]: the distinct current_step values across your own drafts, and how many sit at each. Only you can see your database, so the scene cannot check this one.
+          - generic [ref=f3e527]: what it means
+          - paragraph [ref=f3e528]: A pile-up on one step is where real organizers stop. A value that is not in STEP_SEQUENCE at all is a draft nobody can resume, and the field type allows it.
+        - generic [ref=f3e529]: unverified
+    - generic [ref=f3e530]:
+      - heading "What looks wrong, as opposed to merely costly" [level=2] [ref=f3e531]
+      - paragraph [ref=f3e532]: Most of what is above is the price of a resumable wizard, paid knowingly. Three of them do not read that way, and it is more useful to say so than to present every finding as a design.
+      - generic [ref=f3e533]:
+        - heading "the step 2 route" [level=4] [ref=f3e534]
+        - paragraph [ref=f3e535]: live, its Next calls navigate and nothing else, so selectedEventType never leaves the component. Nothing is saved on the way out.
+        - generic [ref=f3e536]: frontend/src/App.jsx:121
+      - generic [ref=f3e537]:
+        - heading "the localStorage key" [level=4] [ref=f3e538]
+        - paragraph [ref=f3e539]: on resume, mergeStepMaps puts the cached steps over the ones just fetched, so a draft you edited earlier can put its answers into the draft you are looking at now.
+        - generic [ref=f3e540]: frontend/src/context/reactContext.jsx:12, 317-320
+      - generic [ref=f3e541]:
+        - heading "the field whitelist" [level=4] [ref=f3e542]
+        - paragraph [ref=f3e543]: "it is never applied: filteredPayload is computed and then both branches of the ternary evaluate to the same thing, so the full payload goes up either way. Its idea of step5 is wrong too, listing budget and guest_count for the step that collects ticket pricing."
+        - generic [ref=f3e544]: frontend/src/context/reactContext.jsx:417
+      - paragraph [ref=f3e545]: "None of the three is currently losing anyone's data on the shipped routes: step 2 is unreachable, the whitelist's inaction is what makes step 5 save correctly, and the storage bleed needs two drafts in one session. They are worth naming because each one reads as the opposite of what it does, and the next person to touch this code will believe the reading."
+    - generic [ref=f3e546]:
+      - heading "Every part, and how to break it" [level=3] [ref=f3e547]
+      - paragraph [ref=f3e548]: The list the scene is built from. Click one to inspect it, and its controls appear where you clicked.
+      - generic [ref=f3e549]:
+        - button "the step 2 route flagged in the closing note App.jsx" [ref=f3e550] [cursor=pointer]:
+          - generic [ref=f3e551]:
+            - text: the step 2 route
+            - generic "flagged in the closing note" [ref=f3e552]
+          - generic [ref=f3e553]: App.jsx
+        - button "the save call reactContext.jsx" [ref=f3e554] [cursor=pointer]:
+          - generic [ref=f3e555]: the save call
+          - generic [ref=f3e556]: reactContext.jsx
+        - button "the localStorage key flagged in the closing note reactContext.jsx" [ref=f3e557] [cursor=pointer]:
+          - generic [ref=f3e558]:
+            - text: the localStorage key
+            - generic "flagged in the closing note" [ref=f3e559]
+          - generic [ref=f3e560]: reactContext.jsx
+        - button "how you come back ListingWizardLayout.jsx" [ref=f3e561] [cursor=pointer]:
+          - generic [ref=f3e562]: how you come back
+          - generic [ref=f3e563]: ListingWizardLayout.jsx
+        - button "current_step on the row models.py" [ref=f3e564] [cursor=pointer]:
+          - generic [ref=f3e565]: current_step on the row
+          - generic [ref=f3e566]: models.py
+        - button "the field whitelist flagged in the closing note reactContext.jsx" [ref=f3e567] [cursor=pointer]:
+          - generic [ref=f3e568]:
+            - text: the field whitelist
+            - generic "flagged in the closing note" [ref=f3e569]
+          - generic [ref=f3e570]: reactContext.jsx
+        - button "the readiness modal ListingReview.jsx" [ref=f3e571] [cursor=pointer]:
+          - generic [ref=f3e572]: the readiness modal
+          - generic [ref=f3e573]: ListingReview.jsx
+        - button "published_event_id views.py" [ref=f3e574] [cursor=pointer]:
+          - generic [ref=f3e575]: published_event_id
+          - generic [ref=f3e576]: views.py
+  - generic [ref=f3e225]:
+    - button "probes" [ref=f3e226] [cursor=pointer]
+    - button "history ·1" [ref=f3e751] [cursor=pointer]:
+      - text: history
+      - generic [ref=f3e752]: ·1
+    - button "compare" [ref=f3e228] [cursor=pointer]

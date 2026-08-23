@@ -1,0 +1,346 @@
+- generic [ref=f2e3]:
+  - banner [ref=f2e4]:
+    - 'heading "Attica: a REST-first backend and its WebSocket overlay" [level=1] [ref=f2e5]'
+    - generic [ref=f2e6]: the row is committed before anyone is told, so every real-time path is droppable
+    - button "tour" [ref=f2e7] [cursor=pointer]
+  - navigation [ref=f2e8]:
+    - button "0the map" [ref=f2e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=f2e10] [cursor=pointer]
+    - button "2the mechanism" [ref=f2e11] [cursor=pointer]
+    - button "3where it costs you" [ref=f2e12] [cursor=pointer]
+    - button "4build it" [ref=f2e13] [cursor=pointer]
+  - generic [ref=f2e15]:
+    - generic [ref=f2e16]:
+      - generic [ref=f2e17]:
+        - button "the four processes" [ref=f2e18] [cursor=pointer]
+        - generic [ref=f2e19]: ECOSYSTEM · which config line declares each one, and the proxy hop between them
+      - img [ref=f2e20]:
+        - 'generic "POST /api/…: the message body and the Bearer token" [ref=f2e21] [cursor=pointer]': POST /api
+        - 'generic "ws://…/ws/chat/rooms/7/?token=: the JWT in the query string, then one JSON frame per event" [ref=f2e25] [cursor=pointer]': ws upgrade
+        - 'generic "INSERT, then UPDATE delivered_at: the row itself" [ref=f2e29] [cursor=pointer]': INSERT
+        - 'generic "group_send, DB 0: {\"type\": \"chat.event\", \"payload\": {...}} addressed to chat_room_7" [ref=f2e35] [cursor=pointer]': group_send
+        - 'generic "cache, DB 1: cached user permissions, 15 minute timeout" [ref=f2e41] [cursor=pointer]': cache
+        - generic "click to inspect, double-click to open" [ref=f2e47] [cursor=pointer]:
+          - generic [ref=f2e51]: Browser + Vite :5173
+          - generic [ref=f2e52]: React 19 under the Vite dev
+          - generic [ref=f2e53]: server. It is also the proxy that
+          - generic [ref=f2e54]: makes :5173 look like :8000.
+          - generic [ref=f2e55]: 4 rows on screen
+        - generic "click to inspect, double-click to open" [ref=f2e57] [cursor=pointer]:
+          - generic [ref=f2e61]: Daphne :8000
+          - generic [ref=f2e62]: The ASGI server. One process holds
+          - generic [ref=f2e63]: both the HTTP API and every open
+          - generic [ref=f2e64]: WebSocket.
+          - generic [ref=f2e65]: daphne
+        - generic "click to inspect, double-click to open" [ref=f2e67] [cursor=pointer]:
+          - generic [ref=f2e71]: Redis :6379
+          - generic [ref=f2e72]: "Two unrelated jobs on one server:"
+          - generic [ref=f2e73]: DB 0 is the channel layer that
+          - generic [ref=f2e74]: fans messages out, DB 1 is the
+          - generic [ref=f2e75]: reachable
+        - generic "click to inspect" [ref=f2e77] [cursor=pointer]:
+          - generic [ref=f2e81]: SQLite db.sqlite3
+          - generic [ref=f2e82]: The source of truth. Every message
+          - generic [ref=f2e83]: is here before any socket hears
+          - generic [ref=f2e84]: about it.
+          - generic [ref=f2e85]: 4 rows in room 7
+        - generic [ref=f2e86]:
+          - generic [ref=f2e87]:
+            - generic [ref=f2e89]: row committed
+            - generic [ref=f2e90]: yes, 4 rows
+          - generic [ref=f2e91]:
+            - generic [ref=f2e93]: second browser sees it
+            - generic [ref=f2e94]: yes, after 16 ms
+          - generic [ref=f2e95]:
+            - generic [ref=f2e97]: database ahead of screen by
+            - generic [ref=f2e98]: 0 rows
+          - generic [ref=f2e99]:
+            - generic [ref=f2e101]: delivered by
+            - generic [ref=f2e102]: the socket
+      - paragraph [ref=f2e103]: Committed, then broadcast. The second browser rendered it about 16 ms later (illustrative).
+    - generic [ref=f2e104]:
+      - generic [ref=f2e105]:
+        - heading "one message, all the way through" [level=3] [ref=f2e106]
+        - generic [ref=f2e107]: 13 of 14 steps ran
+        - generic [ref=f2e108]: 20 ms to the last push step, illustrative
+      - generic [ref=f2e109]:
+        - button "01" [ref=f2e110] [cursor=pointer]
+        - button "02" [ref=f2e113] [cursor=pointer]
+        - button "03" [ref=f2e116] [cursor=pointer]
+        - button "04" [ref=f2e119] [cursor=pointer]
+        - button "05" [ref=f2e122] [cursor=pointer]
+        - button "06" [ref=f2e125] [cursor=pointer]
+        - button "07" [ref=f2e128] [cursor=pointer]
+        - button "08" [ref=f2e131] [cursor=pointer]
+        - button "09" [ref=f2e134] [cursor=pointer]
+        - button "10" [ref=f2e137] [cursor=pointer]
+        - button "11" [ref=f2e140] [cursor=pointer]
+        - button "12" [ref=f2e143] [cursor=pointer]
+        - button "13" [ref=f2e146] [cursor=pointer]
+        - button "14" [ref=f2e149] [cursor=pointer]
+      - generic [ref=f2e153]:
+        - text: Click any step to see what it did, and the line of Attica that did it. The four that matter most are
+        - strong [ref=f2e154]: the row is written
+        - text: and
+        - strong [ref=f2e155]: send to the room group
+        - text: ": the first always comes before the second, which is the whole argument."
+    - generic [ref=f2e157]:
+      - heading "Six ways this goes wrong, and only one of them loses anything" [level=2] [ref=f2e158]
+      - paragraph [ref=f2e159]: Each card leads with what you would actually see, because that is what you meet first when something is broken. The cause comes after. Every one of them is a control you can set, so predict first, then reproduce it and watch the map.
+    - generic [ref=f2e160]:
+      - generic [ref=f2e161]: WHAT YOU SEE
+      - heading "Two people are in a room. One sends. Their own screen updates. The other screen does not, and never will, and neither browser shows an error." [level=3] [ref=f2e162]
+      - generic [ref=f2e163]:
+        - generic [ref=f2e164]: "WARNING Chat broadcast skipped: Error 111 connecting to 127.0.0.1:6379. Connection refused."
+        - generic [ref=f2e165]: POST /api/chat/rooms/7/messages/ 201 (Created)
+      - generic [ref=f2e166]: WHY
+      - heading "Redis died after both sockets had already joined the group" [level=4] [ref=f2e167]
+      - paragraph [ref=f2e168]: group_add ran while Redis was still up, so both sockets are members and both clients think they are healthy. When the POST reaches group_send, the connection is gone. _safe_group_send catches it, logs a warning, and returns. The view carries on and answers 201. Nothing sends a close frame, nothing sends a warning frame, so socketError is never set and the fallback poll never mounts.
+      - generic [ref=f2e169]:
+        - generic [ref=f2e170]:
+          - generic [ref=f2e171]: backend/main/chat/utils.py
+          - generic [ref=f2e172]: lines 10–37 · running line 19
+        - code [ref=f2e175]: "def _safe_group_send(channel_layer: BaseChannelLayer, group_name: str, payload: Dict[str, Any]) -> None: \"\"\"Attempt to send to a group but swallow channel-layer errors. If Redis or the configured channel layer is unavailable, we log the failure and return without raising so that REST/API handlers can continue and the message remains persisted in the database. \"\"\" try: async_to_sync(channel_layer.group_send)(group_name, payload) except Exception as exc: # pragma: no cover - defensive safety logger.warning(\"Chat broadcast skipped: %s\", exc) def broadcast_room_event(room_id: int, payload: dict) -> None: \"\"\"Send a payload to all websocket subscribers for the given room.\"\"\" channel_layer: Optional[BaseChannelLayer] = get_channel_layer() if not channel_layer: logger.info(\"Chat broadcast skipped: no channel layer configured\") return _safe_group_send( channel_layer, f\"chat_room_{room_id}\", { \"type\": \"chat.event\", \"payload\": payload, }, )"
+      - paragraph [ref=f2e176]: "One honest gap: whether the counterpart's socket eventually closes depends on how channels_redis surfaces a lost connection into the consumer's receive loop, and Attica has no explicit handler for that. If it does close, the client recovers through the ordinary reconnect and poll. If it does not, the staleness is unbounded. The scene models the unhandled case, because that is the one nothing in the code is defending against."
+      - generic [ref=f2e177]:
+        - generic [ref=f2e178]: Redis is about to die, after both sockets already joined the room. The organizer sends a message. What becomes of it?
+        - generic [ref=f2e179]:
+          - button "delivered over the socket row committed, and the second browser was pushed the message" [ref=f2e180] [cursor=pointer]:
+            - strong [ref=f2e181]: delivered over the socket
+            - generic [ref=f2e182]: row committed, and the second browser was pushed the message
+          - button "delivered by the 8-second poll row committed, nothing pushed, the timer picked it up" [ref=f2e183] [cursor=pointer]:
+            - strong [ref=f2e184]: delivered by the 8-second poll
+            - generic [ref=f2e185]: row committed, nothing pushed, the timer picked it up
+          - button "committed, but nobody was told row committed, no push, and no poll running to recover it" [ref=f2e186] [cursor=pointer]:
+            - strong [ref=f2e187]: committed, but nobody was told
+            - generic [ref=f2e188]: row committed, no push, and no poll running to recover it
+          - 'button "refused: not a participant the watching user is not in this room, so both the socket and the GET refuse" [ref=f2e189] [cursor=pointer]':
+            - strong [ref=f2e190]: "refused: not a participant"
+            - generic [ref=f2e191]: the watching user is not in this room, so both the socket and the GET refuse
+          - button "never written at all the POST itself did not succeed, so there is no row" [ref=f2e192] [cursor=pointer]:
+            - strong [ref=f2e193]: never written at all
+            - generic [ref=f2e194]: the POST itself did not succeed, so there is no row
+      - generic [ref=f2e195]:
+        - button "reproduce it on the map" [ref=f2e196] [cursor=pointer]
+        - generic [ref=f2e197]: "row survives: 4 in the database"
+        - generic [ref=f2e198]: not delivered
+    - generic [ref=f2e199]:
+      - generic [ref=f2e200]: WHAT YOU SEE
+      - heading "A banner appears saying realtime updates are unavailable, and messages start arriving late but reliably." [level=3] [ref=f2e201]
+      - generic [ref=f2e202]:
+        - generic [ref=f2e203]: "WARNING Failed to join chat group chat_room_7: Error 111 connecting to 127.0.0.1:6379. Connection refused."
+        - generic [ref=f2e204]: "ws frame out: {\"type\": \"warning\", \"detail\": \"Realtime updates unavailable; refresh to see new messages.\"}"
+      - generic [ref=f2e205]: WHY
+      - heading "Redis was already down when the socket connected" [level=4] [ref=f2e206]
+      - paragraph [ref=f2e207]: group_add raises during connect(). ChatConsumer catches it, sets broadcast_enabled to False, accepts the socket anyway, and then sends a warning frame. The client sets socketError on that frame, which mounts the 8-second poll. This is the graceful path, and it is the one the code actually handles.
+      - generic [ref=f2e208]:
+        - generic [ref=f2e209]:
+          - generic [ref=f2e210]: backend/main/chat/consumers.py
+          - generic [ref=f2e211]: lines 56–78 · running line 72
+        - code [ref=f2e214]: "async def connect(self): self.room_id = self.scope['url_route']['kwargs'].get('room_id') self.broadcast_enabled = True if not self.scope['user'] or self.scope['user'].is_anonymous: await self.close(code=4401) return if not await self._user_in_room(): await self.close(code=4403) return self.room_group_name = f\"chat_room_{self.room_id}\" if not self.channel_layer: self.broadcast_enabled = False logger.warning(\"No channel layer configured; realtime disabled for room %s\", self.room_id) else: try: await self.channel_layer.group_add(self.room_group_name, self.channel_name) except Exception as exc: # pragma: no cover - defensive logger.warning(\"Failed to join chat group %s: %s\", self.room_group_name, exc) self.broadcast_enabled = False await self.accept() if not self.broadcast_enabled: await self.send_json( {\"type\": \"warning\", \"detail\": \"Realtime updates unavailable; refresh to see new messages.\"})"
+      - paragraph [ref=f2e215]: Compare this with the one above. The same dead Redis produces a handled degradation or a silent gap depending only on when it died relative to the handshake. That is the sharpest edge in the whole design.
+      - generic [ref=f2e216]:
+        - generic [ref=f2e217]: Redis is about to be down before anyone connects, so the socket cannot join the group at all. What becomes of the message?
+        - generic [ref=f2e218]:
+          - button "delivered over the socket row committed, and the second browser was pushed the message" [ref=f2e219] [cursor=pointer]:
+            - strong [ref=f2e220]: delivered over the socket
+            - generic [ref=f2e221]: row committed, and the second browser was pushed the message
+          - button "delivered by the 8-second poll row committed, nothing pushed, the timer picked it up" [ref=f2e222] [cursor=pointer]:
+            - strong [ref=f2e223]: delivered by the 8-second poll
+            - generic [ref=f2e224]: row committed, nothing pushed, the timer picked it up
+          - button "committed, but nobody was told row committed, no push, and no poll running to recover it" [ref=f2e225] [cursor=pointer]:
+            - strong [ref=f2e226]: committed, but nobody was told
+            - generic [ref=f2e227]: row committed, no push, and no poll running to recover it
+          - 'button "refused: not a participant the watching user is not in this room, so both the socket and the GET refuse" [ref=f2e228] [cursor=pointer]':
+            - strong [ref=f2e229]: "refused: not a participant"
+            - generic [ref=f2e230]: the watching user is not in this room, so both the socket and the GET refuse
+          - button "never written at all the POST itself did not succeed, so there is no row" [ref=f2e231] [cursor=pointer]:
+            - strong [ref=f2e232]: never written at all
+            - generic [ref=f2e233]: the POST itself did not succeed, so there is no row
+      - generic [ref=f2e234]:
+        - button "reproduce it on the map" [ref=f2e235] [cursor=pointer]
+        - generic [ref=f2e236]: "row survives: 4 in the database"
+        - generic [ref=f2e237]: delivered after 8000 ms
+    - generic [ref=f2e238]:
+      - generic [ref=f2e239]: WHAT YOU SEE
+      - heading "The socket connects, drops immediately, connects again four seconds later, drops again. Forever." [level=3] [ref=f2e240]
+      - generic [ref=f2e241]:
+        - generic [ref=f2e242]: "WebSocket is closed before the connection is established. code: 4401"
+        - generic [ref=f2e243]: POST /api/chat/rooms/7/messages/ 401 (Unauthorized)
+      - generic [ref=f2e244]: WHY
+      - heading "The access token expired" [level=4] [ref=f2e245]
+      - paragraph [ref=f2e246]: "WebSocketJWTAuthMiddleware validates the token once, at handshake. An expired one resolves to AnonymousUser and connect() closes 4401. The client's onclose schedules a reconnect in 4000 ms, which presents the same dead token. The loop only breaks when AuthProvider refreshes: wsUrl depends on tokens, so a refresh rebuilds the URL and the effect reconnects with a live one."
+      - generic [ref=f2e247]:
+        - generic [ref=f2e248]:
+          - generic [ref=f2e249]: backend/main/chat/consumers.py
+          - generic [ref=f2e250]: lines 32–52 · running line 51
+        - code [ref=f2e253]: "class WebSocketJWTAuthMiddleware: \"\"\" Simple middleware that accepts ?token= or header Authorization: Bearer <token>. \"\"\" def __init__(self, inner): self.inner = inner async def __call__(self, scope, receive, send): query_string = scope.get('query_string', b'').decode() params = parse_qs(query_string) token = None if 'token' in params: token = params.get('token')[0] else: headers = dict(scope.get('headers', [])) auth_header = headers.get(b'authorization') if auth_header: token = auth_header.decode().split('Bearer ')[-1] scope['user'] = await _get_user_from_token(token) if token else AnonymousUser() return await self.inner(scope, receive, send)"
+      - paragraph [ref=f2e254]: "The mirror of this is worth saying out loud: the token is checked at handshake and never again. ACCESS_TOKEN_LIFETIME is 30 minutes, so a socket opened at minute zero is still open and still trusted at minute ninety. Nothing in this code path revalidates it."
+      - generic [ref=f2e255]:
+        - generic [ref=f2e256]: The access token is about to expire. What becomes of the message?
+        - generic [ref=f2e257]:
+          - button "delivered over the socket row committed, and the second browser was pushed the message" [ref=f2e258] [cursor=pointer]:
+            - strong [ref=f2e259]: delivered over the socket
+            - generic [ref=f2e260]: row committed, and the second browser was pushed the message
+          - button "delivered by the 8-second poll row committed, nothing pushed, the timer picked it up" [ref=f2e261] [cursor=pointer]:
+            - strong [ref=f2e262]: delivered by the 8-second poll
+            - generic [ref=f2e263]: row committed, nothing pushed, the timer picked it up
+          - button "committed, but nobody was told row committed, no push, and no poll running to recover it" [ref=f2e264] [cursor=pointer]:
+            - strong [ref=f2e265]: committed, but nobody was told
+            - generic [ref=f2e266]: row committed, no push, and no poll running to recover it
+          - 'button "refused: not a participant the watching user is not in this room, so both the socket and the GET refuse" [ref=f2e267] [cursor=pointer]':
+            - strong [ref=f2e268]: "refused: not a participant"
+            - generic [ref=f2e269]: the watching user is not in this room, so both the socket and the GET refuse
+          - button "never written at all the POST itself did not succeed, so there is no row" [ref=f2e270] [cursor=pointer]:
+            - strong [ref=f2e271]: never written at all
+            - generic [ref=f2e272]: the POST itself did not succeed, so there is no row
+      - generic [ref=f2e273]:
+        - button "reproduce it on the map" [ref=f2e274] [cursor=pointer]
+        - generic [ref=f2e275]: no row written
+        - generic [ref=f2e276]: not delivered
+    - generic [ref=f2e277]:
+      - generic [ref=f2e278]: WHAT YOU SEE
+      - heading "A user opens a room they were linked to and the socket closes at once with 4403." [level=3] [ref=f2e279]
+      - generic [ref=f2e280]:
+        - generic [ref=f2e281]: "WebSocket is closed before the connection is established. code: 4403"
+        - generic [ref=f2e282]: GET /api/chat/rooms/7/messages/ 403 (Forbidden)
+      - generic [ref=f2e283]: WHY
+      - heading "They are not the organizer or the vendor of that room" [level=4] [ref=f2e284]
+      - paragraph [ref=f2e285]: _user_in_room checks membership against the two participants and closes 4403 when it fails. The REST endpoints answer 403 for the same user, so there is no fallback and there should not be one. This failure is the authorization check doing its job, and it is the only case in this stage where a stale screen is the correct outcome.
+      - generic [ref=f2e286]:
+        - generic [ref=f2e287]:
+          - generic [ref=f2e288]: backend/main/chat/consumers.py
+          - generic [ref=f2e289]: lines 56–78 · running line 63
+        - code [ref=f2e292]: "async def connect(self): self.room_id = self.scope['url_route']['kwargs'].get('room_id') self.broadcast_enabled = True if not self.scope['user'] or self.scope['user'].is_anonymous: await self.close(code=4401) return if not await self._user_in_room(): await self.close(code=4403) return self.room_group_name = f\"chat_room_{self.room_id}\" if not self.channel_layer: self.broadcast_enabled = False logger.warning(\"No channel layer configured; realtime disabled for room %s\", self.room_id) else: try: await self.channel_layer.group_add(self.room_group_name, self.channel_name) except Exception as exc: # pragma: no cover - defensive logger.warning(\"Failed to join chat group %s: %s\", self.room_group_name, exc) self.broadcast_enabled = False await self.accept() if not self.broadcast_enabled: await self.send_json( {\"type\": \"warning\", \"detail\": \"Realtime updates unavailable; refresh to see new messages.\"})"
+      - generic [ref=f2e293]:
+        - generic [ref=f2e294]: The person watching is about to turn out not to be a participant in this room. What becomes of the message?
+        - generic [ref=f2e295]:
+          - button "delivered over the socket row committed, and the second browser was pushed the message" [ref=f2e296] [cursor=pointer]:
+            - strong [ref=f2e297]: delivered over the socket
+            - generic [ref=f2e298]: row committed, and the second browser was pushed the message
+          - button "delivered by the 8-second poll row committed, nothing pushed, the timer picked it up" [ref=f2e299] [cursor=pointer]:
+            - strong [ref=f2e300]: delivered by the 8-second poll
+            - generic [ref=f2e301]: row committed, nothing pushed, the timer picked it up
+          - button "committed, but nobody was told row committed, no push, and no poll running to recover it" [ref=f2e302] [cursor=pointer]:
+            - strong [ref=f2e303]: committed, but nobody was told
+            - generic [ref=f2e304]: row committed, no push, and no poll running to recover it
+          - 'button "refused: not a participant the watching user is not in this room, so both the socket and the GET refuse" [ref=f2e305] [cursor=pointer]':
+            - strong [ref=f2e306]: "refused: not a participant"
+            - generic [ref=f2e307]: the watching user is not in this room, so both the socket and the GET refuse
+          - button "never written at all the POST itself did not succeed, so there is no row" [ref=f2e308] [cursor=pointer]:
+            - strong [ref=f2e309]: never written at all
+            - generic [ref=f2e310]: the POST itself did not succeed, so there is no row
+      - generic [ref=f2e311]:
+        - button "reproduce it on the map" [ref=f2e312] [cursor=pointer]
+        - generic [ref=f2e313]: "row survives: 4 in the database"
+        - generic [ref=f2e314]: not delivered
+    - generic [ref=f2e315]:
+      - generic [ref=f2e316]: WHAT YOU SEE
+      - heading "Everything in the app works except that nothing is ever live. Chat, notifications, all of it falls back to polling." [level=3] [ref=f2e317]
+      - generic [ref=f2e318]: WebSocket connection to 'ws://localhost:5173/ws/chat/rooms/7/' failed
+      - generic [ref=f2e320]: WHY
+      - heading "The server was started with manage.py runserver instead of daphne" [level=4] [ref=f2e321]
+      - paragraph [ref=f2e322]: "daphne is not in INSTALLED_APPS, so Channels does not patch runserver, and runserver is the plain WSGI dev server. It has no handler for the upgrade at all. The REST API is completely unaffected, which is exactly why this is easy to miss: every feature works, just slowly."
+      - generic [ref=f2e323]:
+        - generic [ref=f2e324]: The server is about to be restarted with manage.py runserver instead of daphne. What becomes of the message?
+        - generic [ref=f2e325]:
+          - button "delivered over the socket row committed, and the second browser was pushed the message" [ref=f2e326] [cursor=pointer]:
+            - strong [ref=f2e327]: delivered over the socket
+            - generic [ref=f2e328]: row committed, and the second browser was pushed the message
+          - button "delivered by the 8-second poll row committed, nothing pushed, the timer picked it up" [ref=f2e329] [cursor=pointer]:
+            - strong [ref=f2e330]: delivered by the 8-second poll
+            - generic [ref=f2e331]: row committed, nothing pushed, the timer picked it up
+          - button "committed, but nobody was told row committed, no push, and no poll running to recover it" [ref=f2e332] [cursor=pointer]:
+            - strong [ref=f2e333]: committed, but nobody was told
+            - generic [ref=f2e334]: row committed, no push, and no poll running to recover it
+          - 'button "refused: not a participant the watching user is not in this room, so both the socket and the GET refuse" [ref=f2e335] [cursor=pointer]':
+            - strong [ref=f2e336]: "refused: not a participant"
+            - generic [ref=f2e337]: the watching user is not in this room, so both the socket and the GET refuse
+          - button "never written at all the POST itself did not succeed, so there is no row" [ref=f2e338] [cursor=pointer]:
+            - strong [ref=f2e339]: never written at all
+            - generic [ref=f2e340]: the POST itself did not succeed, so there is no row
+      - generic [ref=f2e341]:
+        - button "reproduce it on the map" [ref=f2e342] [cursor=pointer]
+        - generic [ref=f2e343]: "row survives: 4 in the database"
+        - generic [ref=f2e344]: delivered after 8000 ms
+    - generic [ref=f2e345]:
+      - generic [ref=f2e346]: WHAT YOU SEE
+      - heading "Sending fails outright with a generic error, and the room will not even load." [level=3] [ref=f2e347]
+      - generic [ref=f2e348]:
+        - generic [ref=f2e349]: POST http://localhost:5173/api/chat/rooms/7/messages/ 404 (Not Found)
+        - generic [ref=f2e350]: Failed to send message.
+      - generic [ref=f2e351]: WHY
+      - heading "The Vite dev-server proxy is not forwarding" [level=4] [ref=f2e352]
+      - paragraph [ref=f2e353]: The client addresses everything as same-origin against :5173. Without the proxy entries, the POST hits Vite itself, which has no such route and answers 404. Vite's SPA fallback does not rescue it, because that only rewrites GET requests which accept text/html. This is the one failure in the stage that loses the message, and it loses it because nothing was ever written.
+      - generic [ref=f2e354]:
+        - generic [ref=f2e355]:
+          - generic [ref=f2e356]: frontend/vite.config.js
+          - generic [ref=f2e357]: lines 4–25 · running line 15
+        - code [ref=f2e360]: "export default defineConfig({ plugins: [react()], server: { hmr: { host: 'localhost', protocol: 'ws', // or 'wss' for secure dev servers }, watch: { usePolling: true, // Try this for WSL2 or Docker environments }, proxy: { '/api': 'http://localhost:8000', '/vendors': 'http://localhost:8000', '/cart': 'http://localhost:8000', '/checkout': 'http://localhost:8000', '/ws': { target: 'http://localhost:8000', ws: true, }, }, }, })"
+      - generic [ref=f2e361]:
+        - generic [ref=f2e362]: The Vite proxy is about to be switched off. What becomes of the message?
+        - generic [ref=f2e363]:
+          - button "delivered over the socket row committed, and the second browser was pushed the message" [ref=f2e364] [cursor=pointer]:
+            - strong [ref=f2e365]: delivered over the socket
+            - generic [ref=f2e366]: row committed, and the second browser was pushed the message
+          - button "delivered by the 8-second poll row committed, nothing pushed, the timer picked it up" [ref=f2e367] [cursor=pointer]:
+            - strong [ref=f2e368]: delivered by the 8-second poll
+            - generic [ref=f2e369]: row committed, nothing pushed, the timer picked it up
+          - button "committed, but nobody was told row committed, no push, and no poll running to recover it" [ref=f2e370] [cursor=pointer]:
+            - strong [ref=f2e371]: committed, but nobody was told
+            - generic [ref=f2e372]: row committed, no push, and no poll running to recover it
+          - 'button "refused: not a participant the watching user is not in this room, so both the socket and the GET refuse" [ref=f2e373] [cursor=pointer]':
+            - strong [ref=f2e374]: "refused: not a participant"
+            - generic [ref=f2e375]: the watching user is not in this room, so both the socket and the GET refuse
+          - button "never written at all the POST itself did not succeed, so there is no row" [ref=f2e376] [cursor=pointer]:
+            - strong [ref=f2e377]: never written at all
+            - generic [ref=f2e378]: the POST itself did not succeed, so there is no row
+      - generic [ref=f2e379]:
+        - button "reproduce it on the map" [ref=f2e380] [cursor=pointer]
+        - generic [ref=f2e381]: no row written
+        - generic [ref=f2e382]: not delivered
+    - generic [ref=f2e383]:
+      - heading "And one surprise that is not a failure" [level=3] [ref=f2e384]
+      - paragraph [ref=f2e385]:
+        - text: "Send from both sides at the same instant and the two events can reach a browser in either order. Nothing prevents that, and nothing needs to: the client sorts by"
+        - code [ref=f2e386]: created_at
+        - text: on every merge, so the wire order never reaches the screen. Set the sender count to two on the
+        - strong [ref=f2e387]: appendMessages
+        - text: box inside the browser and watch the arrival order and the rendered order disagree without anything going wrong.
+      - paragraph [ref=f2e388]:
+        - text: The genuine edge is the tie. Two messages with an identical
+        - code [ref=f2e389]: created_at
+        - text: sort equal, and a stable sort keeps them in arrival order. Rare, harmless, and real.
+    - generic [ref=f2e390]:
+      - heading "Try to prove all of this wrong" [level=2] [ref=f2e391]
+      - paragraph [ref=f2e392]: "Everything above rests on one claim: no configuration of this system loses a committed message. The checks drawer sweeps all 256 configurations on every render and says so. Do not take its word for it."
+      - generic [ref=f2e393]:
+        - heading "Try to prove this scene wrong" [level=4] [ref=f2e394]
+        - generic [ref=f2e395]:
+          - generic [ref=f2e396]: where
+          - paragraph [ref=f2e397]: a terminal in this scene folder, with the file src/model.ts open beside it
+          - generic [ref=f2e398]: do
+          - paragraph [ref=f2e399]: "Write a script that imports everyState() and run() from this scene and searches for a configuration where a message is lost: one where the POST succeeded but the row is not in the database afterwards. Print encodeState(state) for any hit."
+          - generic [ref=f2e400]: bring back
+          - paragraph [ref=f2e401]: paste the encoded state into the box. The scene decodes it and runs the same run() your script ran.
+          - generic [ref=f2e402]: what it means
+          - paragraph [ref=f2e403]: A hit falsifies the claim this whole scene makes, and you should trust your script over the prose. No hit means the 256 configurations here all commit before they broadcast, which is the claim, checked rather than asserted.
+        - generic [ref=f2e404]:
+          - textbox "e.g. up~valid~rest~daphne~1~8000~100~0" [ref=f2e405]
+          - button "check it" [ref=f2e406] [cursor=pointer]
+      - generic [ref=f2e407]:
+        - 'heading "the real Attica app: two browsers" [level=4] [ref=f2e408]'
+        - generic [ref=f2e409]:
+          - generic [ref=f2e410]: where
+          - paragraph [ref=f2e411]: "the real Attica app: two browsers, the backend on :8000, and a terminal"
+          - generic [ref=f2e412]: do
+          - paragraph [ref=f2e413]: Open the same chat room in two browsers. Stop Redis (redis-cli shutdown nosave). Send a message from one. Watch the other. Then reload the other.
+          - generic [ref=f2e414]: bring back
+          - paragraph [ref=f2e415]: the count of messages the second browser showed before the reload, and after it. Only you can see your own database, so the scene cannot check this one.
+          - generic [ref=f2e416]: what it means
+          - paragraph [ref=f2e417]: The gap you see before the reload is the exact cost of the overlay, on your machine rather than in a model. The message reappearing on reload is the claim, on your machine too.
+        - generic [ref=f2e418]: unverified
+  - generic [ref=f2e419]:
+    - button "probes" [ref=f2e420] [cursor=pointer]
+    - button "history" [ref=f2e421] [cursor=pointer]
+    - button "compare" [ref=f2e422] [cursor=pointer]

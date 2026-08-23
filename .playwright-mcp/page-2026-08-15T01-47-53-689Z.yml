@@ -1,0 +1,184 @@
+- generic [ref=f6e3]:
+  - banner [ref=f6e4]:
+    - heading "Attica's event wizard, as a state machine" [level=1] [ref=f6e5]
+    - generic [ref=f6e6]: every Next writes the whole draft to the server, so the wizard survives a closed tab
+    - button "tour" [ref=f6e7] [cursor=pointer]
+  - navigation [ref=f6e8]:
+    - button "0the problem" [ref=f6e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=f6e10] [cursor=pointer]
+    - button "2the machine" [ref=f6e11] [cursor=pointer]
+    - button "3where it costs you" [ref=f6e12] [cursor=pointer]
+    - button "4build it" [ref=f6e13] [cursor=pointer]
+  - generic [ref=f6e15]:
+    - generic [ref=f6e16]:
+      - img [ref=f6e17]:
+        - 'generic "saveStep(id, ''step1'', payload, ''step3''): PATCH with the whole steps map, then current_step moves" [ref=f6e18] [cursor=pointer]': Next
+        - generic "the schedule was already written into step1's bucket by setStepData" [ref=f6e22] [cursor=pointer]: Next
+        - 'generic "saveStep(id, ''step4'', {location: selectedLocation}, ''step5'')" [ref=f6e26] [cursor=pointer]': Next
+        - generic "saves the ticketing payload, which the field whitelist would have thrown away if it were live" [ref=f6e30] [cursor=pointer]: Next
+        - 'generic "saveStep(id, ''step6'', {}, ''step7''): an empty payload, purely to move current_step" [ref=f6e34] [cursor=pointer]': Next
+        - 'generic "saveStep(id, ''step7'', {features: selectedFeatures}, ''step8'')" [ref=f6e38] [cursor=pointer]': Next
+        - 'generic "saveStep(draftId, ''step8'', {}, ''review''): also empty. The photos went up separately." [ref=f6e42] [cursor=pointer]': Next
+        - generic "_build_event_payload projects data.steps onto Event columns, then upserts. Nothing validates first." [ref=f6e46] [cursor=pointer]: Publish
+        - generic "the route itself is a Navigate. ListingStep2.jsx is never rendered." [ref=f6e50] [cursor=pointer]: redirect
+        - generic "name, description, event type, region, dates, capacity. The largest form in the wizard, and the only one that validates before saving." [ref=f6e54] [cursor=pointer]: step1
+        - generic "an event-type picker, in a useState called selectedEventType. Its Next button calls navigate and nothing else." [ref=f6e57] [cursor=pointer]:
+          - generic [ref=f6e59]: step2
+          - generic [ref=f6e60]: excised
+        - generic "the calendar, booking requests to artists and vendors, and the schedule. It writes the schedule into step1." [ref=f6e61] [cursor=pointer]: step3
+        - generic "the venue, chosen on a map. Saved as a whole location object under step4." [ref=f6e64] [cursor=pointer]: step4
+        - generic "ticket price, currency, refund policy, max per buyer, and whether the event is seated. The seating chart is an asset upload." [ref=f6e67] [cursor=pointer]: step5
+        - generic "nothing. Eighty-nine lines of layout, and its Next saves an empty object." [ref=f6e70] [cursor=pointer]:
+          - generic [ref=f6e72]: step6
+          - generic [ref=f6e73]: saves nothing
+        - generic "amenities, as a list of feature names. The only step whose payload maps one-to-one onto its Event column." [ref=f6e74] [cursor=pointer]: step7
+        - 'generic "photos. Its Next also saves an empty object: the files go through the multipart asset endpoint instead." [ref=f6e77] [cursor=pointer]':
+          - generic [ref=f6e79]: step8
+          - generic [ref=f6e80]: files only
+        - generic "a read-only summary and the Publish button, behind a readiness modal that lists booking requests without blocking on them." [ref=f6e81] [cursor=pointer]:
+          - generic [ref=f6e83]: review
+          - generic [ref=f6e84]: saves nothing
+        - generic "EventDraft.status flips to published and an Event row exists. The draft is kept, with published_event_id written into its data." [ref=f6e85] [cursor=pointer]: published
+        - generic "the reducer is gone. localStorage and the EventDraft row are not." [ref=f6e88] [cursor=pointer]: tab closed
+      - generic [ref=f6e91]:
+        - generic [ref=f6e92]:
+          - generic [ref=f6e93]: where you are
+          - generic [ref=f6e94]: no draft yet
+        - generic [ref=f6e95]:
+          - generic [ref=f6e96]: a resume lands on
+          - generic [ref=f6e97]: no draft yet
+        - generic [ref=f6e98]:
+          - generic [ref=f6e99]: typed but never saved
+          - generic [ref=f6e100]: nothing
+        - generic [ref=f6e101]:
+          - generic [ref=f6e102]: waiting for a save
+          - generic [ref=f6e103]: nothing
+      - generic [ref=f6e104]:
+        - generic [ref=f6e105]:
+          - generic [ref=f6e106]: field
+          - generic [ref=f6e107]: form
+          - generic [ref=f6e108]: reducer + localStorage
+          - generic [ref=f6e109]: EventDraft.data
+        - generic [ref=f6e110]:
+          - generic [ref=f6e111]:
+            - text: event name
+            - emphasis [ref=f6e112]: step1 → steps.step1
+          - generic [ref=f6e113]: ○
+          - generic [ref=f6e114]: ○
+          - generic [ref=f6e115]: ○
+        - generic [ref=f6e116]:
+          - generic [ref=f6e117]:
+            - text: event type
+            - emphasis [ref=f6e118]: step1 → steps.step1
+          - generic [ref=f6e119]: ○
+          - generic [ref=f6e120]: ○
+          - generic [ref=f6e121]: ○
+        - generic [ref=f6e122]:
+          - generic [ref=f6e123]:
+            - text: dates and times
+            - emphasis [ref=f6e124]: step3 → steps.step1
+          - generic [ref=f6e125]: ○
+          - generic [ref=f6e126]: ○
+          - generic [ref=f6e127]: ○
+        - generic [ref=f6e128]:
+          - generic [ref=f6e129]:
+            - text: venue
+            - emphasis [ref=f6e130]: step4 → steps.step4
+          - generic [ref=f6e131]: ○
+          - generic [ref=f6e132]: ○
+          - generic [ref=f6e133]: ○
+        - generic [ref=f6e134]:
+          - generic [ref=f6e135]:
+            - text: ticket price
+            - emphasis [ref=f6e136]: step5 → steps.step5
+          - generic [ref=f6e137]: ○
+          - generic [ref=f6e138]: ○
+          - generic [ref=f6e139]: ○
+        - generic [ref=f6e140]:
+          - generic [ref=f6e141]:
+            - text: amenities
+            - emphasis [ref=f6e142]: step7 → steps.step7
+          - generic [ref=f6e143]: ○
+          - generic [ref=f6e144]: ○
+          - generic [ref=f6e145]: ○
+        - generic [ref=f6e146]:
+          - generic [ref=f6e147]:
+            - text: photos
+            - emphasis [ref=f6e148]: step8 → steps.step8
+          - generic [ref=f6e149]: ○
+          - generic [ref=f6e150]: ○
+          - 'generic "never: files go up separately" [ref=f6e151]': —
+      - paragraph [ref=f6e152]: No draft row exists. Start one and the wizard has something to persist into.
+    - generic [ref=f6e153]:
+      - generic [ref=f6e154]:
+        - generic [ref=f6e155]: the organizer
+        - button "start a draft" [ref=f6e156] [cursor=pointer]
+      - generic [ref=f6e157]:
+        - generic [ref=f6e158]: navigation
+        - button "Back" [disabled] [ref=f6e159]
+        - button "Next" [disabled] [ref=f6e160]
+        - button "Save & exit" [disabled] [ref=f6e161]
+        - button "Publish" [disabled] [ref=f6e162]
+      - generic [ref=f6e163]:
+        - generic [ref=f6e164]: life happens
+        - button "close the tab" [disabled] [ref=f6e165]
+        - button "come back" [disabled] [ref=f6e166]
+        - generic [ref=f6e168]: or run one
+        - button "fill it in and publish" [ref=f6e169] [cursor=pointer]
+        - button "interrupted at step 5" [ref=f6e170] [cursor=pointer]
+        - button "the step 2 path" [ref=f6e171] [cursor=pointer]
+        - button "publish an empty draft" [ref=f6e172] [cursor=pointer]
+        - button "reset" [ref=f6e173] [cursor=pointer]
+    - generic [ref=f6e175]:
+      - heading "what you did" [level=3] [ref=f6e176]
+      - generic [ref=f6e177]: nothing yet. Press a control above, or run one of the scenarios.
+    - generic [ref=f6e179]:
+      - heading "An organizer starts an event, then life happens" [level=2] [ref=f6e180]
+      - paragraph [ref=f6e181]: They fill in a screen, and before they finish the wizard the tab closes. A phone call, a flat battery, a Monday. When they come back, what is still there?
+      - paragraph [ref=f6e182]: The answer depends entirely on which screen they were on, and the difference is not cosmetic. Below is the same answer given on two different screens of the same wizard.
+      - generic [ref=f6e183]:
+        - generic [ref=f6e184]:
+          - generic [ref=f6e185]: typed on step 1
+          - generic [ref=f6e186]: saveStep sends it with the rest of the accumulated steps map
+          - generic [ref=f6e187]: still there when they came back
+          - generic [ref=f6e188]:
+            - term [ref=f6e189]: data.steps
+            - definition [ref=f6e190]: step1
+            - term [ref=f6e191]: resumed on
+            - definition [ref=f6e192]: step3
+        - generic [ref=f6e193]:
+          - generic [ref=f6e194]: typed on step 2
+          - generic [ref=f6e195]: its Next calls navigate and nothing else
+          - generic [ref=f6e196]: gone
+          - generic [ref=f6e197]:
+            - term [ref=f6e198]: data.steps
+            - definition [ref=f6e199]: empty
+            - term [ref=f6e200]: resumed on
+            - definition [ref=f6e201]: step2
+        - generic [ref=f6e202]:
+          - term [ref=f6e203]: same answer
+          - definition [ref=f6e204]: the organizer picked an event type in both lanes, then closed the tab and came back two days later.
+          - term [ref=f6e205]: what differs
+          - definition [ref=f6e206]: only which screen collected it. One of them calls saveStep on the way out. The other one does not.
+          - term [ref=f6e207]: the point
+          - definition [ref=f6e208]: this is not a hypothetical alternative. ListingStep2.jsx is in the repository, and it is the design the wizard was moved away from.
+    - generic [ref=f6e209]:
+      - heading "Why this is the argument and not a bug report" [level=3] [ref=f6e210]
+      - paragraph [ref=f6e211]: Every multi-step form has to decide where a half-finished answer lives. Keep it in the component and the code is simpler, the form is faster, and you validate the whole thing once at the end. Push it to the server on every step and you pay a request per screen and you can never validate the whole thing, because there is no moment when you have it all.
+      - paragraph [ref=f6e212]: "Attica made that choice one way, and then had to make its publish step lenient enough to cope. That trade is what the rest of this scene is about: how the machine works, and what it costs."
+    - generic [ref=f6e213]:
+      - heading "What is coming" [level=3] [ref=f6e214]
+      - generic [ref=f6e215]:
+        - term [ref=f6e216]: stage 1
+        - definition [ref=f6e217]: the four calls that make a wizard resumable, whole and short enough to read.
+        - term [ref=f6e218]: stage 2
+        - definition [ref=f6e219]: "the machine itself: seven states, three places a value can live, and the merge rule that decides which one wins."
+        - term [ref=f6e220]: stage 3
+        - definition [ref=f6e221]: six ways it goes wrong, each one reachable from the controls.
+        - term [ref=f6e222]: stage 4
+        - definition [ref=f6e223]: build it yourself, starting from the failure that makes each piece necessary.
+      - paragraph [ref=f6e224]: How the left lane actually gets that answer to the server is stage 2. Until then it is allowed to be a black box.
+  - generic [ref=f6e225]:
+    - button "probes" [ref=f6e226] [cursor=pointer]
+    - button "history" [ref=f6e227] [cursor=pointer]
+    - button "compare" [ref=f6e228] [cursor=pointer]

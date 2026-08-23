@@ -1,0 +1,129 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - button "Notifications" [ref=f1e81] [cursor=pointer]
+        - link [ref=f1e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e23]
+        - button "Log out" [ref=f1e84] [cursor=pointer]
+        - button "Open menu" [ref=f1e26] [cursor=pointer]
+  - generic [ref=f1e2084]:
+    - banner [ref=f1e2085]:
+      - generic [ref=f1e2086]:
+        - generic [ref=f1e2087]:
+          - generic [ref=f1e2088]: A
+          - generic [ref=f1e2089]:
+            - paragraph [ref=f1e2090]: Review & Publish
+            - heading "Confirm your event details" [level=1] [ref=f1e2091]
+        - generic [ref=f1e2093]:
+          - generic [ref=f1e2094]: Published
+          - generic [ref=f1e2095]: 8/16/2026, 7:14:04 AM
+    - main [ref=f1e2096]:
+      - generic [ref=f1e2097]:
+        - generic [ref=f1e2098]:
+          - paragraph [ref=f1e2099]: "0"
+          - paragraph [ref=f1e2100]: Venues
+        - generic [ref=f1e2101]:
+          - paragraph [ref=f1e2102]: "0"
+          - paragraph [ref=f1e2103]: Artists
+        - generic [ref=f1e2104]:
+          - paragraph [ref=f1e2105]: "0"
+          - paragraph [ref=f1e2106]: Vendors
+        - generic [ref=f1e2107]:
+          - paragraph [ref=f1e2108]: "2"
+          - paragraph [ref=f1e2109]: Features
+        - generic [ref=f1e2110]:
+          - paragraph [ref=f1e2111]: "1"
+          - paragraph [ref=f1e2112]: Media
+      - generic [ref=f1e2113]:
+        - generic [ref=f1e2114]:
+          - generic [ref=f1e2115]:
+            - generic [ref=f1e2116]:
+              - heading "Event basics" [level=3] [ref=f1e2121]
+              - generic [ref=f1e2122]: From steps 1 & 2
+            - generic [ref=f1e2123]:
+              - generic [ref=f1e2124]:
+                - paragraph [ref=f1e2125]: Title
+                - paragraph [ref=f1e2126]: Pending details from Step 1
+              - generic [ref=f1e2127]:
+                - paragraph [ref=f1e2128]: Date & time
+                - paragraph [ref=f1e2129]: Add schedule in earlier steps
+              - generic [ref=f1e2130]:
+                - paragraph [ref=f1e2131]: Category
+                - paragraph [ref=f1e2132]: Not provided
+              - generic [ref=f1e2133]:
+                - paragraph [ref=f1e2134]: Capacity
+                - paragraph [ref=f1e2135]: Not provided
+          - generic [ref=f1e2136]:
+            - generic [ref=f1e2137]:
+              - heading "Location" [level=3] [ref=f1e2143]
+              - generic [ref=f1e2144]: Step 4
+            - generic [ref=f1e2145]:
+              - paragraph [ref=f1e2146]: Sandton, City of Johannesburg Metropolitan Municipality, Gauteng, 2146, South Africa
+              - paragraph [ref=f1e2147]: "Lat: -26.1045525 • Lng: 28.0545147"
+          - generic [ref=f1e2148]:
+            - generic [ref=f1e2149]:
+              - heading "Team & partners" [level=3] [ref=f1e2157]
+              - generic [ref=f1e2158]: Step 3
+            - generic [ref=f1e2159]:
+              - generic [ref=f1e2160]:
+                - paragraph [ref=f1e2161]: Venues
+                - paragraph [ref=f1e2162]: 0 selected
+              - generic [ref=f1e2163]:
+                - paragraph [ref=f1e2164]: Artists
+                - paragraph [ref=f1e2165]: 0 selected
+              - generic [ref=f1e2166]:
+                - paragraph [ref=f1e2167]: Vendors
+                - paragraph [ref=f1e2168]: 0 selected
+          - generic [ref=f1e2169]:
+            - generic [ref=f1e2170]:
+              - heading "Features & perks" [level=3] [ref=f1e2175]
+              - generic [ref=f1e2176]: Step 7
+            - generic [ref=f1e2177]:
+              - generic [ref=f1e2178]: Bar Available
+              - generic [ref=f1e2179]: Accepts Cards
+          - generic [ref=f1e2180]:
+            - generic [ref=f1e2181]:
+              - heading "Uploaded files" [level=3] [ref=f1e2187]
+              - generic [ref=f1e2188]: Steps 5 & 8
+            - generic [ref=f1e2189]:
+              - generic [ref=f1e2190]:
+                - paragraph [ref=f1e2191]: Media uploads
+                - paragraph [ref=f1e2192]: 1 saved to draft
+              - generic [ref=f1e2193]:
+                - paragraph [ref=f1e2194]: Seating chart
+                - paragraph [ref=f1e2195]: Not uploaded
+            - generic [ref=f1e2196]: poster.png
+        - generic [ref=f1e2199]:
+          - generic [ref=f1e2205]:
+            - paragraph [ref=f1e2206]: Live
+            - paragraph [ref=f1e2207]: Review complete
+          - list [ref=f1e2208]:
+            - listitem [ref=f1e2209]: • Confirm your selections before creating your event.
+            - listitem [ref=f1e2210]: • You can return to any step to make changes even after publishing.
+            - listitem [ref=f1e2211]: • Uploaded files are saved to this draft, and your first images become the published poster and banner.
+          - button "Republish" [ref=f1e2234] [cursor=pointer]
+          - button "Back to pricing (Step 6)" [ref=f1e2213] [cursor=pointer]
+          - paragraph [ref=f1e2214]: Admins can view the live listing in the dashboard events table.

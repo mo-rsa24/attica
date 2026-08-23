@@ -1,0 +1,474 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - 'heading "Attica scheduling: availability, holds, and conflicts" [level=1] [ref=f5e5]'
+    - generic [ref=f5e6]: materialized slots with a counter, two locks, and a record of which layer caught it
+    - button "tour" [ref=f5e7] [cursor=pointer]
+  - navigation [ref=f5e8]:
+    - button "0why not just query" [ref=f5e9] [cursor=pointer]
+    - button "1one rule, one row" [ref=f5e10] [cursor=pointer]
+    - button "2the mechanism" [ref=f5e11] [cursor=pointer]
+    - button "3where it costs you" [ref=f5e12] [cursor=pointer]
+    - button "4build it" [ref=f5e13] [cursor=pointer]
+  - generic [ref=f5e15]:
+    - generic [ref=f5e16]:
+      - generic [ref=f5e17]:
+        - button "the whole system" [ref=f5e18] [cursor=pointer]
+        - generic [ref=f5e19]: ECOSYSTEM · the application, the database, the scheduled jobs, and the incident log
+      - img [ref=f5e20]:
+        - generic "the capacity UPDATE and the booking INSERT" [ref=f5e21] [cursor=pointer]: writes
+        - generic "get_or_create per rule per date" [ref=f5e25] [cursor=pointer]: materializes
+        - generic "the window, the message, and the conflicting id" [ref=f5e29] [cursor=pointer]: application_check
+        - generic "the same shape, tagged differently" [ref=f5e35] [cursor=pointer]: db_constraint
+        - generic "click to inspect, double-click to open" [ref=f5e39] [cursor=pointer]: the application
+        - generic "click to inspect, double-click to open" [ref=f5e43] [cursor=pointer]:
+          - generic [ref=f5e45]: the database
+          - generic [ref=f5e46]: "constraint_present: None"
+        - generic "click to inspect, double-click to open" [ref=f5e48] [cursor=pointer]:
+          - generic [ref=f5e50]: the scheduled jobs
+          - generic [ref=f5e51]: 1 materialize run(s)
+        - generic "click to inspect" [ref=f5e53] [cursor=pointer]:
+          - generic [ref=f5e55]: BookingConflictIncident
+          - generic [ref=f5e56]: 0 row(s)
+    - generic [ref=f5e57]:
+      - generic [ref=f5e58]:
+        - generic [ref=f5e59]:
+          - heading "create_booking, one phase at a time" [level=3] [ref=f5e60]
+          - generic [ref=f5e61]: click in any order. the two transactions are independent until a lock says otherwise
+        - generic [ref=f5e62]:
+          - generic [ref=f5e63]: A
+          - button "1 SELECT FOR UPDATE" [ref=f5e64] [cursor=pointer]:
+            - generic [ref=f5e65]: "1"
+            - text: SELECT FOR UPDATE
+          - button "2 check capacity" [ref=f5e66] [cursor=pointer]:
+            - generic [ref=f5e67]: "2"
+            - text: check capacity
+          - button "3 reserve" [ref=f5e68] [cursor=pointer]:
+            - generic [ref=f5e69]: "3"
+            - text: reserve
+          - button "4 INSERT booking" [ref=f5e70] [cursor=pointer]:
+            - generic [ref=f5e71]: "4"
+            - text: INSERT booking
+          - button "5 COMMIT" [ref=f5e72] [cursor=pointer]:
+            - generic [ref=f5e73]: "5"
+            - text: COMMIT
+          - generic [ref=f5e74]:
+            - text: committed
+            - emphasis [ref=f5e75]: read 1
+        - generic [ref=f5e76]:
+          - generic [ref=f5e77]: B
+          - button "1 SELECT FOR UPDATE" [ref=f5e78] [cursor=pointer]:
+            - generic [ref=f5e79]: "1"
+            - text: SELECT FOR UPDATE
+          - button "2 check capacity" [ref=f5e80] [cursor=pointer]:
+            - generic [ref=f5e81]: "2"
+            - text: check capacity
+          - button "3 reserve" [ref=f5e82] [cursor=pointer]:
+            - generic [ref=f5e83]: "3"
+            - text: reserve
+          - button "4 INSERT booking" [ref=f5e84] [cursor=pointer]:
+            - generic [ref=f5e85]: "4"
+            - text: INSERT booking
+          - button "5 COMMIT" [ref=f5e86] [cursor=pointer]:
+            - generic [ref=f5e87]: "5"
+            - text: COMMIT
+          - generic [ref=f5e88]:
+            - text: committed
+            - emphasis [ref=f5e89]: read 1
+        - generic [ref=f5e90]:
+          - generic [ref=f5e91]: lock
+          - generic [ref=f5e92]: select_for_update is switched off, so nothing serialises these two
+      - generic [ref=f5e93]:
+        - generic [ref=f5e94]:
+          - generic [ref=f5e95]: active bookings
+          - generic [ref=f5e96]: "2"
+        - generic [ref=f5e97]:
+          - generic [ref=f5e98]: capacity
+          - generic [ref=f5e99]: no slots exist
+        - generic [ref=f5e100]:
+          - generic [ref=f5e101]: incidents recorded
+          - generic [ref=f5e102]: none
+        - generic [ref=f5e103]:
+          - generic [ref=f5e104]: collisions unrecorded
+          - generic [ref=f5e105]: "yes"
+      - generic [ref=f5e106]:
+        - generic [ref=f5e107]:
+          - generic [ref=f5e108]: AvailabilitySlot
+          - generic [ref=f5e109]: "no rows: nothing materialized, so create_booking takes the overlap-query branch"
+        - generic [ref=f5e110]:
+          - generic [ref=f5e111]: Booking
+          - generic [ref=f5e112]:
+            - generic [ref=f5e113]: id
+            - generic [ref=f5e114]: by
+            - generic [ref=f5e115]: status
+          - generic [ref=f5e116]:
+            - generic [ref=f5e117]: "#1"
+            - generic [ref=f5e118]: A
+            - generic [ref=f5e119]: confirmed
+          - generic [ref=f5e120]:
+            - generic [ref=f5e121]: "#2"
+            - generic [ref=f5e122]: B
+            - generic [ref=f5e123]: confirmed
+        - generic [ref=f5e124]:
+          - generic [ref=f5e125]: BookingConflictIncident
+          - generic [ref=f5e126]: no rows, and that is the problem
+      - paragraph [ref=f5e127]: 2 active bookings on one resource, and zero incidents. Both transactions checked before either inserted, and on this vendor there is no constraint to catch the second one.
+    - generic [ref=f5e128]:
+      - generic [ref=f5e129]:
+        - generic [ref=f5e130]: design
+        - button "materialized slots" [ref=f5e131] [cursor=pointer]
+        - button "one table + overlap query" [pressed] [ref=f5e132] [cursor=pointer]
+      - generic [ref=f5e133]:
+        - generic [ref=f5e134]: locking
+        - button "SELECT FOR UPDATE" [ref=f5e135] [cursor=pointer]
+        - button "no lock" [pressed] [ref=f5e136] [cursor=pointer]
+      - generic [ref=f5e137]:
+        - generic [ref=f5e138]: database
+        - button "sqlite (dev)" [pressed] [ref=f5e139] [cursor=pointer]
+        - button "postgresql" [ref=f5e140] [cursor=pointer]
+      - generic [ref=f5e141]:
+        - generic [ref=f5e142]: slot capacity
+        - button "capacity 1" [pressed] [ref=f5e143] [cursor=pointer]
+        - button "capacity 5" [ref=f5e144] [cursor=pointer]
+      - generic [ref=f5e145]:
+        - generic [ref=f5e146]: jobs
+        - button "materialize slots" [ref=f5e147] [cursor=pointer]
+        - button "expire holds" [ref=f5e148] [cursor=pointer]
+        - generic [ref=f5e150]: the clock
+        - button "+1 min" [ref=f5e151] [cursor=pointer]
+        - button "+29 min" [ref=f5e152] [cursor=pointer]
+        - button "+5 min" [ref=f5e153] [cursor=pointer]
+      - generic [ref=f5e154]:
+        - generic [ref=f5e155]: the hold path
+        - button "A requests" [ref=f5e156] [cursor=pointer]
+        - button "approve" [ref=f5e157] [cursor=pointer]
+        - button "A pays" [ref=f5e158] [cursor=pointer]
+        - button "A retries" [ref=f5e159] [cursor=pointer]
+      - generic [ref=f5e160]:
+        - generic [ref=f5e161]: or run one
+        - button "one after the other" [ref=f5e162] [cursor=pointer]
+        - button "interleaved, lock on" [ref=f5e163] [cursor=pointer]
+        - button "interleaved, lock off" [ref=f5e164] [cursor=pointer]
+        - button "the overlap query, lock off" [ref=f5e165] [cursor=pointer]
+        - button "paid, then expired" [ref=f5e166] [cursor=pointer]
+        - button "reset" [ref=f5e167] [cursor=pointer]
+    - generic [ref=f5e168]:
+      - generic [ref=f5e169]:
+        - heading "the schedule" [level=3] [ref=f5e170]
+        - generic [ref=f5e171]: 11 of 11 steps
+      - generic [ref=f5e172]:
+        - button "materialize" [ref=f5e173] [cursor=pointer]
+        - button "A SELECT FOR UPDATE" [ref=f5e176] [cursor=pointer]
+        - button "A check capacity" [ref=f5e179] [cursor=pointer]
+        - button "B SELECT FOR UPDATE" [ref=f5e182] [cursor=pointer]
+        - button "B check capacity" [ref=f5e185] [cursor=pointer]
+        - button "A reserve" [ref=f5e188] [cursor=pointer]
+        - button "A INSERT booking" [ref=f5e191] [cursor=pointer]
+        - button "A COMMIT" [ref=f5e194] [cursor=pointer]
+        - button "B reserve" [ref=f5e197] [cursor=pointer]
+        - button "B INSERT booking" [ref=f5e200] [cursor=pointer]
+        - button "B COMMIT" [ref=f5e203] [cursor=pointer]
+      - generic [ref=f5e207]:
+        - generic [ref=f5e208]: "B: _find_booking_conflict returned None, window looks free"
+        - generic [ref=f5e209]: "A: no slots on this path, nothing to reserve"
+        - generic [ref=f5e210]: "A: INSERT booking #1 status=confirmed"
+        - generic [ref=f5e211]: "A: COMMIT, lock released"
+        - generic [ref=f5e212]: "B: no slots on this path, nothing to reserve"
+        - generic [ref=f5e213]: "B: INSERT booking #2 status=confirmed"
+        - generic [ref=f5e214]: "no exclusion constraint on this vendor: the overlapping row is accepted"
+        - generic [ref=f5e215]: "B: COMMIT, lock released"
+    - generic [ref=f5e217]:
+      - heading "Six ways it costs you, and two of them are quiet" [level=2] [ref=f5e218]
+      - paragraph [ref=f5e219]: Each card leads with what you would actually see. Every one is reachable from the controls, so predict first, then run it on the bench and watch the tables.
+    - generic [ref=f5e220]:
+      - generic [ref=f5e221]: WHAT YOU SEE
+      - heading "Two organizers both get a confirmation email for the same venue on the same night. Nothing in the logs mentions it. The provider finds out when both turn up." [level=3] [ref=f5e222]
+      - generic [ref=f5e223]: (no error, no log line, no incident row)
+      - generic [ref=f5e225]: WHY
+      - heading "Two overlap queries, both run before either insert" [level=4] [ref=f5e226]
+      - paragraph [ref=f5e227]: Without a lock, both transactions ask whether anything overlaps and both are told no, because neither has written yet. On SQLite there is no exclusion constraint to refuse the second INSERT, so both succeed. No exception is raised anywhere, so _record_conflict_incident is never reached and the incident table stays empty.
+      - generic [ref=f5e228]:
+        - generic [ref=f5e229]:
+          - generic [ref=f5e230]: backend/main/scheduling/services.py
+          - generic [ref=f5e231]: lines 332–344 · running line 341
+        - code [ref=f5e234]: "def _overlap_q(start_at: datetime, end_at: datetime): return Q(start_at__lt=end_at) & Q(end_at__gt=start_at) def _active_booking_qs(resource: MarketplaceResource): return Booking.objects.filter(resource=resource, status__in=Booking.ACTIVE_STATES) def _find_booking_conflict(resource: MarketplaceResource, start_at: datetime, end_at: datetime, exclude_booking_id: int | None = None): qs = _active_booking_qs(resource).filter(_overlap_q(start_at, end_at)) if exclude_booking_id: qs = qs.exclude(id=exclude_booking_id) return qs.order_by(\"start_at\").first()"
+      - paragraph [ref=f5e235]: This is the outcome the whole architecture exists to prevent, and it is also the one your monitoring cannot see. An incident count of zero looks identical to a healthy day.
+      - generic [ref=f5e236]:
+        - generic [ref=f5e237]: One booking table, an overlap query, no lock, on SQLite. Both A and B check, then both insert. What comes out?
+        - generic [ref=f5e238]:
+          - button "one booking, cleanly the window is taken once and nothing is refused" [ref=f5e239] [cursor=pointer]:
+            - strong [ref=f5e240]: one booking, cleanly
+            - generic [ref=f5e241]: the window is taken once and nothing is refused
+          - button "refused by the application check ConflictError, and an incident tagged application_check" [ref=f5e242] [cursor=pointer]:
+            - strong [ref=f5e243]: refused by the application check
+            - generic [ref=f5e244]: ConflictError, and an incident tagged application_check
+          - button "refused by the database the exclusion constraint fired and the incident says db_constraint" [ref=f5e245] [cursor=pointer]:
+            - strong [ref=f5e246]: refused by the database
+            - generic [ref=f5e247]: the exclusion constraint fired and the incident says db_constraint
+          - button "double booked, nothing recorded two active bookings on one resource and zero incidents" [ref=f5e248] [cursor=pointer]:
+            - strong [ref=f5e249]: double booked, nothing recorded
+            - generic [ref=f5e250]: two active bookings on one resource and zero incidents
+          - 'button "an uncaught IntegrityError the check constraint fired where nothing catches it: a 500, no incident" [ref=f5e251] [cursor=pointer]':
+            - strong [ref=f5e252]: an uncaught IntegrityError
+            - generic [ref=f5e253]: "the check constraint fired where nothing catches it: a 500, no incident"
+          - button "the stored response replayed the retry returned the first booking and created nothing" [ref=f5e254] [cursor=pointer]:
+            - strong [ref=f5e255]: the stored response replayed
+            - generic [ref=f5e256]: the retry returned the first booking and created nothing
+          - button "a paid hold expired anyway the seats went back while paid_at was set" [ref=f5e257] [cursor=pointer]:
+            - strong [ref=f5e258]: a paid hold expired anyway
+            - generic [ref=f5e259]: the seats went back while paid_at was set
+      - button "run it on the bench" [ref=f5e260] [cursor=pointer]
+    - generic [ref=f5e261]:
+      - generic [ref=f5e262]: WHAT YOU SEE
+      - heading "A 500 from the booking endpoint, with an IntegrityError in the traceback and no incident recorded." [level=3] [ref=f5e263]
+      - generic [ref=f5e264]: "IntegrityError: CHECK constraint failed: capacity_reserved_lte_total"
+      - generic [ref=f5e266]: WHY
+      - heading "The slot design without the lock" [level=4] [ref=f5e267]
+      - paragraph [ref=f5e268]: Both transactions read capacity_remaining before either reserved, so both decide there is room. The first UPDATE succeeds; the second pushes capacity_reserved past capacity_total and the check constraint refuses it. That UPDATE is _reserve_capacity, which sits a few lines above the only try/except IntegrityError in the function, so nothing converts it into a ConflictError and nothing records it.
+      - generic [ref=f5e269]:
+        - generic [ref=f5e270]:
+          - generic [ref=f5e271]: backend/main/scheduling/services.py
+          - generic [ref=f5e272]: lines 347–369 · running line 369
+        - code [ref=f5e275]: "def _lock_overlapping_slots(resource: MarketplaceResource, start_at: datetime, end_at: datetime): return ( AvailabilitySlot.objects.select_for_update() .filter(resource=resource, is_bookable=True) .filter(_overlap_q(start_at, end_at)) .order_by(\"start_at\") ) def _assert_slot_capacity(slots, attendee_count: int): for slot in slots: if slot.capacity_remaining < attendee_count: raise ConflictError( f\"Slot capacity exceeded for window {slot.start_at.isoformat()} - {slot.end_at.isoformat()}.\" ) def _reserve_capacity(slots, attendee_count: int): if attendee_count <= 0: return slot_ids = [slot.id for slot in slots] if slot_ids: AvailabilitySlot.objects.filter(id__in=slot_ids).update(capacity_reserved=F(\"capacity_reserved\") + attendee_count)"
+      - paragraph [ref=f5e276]: Better than the silent double booking, because it fails loudly and the data stays correct. Worse than a ConflictError, because the caller gets a 500 instead of a 409 and the incident log learns nothing.
+      - generic [ref=f5e277]:
+        - generic [ref=f5e278]: Materialized slots with capacity 1, but no lock. Both check while the counter reads 1, then both reserve. What comes out?
+        - generic [ref=f5e279]:
+          - button "one booking, cleanly the window is taken once and nothing is refused" [ref=f5e280] [cursor=pointer]:
+            - strong [ref=f5e281]: one booking, cleanly
+            - generic [ref=f5e282]: the window is taken once and nothing is refused
+          - button "refused by the application check ConflictError, and an incident tagged application_check" [ref=f5e283] [cursor=pointer]:
+            - strong [ref=f5e284]: refused by the application check
+            - generic [ref=f5e285]: ConflictError, and an incident tagged application_check
+          - button "refused by the database the exclusion constraint fired and the incident says db_constraint" [ref=f5e286] [cursor=pointer]:
+            - strong [ref=f5e287]: refused by the database
+            - generic [ref=f5e288]: the exclusion constraint fired and the incident says db_constraint
+          - button "double booked, nothing recorded two active bookings on one resource and zero incidents" [ref=f5e289] [cursor=pointer]:
+            - strong [ref=f5e290]: double booked, nothing recorded
+            - generic [ref=f5e291]: two active bookings on one resource and zero incidents
+          - 'button "an uncaught IntegrityError the check constraint fired where nothing catches it: a 500, no incident" [ref=f5e292] [cursor=pointer]':
+            - strong [ref=f5e293]: an uncaught IntegrityError
+            - generic [ref=f5e294]: "the check constraint fired where nothing catches it: a 500, no incident"
+          - button "the stored response replayed the retry returned the first booking and created nothing" [ref=f5e295] [cursor=pointer]:
+            - strong [ref=f5e296]: the stored response replayed
+            - generic [ref=f5e297]: the retry returned the first booking and created nothing
+          - button "a paid hold expired anyway the seats went back while paid_at was set" [ref=f5e298] [cursor=pointer]:
+            - strong [ref=f5e299]: a paid hold expired anyway
+            - generic [ref=f5e300]: the seats went back while paid_at was set
+      - button "run it on the bench" [ref=f5e301] [cursor=pointer]
+    - generic [ref=f5e302]:
+      - generic [ref=f5e303]: WHAT YOU SEE
+      - heading "A 409 with a clear message, and an incident in the log tagged db_constraint rather than application_check." [level=3] [ref=f5e304]
+      - generic [ref=f5e305]:
+        - generic [ref=f5e306]: "IntegrityError: conflicting key value violates exclusion constraint \"scheduling_booking_no_overlap_active\""
+        - generic [ref=f5e307]: "ConflictError: Resource has a conflicting booking for this time window."
+      - generic [ref=f5e308]: WHY
+      - heading "The application check missed it and the exclusion constraint caught it" [level=4] [ref=f5e309]
+      - paragraph [ref=f5e310]: "Same race, same missing lock, but the database now has a rule it enforces without being asked. The second INSERT violates the GiST exclusion over the time range, the one try block catches it, and the incident is written with conflict_source=db_constraint. That tag is the signal: every db_constraint incident is a report that layer one leaked."
+      - generic [ref=f5e311]:
+        - generic [ref=f5e312]:
+          - generic [ref=f5e313]: backend/main/scheduling/services.py
+          - generic [ref=f5e314]: lines 640–665 · running line 653
+        - code [ref=f5e317]: "try: booking = Booking.objects.create( event=event, organizer=organizer, resource=resource, source_request=source_request, start_at=start_at, end_at=end_at, attendee_count=attendee_count, status=Booking.Status.CONFIRMED, source=source, idempotency_key=idempotency_key, ) except IntegrityError as exc: _record_conflict_incident( operation=BookingConflictIncident.Operation.CREATE, conflict_source=BookingConflictIncident.ConflictSource.DB_CONSTRAINT, resource=resource, event=event, organizer=organizer, requested_start_at=start_at, requested_end_at=end_at, message=\"Resource has a conflicting booking for this time window.\", details={\"source\": \"integrity_error\"}, ) raise ConflictError(\"Resource has a conflicting booking for this time window.\") from exc"
+      - generic [ref=f5e318]:
+        - generic [ref=f5e319]: The overlap query with no lock again, but the database is Postgres this time. What comes out?
+        - generic [ref=f5e320]:
+          - button "one booking, cleanly the window is taken once and nothing is refused" [ref=f5e321] [cursor=pointer]:
+            - strong [ref=f5e322]: one booking, cleanly
+            - generic [ref=f5e323]: the window is taken once and nothing is refused
+          - button "refused by the application check ConflictError, and an incident tagged application_check" [ref=f5e324] [cursor=pointer]:
+            - strong [ref=f5e325]: refused by the application check
+            - generic [ref=f5e326]: ConflictError, and an incident tagged application_check
+          - button "refused by the database the exclusion constraint fired and the incident says db_constraint" [ref=f5e327] [cursor=pointer]:
+            - strong [ref=f5e328]: refused by the database
+            - generic [ref=f5e329]: the exclusion constraint fired and the incident says db_constraint
+          - button "double booked, nothing recorded two active bookings on one resource and zero incidents" [ref=f5e330] [cursor=pointer]:
+            - strong [ref=f5e331]: double booked, nothing recorded
+            - generic [ref=f5e332]: two active bookings on one resource and zero incidents
+          - 'button "an uncaught IntegrityError the check constraint fired where nothing catches it: a 500, no incident" [ref=f5e333] [cursor=pointer]':
+            - strong [ref=f5e334]: an uncaught IntegrityError
+            - generic [ref=f5e335]: "the check constraint fired where nothing catches it: a 500, no incident"
+          - button "the stored response replayed the retry returned the first booking and created nothing" [ref=f5e336] [cursor=pointer]:
+            - strong [ref=f5e337]: the stored response replayed
+            - generic [ref=f5e338]: the retry returned the first booking and created nothing
+          - button "a paid hold expired anyway the seats went back while paid_at was set" [ref=f5e339] [cursor=pointer]:
+            - strong [ref=f5e340]: a paid hold expired anyway
+            - generic [ref=f5e341]: the seats went back while paid_at was set
+      - button "run it on the bench" [ref=f5e342] [cursor=pointer]
+    - generic [ref=f5e343]:
+      - generic [ref=f5e344]: WHAT YOU SEE
+      - 'heading "A resource with availability configured starts behaving as though it has none: single capacity, hard conflicts, no counter." [level=3] [ref=f5e345]'
+      - generic [ref=f5e346]: "if exception.exception_type == ...BLACKOUT: return False"
+      - generic [ref=f5e348]: WHY
+      - heading "A blackout made the slot invisible to the booking path" [level=4] [ref=f5e349]
+      - paragraph [ref=f5e350]: _apply_exceptions sets is_bookable=False on any slot a blackout overlaps. _lock_overlapping_slots then filters on is_bookable=True, so the query returns nothing, and create_booking takes the else branch. The slot row still exists and still says capacity 5; the booking path simply cannot see it and quietly reverts to the design you thought you had replaced.
+      - generic [ref=f5e351]:
+        - generic [ref=f5e352]:
+          - generic [ref=f5e353]: backend/main/scheduling/services.py
+          - generic [ref=f5e354]: lines 2384–2389 · running line 2387
+        - code [ref=f5e357]: "def _apply_exceptions(resource: MarketplaceResource, start_at: datetime, end_at: datetime): exceptions = AvailabilityException.objects.filter(resource=resource).filter(_overlap_q(start_at, end_at)) for exception in exceptions: if exception.exception_type == AvailabilityException.ExceptionType.BLACKOUT: return False return True"
+      - paragraph [ref=f5e358]: "And while you are in that function: an override exception is fetched by the same query and then ignored. is_available_override and capacity_override are on the model and in the serializer, and no code reads either one."
+      - generic [ref=f5e359]:
+        - generic [ref=f5e360]: A blackout exception now covers the window, and the resource has exactly one slot. A tries to book. What comes out?
+        - generic [ref=f5e361]:
+          - button "one booking, cleanly the window is taken once and nothing is refused" [ref=f5e362] [cursor=pointer]:
+            - strong [ref=f5e363]: one booking, cleanly
+            - generic [ref=f5e364]: the window is taken once and nothing is refused
+          - button "refused by the application check ConflictError, and an incident tagged application_check" [ref=f5e365] [cursor=pointer]:
+            - strong [ref=f5e366]: refused by the application check
+            - generic [ref=f5e367]: ConflictError, and an incident tagged application_check
+          - button "refused by the database the exclusion constraint fired and the incident says db_constraint" [ref=f5e368] [cursor=pointer]:
+            - strong [ref=f5e369]: refused by the database
+            - generic [ref=f5e370]: the exclusion constraint fired and the incident says db_constraint
+          - button "double booked, nothing recorded two active bookings on one resource and zero incidents" [ref=f5e371] [cursor=pointer]:
+            - strong [ref=f5e372]: double booked, nothing recorded
+            - generic [ref=f5e373]: two active bookings on one resource and zero incidents
+          - 'button "an uncaught IntegrityError the check constraint fired where nothing catches it: a 500, no incident" [ref=f5e374] [cursor=pointer]':
+            - strong [ref=f5e375]: an uncaught IntegrityError
+            - generic [ref=f5e376]: "the check constraint fired where nothing catches it: a 500, no incident"
+          - button "the stored response replayed the retry returned the first booking and created nothing" [ref=f5e377] [cursor=pointer]:
+            - strong [ref=f5e378]: the stored response replayed
+            - generic [ref=f5e379]: the retry returned the first booking and created nothing
+          - button "a paid hold expired anyway the seats went back while paid_at was set" [ref=f5e380] [cursor=pointer]:
+            - strong [ref=f5e381]: a paid hold expired anyway
+            - generic [ref=f5e382]: the seats went back while paid_at was set
+      - button "run it on the bench" [ref=f5e383] [cursor=pointer]
+    - generic [ref=f5e384]:
+      - generic [ref=f5e385]: WHAT YOU SEE
+      - heading "One Sunday a year, a resource has no availability at all, and nobody can say why. The rule has not changed." [level=3] [ref=f5e386]
+      - generic [ref=f5e387]: "materialize_availability_slots -> {'slots_created': 0, 'skipped_nonexistent': 1}"
+      - generic [ref=f5e389]: WHY
+      - heading "The local start time did not exist on that date" [level=4] [ref=f5e390]
+      - paragraph [ref=f5e391]: When the clocks go forward, a local time in the skipped hour is not a real instant. _resolve_local_datetime returns None for it, _rule_slot_to_utc returns None, and the materialize loop increments skipped_nonexistent and moves on. No slot, no error, no log line beyond a count in the run summary. And because no slot exists, create_booking falls into the overlap-query branch for that window.
+      - generic [ref=f5e392]:
+        - generic [ref=f5e393]:
+          - generic [ref=f5e394]: backend/main/scheduling/services.py
+          - generic [ref=f5e395]: lines 2364–2375 · running line 2374
+        - code [ref=f5e398]: "def _rule_slot_to_utc(rule: AvailabilityRule, slot_date: date): tz = ZoneInfo(rule.timezone or \"UTC\") local_start = datetime.combine(slot_date, rule.local_start_time) local_end = datetime.combine(slot_date, rule.local_end_time) # DST policy: # - ambiguous local times pick fold=0 (earlier occurrence), # - nonexistent local times are skipped entirely. aware_start = _resolve_local_datetime(local_start, tz, prefer_fold=0) aware_end = _resolve_local_datetime(local_end, tz, prefer_fold=0) if not aware_start or not aware_end: return None"
+      - button "run it on the bench" [ref=f5e399] [cursor=pointer]
+    - generic [ref=f5e400]:
+      - generic [ref=f5e401]: WHAT YOU SEE
+      - heading "An organizer pays a deposit, gets a receipt, and then finds the window has been given back to the pool. The money is taken and the booking is gone." [level=3] [ref=f5e402]
+      - generic [ref=f5e403]: expire_checkout_sessions -> released 1 hold(s)
+      - generic [ref=f5e405]: WHY
+      - heading "Paying does not finalize the session, and the expiry job does not look at paid_at" [level=4] [ref=f5e406]
+      - paragraph [ref=f5e407]: complete_checkout_mock_deposit sets paid_at and leaves status ACTIVE, without extending hold_expires_at. expire_checkout_sessions selects exactly on status=ACTIVE and hold_expires_at <= now. release_checkout_session refuses only when the status is already FINALIZED, which paying never sets, so the session is expired and _release_capacity hands the seats back.
+      - generic [ref=f5e408]:
+        - generic [ref=f5e409]:
+          - generic [ref=f5e410]: backend/main/scheduling/services.py
+          - generic [ref=f5e411]: lines 1656–1675 · running line 1659
+        - code [ref=f5e414]: "locked_session = CheckoutSession.objects.select_for_update().get(id=checkout_session.id) if locked_session.organizer_id != actor.id: raise PolicyViolationError(\"You do not have permission to release this checkout session.\") if locked_session.status == CheckoutSession.Status.FINALIZED: raise TransitionError(\"Finalized checkout sessions cannot be released.\") if locked_session.status in {CheckoutSession.Status.RELEASED, CheckoutSession.Status.EXPIRED}: return locked_session held_requests = list( BookingRequest.objects.select_for_update() .select_related(\"resource\", \"resource__owner\", \"organizer\") .filter(checkout_session=locked_session) ) for held_request in held_requests: _release_capacity( held_request.resource, held_request.requested_start_at, held_request.requested_end_at, held_request.attendee_count, )"
+      - paragraph [ref=f5e415]: Finalization happens later, in finalize_draft_bookings when the event is published. The window between paying and publishing is exactly the window in which this can happen, and its width is checkout_hold_minutes minus however long the organizer took to pay.
+      - generic [ref=f5e416]:
+        - generic [ref=f5e417]: A pays at minute 29 of a 30 minute hold, then the expiry job runs at minute 31. What happens to the hold?
+        - generic [ref=f5e418]:
+          - button "one booking, cleanly the window is taken once and nothing is refused" [ref=f5e419] [cursor=pointer]:
+            - strong [ref=f5e420]: one booking, cleanly
+            - generic [ref=f5e421]: the window is taken once and nothing is refused
+          - button "refused by the application check ConflictError, and an incident tagged application_check" [ref=f5e422] [cursor=pointer]:
+            - strong [ref=f5e423]: refused by the application check
+            - generic [ref=f5e424]: ConflictError, and an incident tagged application_check
+          - button "refused by the database the exclusion constraint fired and the incident says db_constraint" [ref=f5e425] [cursor=pointer]:
+            - strong [ref=f5e426]: refused by the database
+            - generic [ref=f5e427]: the exclusion constraint fired and the incident says db_constraint
+          - button "double booked, nothing recorded two active bookings on one resource and zero incidents" [ref=f5e428] [cursor=pointer]:
+            - strong [ref=f5e429]: double booked, nothing recorded
+            - generic [ref=f5e430]: two active bookings on one resource and zero incidents
+          - 'button "an uncaught IntegrityError the check constraint fired where nothing catches it: a 500, no incident" [ref=f5e431] [cursor=pointer]':
+            - strong [ref=f5e432]: an uncaught IntegrityError
+            - generic [ref=f5e433]: "the check constraint fired where nothing catches it: a 500, no incident"
+          - button "the stored response replayed the retry returned the first booking and created nothing" [ref=f5e434] [cursor=pointer]:
+            - strong [ref=f5e435]: the stored response replayed
+            - generic [ref=f5e436]: the retry returned the first booking and created nothing
+          - button "a paid hold expired anyway the seats went back while paid_at was set" [ref=f5e437] [cursor=pointer]:
+            - strong [ref=f5e438]: a paid hold expired anyway
+            - generic [ref=f5e439]: the seats went back while paid_at was set
+      - button "run it on the bench" [ref=f5e440] [cursor=pointer]
+    - generic [ref=f5e441]:
+      - heading "Go and find the quiet one yourself" [level=2] [ref=f5e442]
+      - generic [ref=f5e443]:
+        - heading "Find the quiet double booking" [level=4] [ref=f5e444]
+        - generic [ref=f5e445]:
+          - generic [ref=f5e446]: where
+          - paragraph [ref=f5e447]: this page, with the phase stepper and the controls
+          - generic [ref=f5e448]: do
+          - paragraph [ref=f5e449]: Find an interleaving that ends with two active bookings on one resource and nothing at all in the incident log. Then copy the link from the address bar.
+          - generic [ref=f5e450]: bring back
+          - paragraph [ref=f5e451]: paste it back. The scene decodes the configuration and the whole schedule and folds them through the same run() it uses everywhere.
+          - generic [ref=f5e452]: what it means
+          - paragraph [ref=f5e453]: "That is the outcome the extra models exist to prevent, and the one your monitoring cannot see: no exception was raised, no incident was written, and both organizers were told yes."
+        - generic [ref=f5e454]:
+          - textbox "paste the link, or the part after s=" [ref=f5e455]
+          - button "check it" [ref=f5e456] [cursor=pointer]
+      - generic [ref=f5e457]:
+        - heading "a terminal" [level=4] [ref=f5e458]
+        - generic [ref=f5e459]:
+          - generic [ref=f5e460]: where
+          - paragraph [ref=f5e461]: a terminal, in backend/main, with the venv active
+          - generic [ref=f5e462]: do
+          - paragraph [ref=f5e463]: "Run: python manage.py shell -c \"from scheduling.services import get_constraint_monitor_status as s; print(s())\" and read database_vendor and constraint_present."
+          - generic [ref=f5e464]: bring back
+          - paragraph [ref=f5e465]: what constraint_present came back as. Only you can see your own database, so the scene cannot check this one.
+          - generic [ref=f5e466]: what it means
+          - paragraph [ref=f5e467]: On SQLite it is None, not False, because the function only asks the question on postgresql. None means unknown, and here unknown means absent.
+        - generic [ref=f5e468]: unverified
+    - generic [ref=f5e469]:
+      - heading "What looks wrong, as opposed to merely costly" [level=2] [ref=f5e470]
+      - paragraph [ref=f5e471]: "Most of the above is the price of the design, paid knowingly: more models, a cron job, a horizon. Three of them do not read that way."
+      - generic [ref=f5e472]:
+        - heading "the database vendor" [level=4] [ref=f5e473]
+        - paragraph [ref=f5e474]: on anything that is not postgresql the migration returns immediately, the constraint never exists, and get_constraint_monitor_status reports None rather than False.
+        - generic [ref=f5e475]: migrations/0003_postgres_booking_overlap_constraint.py:8-9
+      - generic [ref=f5e476]:
+        - heading "AvailabilityException" [level=4] [ref=f5e477]
+        - paragraph [ref=f5e478]: the slot still exists, but _lock_overlapping_slots filters on is_bookable=True, so the booking path stops seeing it and quietly falls into the overlap-query branch instead.
+        - generic [ref=f5e479]: services.py:2384-2389
+      - generic [ref=f5e480]:
+        - heading "checkout_hold_minutes" [level=4] [ref=f5e481]
+        - paragraph [ref=f5e482]: paying does not extend it and does not finalize the session, and the expiry job never checks paid_at. Pay at minute 29 of a 30 minute hold and the seats are released at minute 30.
+        - generic [ref=f5e483]: services.py:1554, 1744-1769
+      - generic [ref=f5e484]:
+        - heading "expire_and_materialize" [level=4] [ref=f5e485]
+        - paragraph [ref=f5e486]: The command imports materialize_slots_for_resource from scheduling.services, which does not define it, so the command raises ImportError before its loop starts. Its docstring says it runs both expiry and materialization; its loop body only expires stale requests.
+        - generic [ref=f5e487]: management/commands/expire_and_materialize.py:20
+      - paragraph [ref=f5e488]: The first three are each one line, and each one turns a two-layer defence into a one-layer defence without saying so. The fourth means the job that keeps the horizon full is not running from that command, so materialization has to be someone's cron entry against materialize_availability_slots instead, and if it is not, every resource quietly falls back to the overlap query as the horizon runs out.
+    - generic [ref=f5e489]:
+      - heading "Every part, and how to break it" [level=3] [ref=f5e490]
+      - paragraph [ref=f5e491]: The list the scene is built from. Click one to inspect it; its controls appear where you clicked.
+      - generic [ref=f5e492]:
+        - button "which branch runs services.py" [ref=f5e493] [cursor=pointer]:
+          - generic [ref=f5e494]: which branch runs
+          - generic [ref=f5e495]: services.py
+        - button "select_for_update services.py" [ref=f5e496] [cursor=pointer]:
+          - generic [ref=f5e497]: select_for_update
+          - generic [ref=f5e498]: services.py
+        - button "the database vendor flagged in the closing note 0003_postgres_booking_overlap_constraint.py" [ref=f5e499] [cursor=pointer]:
+          - generic [ref=f5e500]:
+            - text: the database vendor
+            - generic "flagged in the closing note" [ref=f5e501]
+          - generic [ref=f5e502]: 0003_postgres_booking_overlap_constraint.py
+        - button "slot capacity models.py" [ref=f5e503] [cursor=pointer]:
+          - generic [ref=f5e504]: slot capacity
+          - generic [ref=f5e505]: models.py
+        - button "attendee_count services.py" [ref=f5e506] [cursor=pointer]:
+          - generic [ref=f5e507]: attendee_count
+          - generic [ref=f5e508]: services.py
+        - button "the Idempotency-Key services.py" [ref=f5e509] [cursor=pointer]:
+          - generic [ref=f5e510]: the Idempotency-Key
+          - generic [ref=f5e511]: services.py
+        - button "the DST policy services.py" [ref=f5e512] [cursor=pointer]:
+          - generic [ref=f5e513]: the DST policy
+          - generic [ref=f5e514]: services.py
+        - button "AvailabilityException flagged in the closing note services.py" [ref=f5e515] [cursor=pointer]:
+          - generic [ref=f5e516]:
+            - text: AvailabilityException
+            - generic "flagged in the closing note" [ref=f5e517]
+          - generic [ref=f5e518]: services.py
+        - button "checkout_hold_minutes flagged in the closing note services.py" [ref=f5e519] [cursor=pointer]:
+          - generic [ref=f5e520]:
+            - text: checkout_hold_minutes
+            - generic "flagged in the closing note" [ref=f5e521]
+          - generic [ref=f5e522]: services.py
+  - generic [ref=f5e523]:
+    - button "probes" [ref=f5e524] [cursor=pointer]
+    - button "history" [ref=f5e525] [cursor=pointer]
+    - button "compare" [ref=f5e526] [cursor=pointer]

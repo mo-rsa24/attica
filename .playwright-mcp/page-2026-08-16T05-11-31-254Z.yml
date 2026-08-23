@@ -1,0 +1,98 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - button "Notifications" [ref=f1e81] [cursor=pointer]
+        - link [ref=f1e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e23]
+        - button "Log out" [ref=f1e84] [cursor=pointer]
+        - button "Open menu" [ref=f1e26] [cursor=pointer]
+  - generic [ref=f1e1241]:
+    - banner [ref=f1e1242]:
+      - generic [ref=f1e1243]:
+        - link [ref=f1e1244] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e1247]:
+          - button "Open booking summary" [ref=f1e1248] [cursor=pointer]:
+            - generic [ref=f1e1249]: Booking Summary
+            - generic [ref=f1e1250]: "1"
+          - generic [ref=f1e1251]:
+            - banner [ref=f1e1252]:
+              - generic [ref=f1e1253]:
+                - generic [ref=f1e1254]:
+                  - heading "Event Booking Summary" [level=2] [ref=f1e1255]
+                  - paragraph [ref=f1e1256]: 1 request across your draft
+                - button "Close booking summary" [ref=f1e1258] [cursor=pointer]
+            - generic [ref=f1e1261]:
+              - generic [ref=f1e1262]:
+                - paragraph [ref=f1e1263]: Accepted
+                - paragraph [ref=f1e1264]: "0"
+              - generic [ref=f1e1265]:
+                - paragraph [ref=f1e1266]: Ready
+                - paragraph [ref=f1e1267]: "0"
+              - generic [ref=f1e1268]:
+                - paragraph [ref=f1e1269]: Deposit due now
+                - paragraph [ref=f1e1270]: R 0,00
+            - generic [ref=f1e1272]:
+              - heading "Awaiting Response" [level=3] [ref=f1e1275]
+              - generic [ref=f1e1278]:
+                - link "R" [ref=f1e1279] [cursor=pointer]:
+                  - /url: /venues/79
+                - generic [ref=f1e1281]:
+                  - generic [ref=f1e1282]:
+                    - generic [ref=f1e1283]:
+                      - link "Rise Rooftop, Sandton" [ref=f1e1284] [cursor=pointer]:
+                        - /url: /booking-request/37
+                      - paragraph [ref=f1e1285]: venue
+                    - generic [ref=f1e1286]:
+                      - paragraph [ref=f1e1287]: Deposit due
+                      - paragraph [ref=f1e1288]: R 0,00
+                  - generic [ref=f1e1289]: Awaiting response
+                  - link "View request" [ref=f1e1292] [cursor=pointer]:
+                    - /url: /booking-request/37
+          - button "Save & exit" [ref=f1e1293] [cursor=pointer]
+    - main [ref=f1e1294]:
+      - generic [ref=f1e1295]:
+        - heading "Where's your event located?" [level=1] [ref=f1e1296]
+        - paragraph [ref=f1e1297]: Search for an address or click on the map to set your event's location.
+        - generic [ref=f1e1298]:
+          - textbox "Start typing an address..." [active] [ref=f1e1299]: Sandton
+          - list [ref=f1e1317]:
+            - listitem [ref=f1e1318] [cursor=pointer]: Sandton, City of Johannesburg Metropolitan Municipality, Gauteng, 2146, South Africa
+            - listitem [ref=f1e1319] [cursor=pointer]: Sandton, Johannesburg Ward 103, Sandton, City of Johannesburg Metropolitan Municipality, Gauteng, 1617, South Africa
+            - listitem [ref=f1e1320] [cursor=pointer]: Sandton, Rivonia Road, Sandown, Johannesburg Ward 103, Sandton, City of Johannesburg Metropolitan Municipality, Gauteng, 2146, South Africa
+        - generic [ref=f1e1301]:
+          - generic:
+            - generic [ref=f1e1302]:
+              - button "Zoom in" [ref=f1e1303] [cursor=pointer]: +
+              - button "Zoom out" [ref=f1e1304] [cursor=pointer]: −
+            - generic [ref=f1e1305]:
+              - link "Leaflet" [ref=f1e1306] [cursor=pointer]:
+                - /url: https://leafletjs.com
+              - text: "| © OpenStreetMap contributors"
+    - contentinfo [ref=f1e1311]:
+      - generic [ref=f1e1314]:
+        - button "Back" [ref=f1e1315] [cursor=pointer]
+        - button "Next" [disabled] [ref=f1e1316]

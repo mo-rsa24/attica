@@ -1,0 +1,148 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "Brownian motion, and why E[W² at t] = t" [level=1] [ref=e6]
+      - generic [ref=e7]:
+        - text: from
+        - link "01-brownian-motion.md" [ref=e8] [cursor=pointer]:
+          - /url: ../../01-brownian-motion.md
+    - generic [ref=e9]:
+      - button "the path and the check" [pressed] [ref=e10] [cursor=pointer]
+      - button "moments, first and second" [ref=e11] [cursor=pointer]
+      - button "why it is t" [ref=e12] [cursor=pointer]
+  - generic [ref=e13]:
+    - button "play the story" [ref=e14] [cursor=pointer]
+    - button "back" [ref=e15] [cursor=pointer]
+    - button "forward" [ref=e16] [cursor=pointer]
+    - generic [ref=e17]:
+      - button "story" [ref=e18] [cursor=pointer]
+      - button "explore" [pressed] [ref=e19] [cursor=pointer]
+    - button "tour" [ref=e20] [cursor=pointer]
+  - paragraph [ref=e21]: Explore. Drag the time cursor on the paths, or move any control below.
+  - generic [ref=e22]:
+    - heading "Paths from one rule" [level=2] [ref=e23]
+    - paragraph [ref=e24]: Each step adds an independent normal draw of variance dt.
+    - img [ref=e27]:
+      - generic [ref=e28]: "-3"
+      - generic [ref=e30]: "-2"
+      - generic [ref=e32]: "-1"
+      - generic [ref=e34]: "0"
+      - generic [ref=e36]: "1"
+      - generic [ref=e38]: "2"
+      - generic [ref=e40]: "3"
+      - generic [ref=e42]: "0"
+      - generic [ref=e43]: "0.25"
+      - generic [ref=e44]: "0.5"
+      - generic [ref=e45]: "0.75"
+      - generic [ref=e46]: "1"
+      - generic [ref=e47]: W
+      - generic [ref=e48]: t
+      - generic [ref=e50]: t = 1.000
+  - generic [ref=e53]:
+    - math [ref=e55]:
+      - generic [ref=e57]:
+        - generic [ref=e58]: E
+        - generic: ⁣
+        - generic [ref=e59]:
+          - generic [ref=e60]: "["
+          - generic [ref=e61]:
+            - generic [ref=e62]: W
+            - generic [ref=e64]: "1.000"
+            - generic [ref=e66]: "2"
+          - generic [ref=e67]: "]"
+        - generic [ref=e68]: =
+        - generic [ref=e69]: t
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - generic [ref=e73]: "1.0167"
+            - generic [ref=e74]: ⏟
+          - generic [ref=e75]: measured
+        - generic [ref=e76]: vs
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e79]: "1.0000"
+            - generic [ref=e80]: ⏟
+          - generic [ref=e81]: t
+        - generic [ref=e82]: ±
+        - generic [ref=e83]: "0.2000"
+    - generic [ref=e84]:
+      - generic [ref=e85]:
+        - text: E
+        - generic [ref=e86]:
+          - generic [ref=e87]: "["
+          - generic [ref=e88]:
+            - text: W
+            - generic [ref=e92]:
+              - generic [ref=e93]: "1.000"
+              - generic [ref=e95]: "2"
+          - generic [ref=e100]: "]"
+        - text: =
+      - generic [ref=e101]:
+        - text: t
+        - generic [ref=e105]:
+          - generic [ref=e106]: measured
+          - generic [ref=e109]: "1.0167"
+        - generic [ref=e130]: vs
+        - generic [ref=e134]:
+          - generic [ref=e135]: t
+          - generic [ref=e137]: "1.0000"
+        - text: ±
+      - generic [ref=e158]: "0.2000"
+  - generic [ref=e159]:
+    - heading "Average of W squared, against t" [level=2] [ref=e160]
+    - paragraph [ref=e161]: The estimate should sit inside the band, not exactly on the line.
+    - img [ref=e163]:
+      - generic [ref=e167]: "0"
+      - generic [ref=e169]: "0.5"
+      - generic [ref=e171]: "1"
+      - generic [ref=e173]: "1.5"
+      - generic [ref=e175]: "2"
+      - generic [ref=e177]: "0"
+      - generic [ref=e178]: "0.25"
+      - generic [ref=e179]: "0.5"
+      - generic [ref=e180]: "0.75"
+      - generic [ref=e181]: "1"
+      - generic [ref=e182]: t
+      - generic [ref=e183]: "what the identity says: y = t"
+      - generic [ref=e185]: "1.017"
+    - generic [ref=e186]:
+      - generic [ref=e187]: mean of W squared 1.0167
+      - generic [ref=e188]: t 1.0000
+      - generic [ref=e189]: gap 0.0167
+      - generic [ref=e190]: two standard errors 0.2000
+    - paragraph [ref=e191]: Inside the band. At N = 200 the band is 20% of t, so this is as close as 200 paths can pin it down.
+  - group [ref=e192]:
+    - generic "the values at the cursor, across paths" [ref=e193] [cursor=pointer]
+  - generic [ref=e194]:
+    - generic [ref=e195]:
+      - generic [ref=e196]:
+        - text: where in time you are looking
+        - generic [ref=e197]: (t)
+        - text: "1.000"
+      - slider "where in time you are looking (t) 1.000" [ref=e198]: "1"
+    - generic [ref=e199]:
+      - generic [ref=e200]:
+        - text: how many paths are averaged
+        - generic [ref=e201]: (N)
+        - text: "200"
+      - slider "how many paths are averaged (N) 200" [ref=e202]: "200"
+    - generic [ref=e203]:
+      - generic [ref=e204]:
+        - text: how many steps per path
+        - generic [ref=e205]: (n)
+        - text: 64, so dt = 0.0156
+      - slider "how many steps per path (n) 64, so dt = 0.0156" [ref=e206]: "6"
+    - generic [ref=e207]:
+      - generic [ref=e208]:
+        - text: which sample you are looking at
+        - generic [ref=e209]: (seed 0)
+      - button "draw again" [ref=e210] [cursor=pointer]
+    - generic [ref=e211]:
+      - generic [ref=e212]: the maths, unchanged by any of the above
+      - text: n and N change how well you can see it, never what it is.
+  - group [ref=e213]:
+    - generic "what you changed, and what it did" [ref=e214] [cursor=pointer]
+  - group [ref=e215]:
+    - generic "do it yourself, off the page" [ref=e216] [cursor=pointer]
+  - group [ref=e217]:
+    - generic "where these numbers come from" [ref=e218] [cursor=pointer]

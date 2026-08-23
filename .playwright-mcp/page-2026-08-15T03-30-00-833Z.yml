@@ -1,0 +1,216 @@
+- generic [ref=f4e3]:
+  - banner [ref=f4e4]:
+    - 'heading "Attica scheduling: availability, holds, and conflicts" [level=1] [ref=f4e5]'
+    - generic [ref=f4e6]: materialized slots with a counter, two locks, and a record of which layer caught it
+    - button "tour" [ref=f4e7] [cursor=pointer]
+  - navigation [ref=f4e8]:
+    - button "0why not just query" [ref=f4e9] [cursor=pointer]
+    - button "1one rule, one row" [ref=f4e10] [cursor=pointer]
+    - button "2the mechanism" [ref=f4e11] [cursor=pointer]
+    - button "3where it costs you" [ref=f4e12] [cursor=pointer]
+    - button "4build it" [ref=f4e13] [cursor=pointer]
+  - generic [ref=f4e15]:
+    - generic [ref=f4e16]:
+      - generic [ref=f4e17]:
+        - generic [ref=f4e18]:
+          - heading "create_booking, one phase at a time" [level=3] [ref=f4e19]
+          - generic [ref=f4e20]: click in any order. the two transactions are independent until a lock says otherwise
+        - generic [ref=f4e21]:
+          - generic [ref=f4e22]: A
+          - button "1 SELECT FOR UPDATE" [ref=f4e23] [cursor=pointer]:
+            - generic [ref=f4e24]: "1"
+            - text: SELECT FOR UPDATE
+          - button "2 check capacity" [ref=f4e25] [cursor=pointer]:
+            - generic [ref=f4e26]: "2"
+            - text: check capacity
+          - button "3 reserve" [ref=f4e27] [cursor=pointer]:
+            - generic [ref=f4e28]: "3"
+            - text: reserve
+          - button "4 INSERT booking" [ref=f4e29] [cursor=pointer]:
+            - generic [ref=f4e30]: "4"
+            - text: INSERT booking
+          - button "5 COMMIT" [ref=f4e31] [cursor=pointer]:
+            - generic [ref=f4e32]: "5"
+            - text: COMMIT
+          - generic [ref=f4e33]: idle
+        - generic [ref=f4e34]:
+          - generic [ref=f4e35]: B
+          - button "1 SELECT FOR UPDATE" [ref=f4e36] [cursor=pointer]:
+            - generic [ref=f4e37]: "1"
+            - text: SELECT FOR UPDATE
+          - button "2 check capacity" [ref=f4e38] [cursor=pointer]:
+            - generic [ref=f4e39]: "2"
+            - text: check capacity
+          - button "3 reserve" [ref=f4e40] [cursor=pointer]:
+            - generic [ref=f4e41]: "3"
+            - text: reserve
+          - button "4 INSERT booking" [ref=f4e42] [cursor=pointer]:
+            - generic [ref=f4e43]: "4"
+            - text: INSERT booking
+          - button "5 COMMIT" [ref=f4e44] [cursor=pointer]:
+            - generic [ref=f4e45]: "5"
+            - text: COMMIT
+          - generic [ref=f4e46]: idle
+        - generic [ref=f4e47]:
+          - generic [ref=f4e48]: lock
+          - generic [ref=f4e49]: free
+      - generic [ref=f4e50]:
+        - generic [ref=f4e51]:
+          - generic [ref=f4e52]: active bookings
+          - generic [ref=f4e53]: "0"
+        - generic [ref=f4e54]:
+          - generic [ref=f4e55]: capacity
+          - generic [ref=f4e56]: no slots exist
+        - generic [ref=f4e57]:
+          - generic [ref=f4e58]: incidents recorded
+          - generic [ref=f4e59]: none
+        - generic [ref=f4e60]:
+          - generic [ref=f4e61]: collisions unrecorded
+          - generic [ref=f4e62]: none
+      - generic [ref=f4e63]:
+        - generic [ref=f4e64]:
+          - generic [ref=f4e65]: AvailabilitySlot
+          - generic [ref=f4e66]: "no rows: nothing materialized, so create_booking takes the overlap-query branch"
+        - generic [ref=f4e67]:
+          - generic [ref=f4e68]: Booking
+          - generic [ref=f4e69]: no rows
+        - generic [ref=f4e70]:
+          - generic [ref=f4e71]: BookingConflictIncident
+          - generic [ref=f4e72]: no rows
+      - paragraph [ref=f4e73]: Nothing has run yet. Materialize the slots, then step the two transactions.
+    - generic [ref=f4e74]:
+      - generic [ref=f4e75]:
+        - generic [ref=f4e76]: design
+        - button "materialized slots" [pressed] [ref=f4e77] [cursor=pointer]
+        - button "one table + overlap query" [ref=f4e78] [cursor=pointer]
+      - generic [ref=f4e79]:
+        - generic [ref=f4e80]: locking
+        - button "SELECT FOR UPDATE" [pressed] [ref=f4e81] [cursor=pointer]
+        - button "no lock" [ref=f4e82] [cursor=pointer]
+      - generic [ref=f4e83]:
+        - generic [ref=f4e84]: database
+        - button "sqlite (dev)" [pressed] [ref=f4e85] [cursor=pointer]
+        - button "postgresql" [ref=f4e86] [cursor=pointer]
+      - generic [ref=f4e87]:
+        - generic [ref=f4e88]: slot capacity
+        - button "capacity 1" [ref=f4e89] [cursor=pointer]
+        - button "capacity 5" [pressed] [ref=f4e90] [cursor=pointer]
+      - generic [ref=f4e91]:
+        - generic [ref=f4e92]: jobs
+        - button "materialize slots" [ref=f4e93] [cursor=pointer]
+        - button "expire holds" [ref=f4e94] [cursor=pointer]
+        - generic [ref=f4e96]: the clock
+        - button "+1 min" [ref=f4e97] [cursor=pointer]
+        - button "+29 min" [ref=f4e98] [cursor=pointer]
+        - button "+5 min" [ref=f4e99] [cursor=pointer]
+      - generic [ref=f4e100]:
+        - generic [ref=f4e101]: the hold path
+        - button "A requests" [ref=f4e102] [cursor=pointer]
+        - button "approve" [ref=f4e103] [cursor=pointer]
+        - button "A pays" [ref=f4e104] [cursor=pointer]
+        - button "A retries" [ref=f4e105] [cursor=pointer]
+      - generic [ref=f4e106]:
+        - generic [ref=f4e107]: or run one
+        - button "one after the other" [ref=f4e108] [cursor=pointer]
+        - button "interleaved, lock on" [ref=f4e109] [cursor=pointer]
+        - button "interleaved, lock off" [ref=f4e110] [cursor=pointer]
+        - button "the overlap query, lock off" [ref=f4e111] [cursor=pointer]
+        - button "paid, then expired" [ref=f4e112] [cursor=pointer]
+        - button "reset" [ref=f4e113] [cursor=pointer]
+    - generic [ref=f4e115]:
+      - heading "the schedule" [level=3] [ref=f4e116]
+      - generic [ref=f4e117]: nothing yet. materialize the slots, then step the two transactions.
+    - generic [ref=f4e201]:
+      - 'heading "slot capacity: capacity 5" [level=3] [ref=f4e202]'
+      - paragraph [ref=f4e203]: Nothing observable changed. That action is not load-bearing here, which is a real answer rather than a missing one.
+      - group [ref=f4e204]:
+        - generic "why?" [ref=f4e205] [cursor=pointer]
+    - generic [ref=f4e119]:
+      - heading "Two organizers want the same Saturday" [level=2] [ref=f4e120]
+      - paragraph [ref=f4e121]: They click within a second of each other. Nothing about that is unusual, and everything about what happens next depends on how availability is stored.
+      - paragraph [ref=f4e122]: "The obvious design is one Booking table with a start and an end, and a query on every attempt: is there already an active booking overlapping this window? It is one table, one index, and about four lines. Below it is the design Attica actually has, running the same two attempts."
+      - paragraph [ref=f4e123]: "On arrival the two agree, and that is the honest place to start: at capacity 1 with the lock held, all the extra models buy you is nothing. Two settings make them diverge, and they are the two controls under the lanes."
+      - paragraph [ref=f4e124]: B waits on the lock, then runs after A commits.
+      - generic [ref=f4e125]:
+        - generic [ref=f4e126]:
+          - generic [ref=f4e127]: one table, an overlap query
+          - generic [ref=f4e128]: WHERE start_at < :end AND end_at > :start
+          - generic [ref=f4e129]: 1 booking(s), 1 incident(s)
+          - generic [ref=f4e130]:
+            - term [ref=f4e131]: capacity
+            - definition [ref=f4e132]: no slots exist
+            - term [ref=f4e133]: refused by
+            - definition [ref=f4e134]: the application check
+            - term [ref=f4e135]: outcome
+            - definition [ref=f4e136]: refused-application
+        - generic [ref=f4e137]:
+          - generic [ref=f4e138]: materialized slots, a counter
+          - generic [ref=f4e139]: capacity_remaining compared against attendee_count
+          - generic [ref=f4e140]: 2 booking(s), 0 incident(s)
+          - generic [ref=f4e141]:
+            - term [ref=f4e142]: capacity
+            - definition [ref=f4e143]: 2 / 5 reserved
+            - term [ref=f4e144]: refused by
+            - definition [ref=f4e145]: nothing
+            - term [ref=f4e146]: outcome
+            - definition [ref=f4e147]: booked
+      - generic [ref=f4e148]: They diverge here, and the two rows above say exactly how.
+      - generic [ref=f4e149]:
+        - generic [ref=f4e150]: locking
+        - button "SELECT FOR UPDATE" [pressed] [ref=f4e151] [cursor=pointer]
+        - button "no lock" [ref=f4e152] [cursor=pointer]
+      - generic [ref=f4e153]:
+        - generic [ref=f4e154]: slot capacity
+        - button "capacity 1" [ref=f4e155] [cursor=pointer]
+        - button "capacity 5" [active] [pressed] [ref=f4e156] [cursor=pointer]
+      - generic [ref=f4e157]:
+        - button "put that schedule on the bench" [ref=f4e158] [cursor=pointer]
+        - generic [ref=f4e159]: then step it yourself and try a different order
+    - generic [ref=f4e160]:
+      - heading "The query is not wrong. It is just answering a question about the past." [level=3] [ref=f4e161]
+      - paragraph [ref=f4e162]:
+        - code [ref=f4e163]: WHERE start_at < :end AND end_at > :start
+        - text: "is a correct overlap test. The problem is when it runs: both transactions ask it before either has written anything, so both get the same true answer, and both act on it."
+      - paragraph [ref=f4e164]: Two fixes are available and they are not the same fix. Serialize the readers so only one can be between the question and the answer at a time. Or give the database a rule it can enforce without being asked. Attica does both, in that order, and records which one caught each collision.
+      - paragraph [ref=f4e165]: "It also does a third thing that neither fix gives you: it turns availability into rows with a counter, so a resource that can take five bookings at once can say so. An overlap query has no way to express five."
+    - generic [ref=f4e166]:
+      - heading "The three settings this whole scene turns on" [level=3] [ref=f4e167]
+      - paragraph [ref=f4e168]: Everything else is detail. These three decide which of the four outcomes you get.
+      - generic [ref=f4e169]:
+        - strong [ref=f4e170]: which branch runs
+        - generic [ref=f4e171]: create_booking has two bodies. With slots it compares a counter; with none it runs the overlap query and treats the resource as single-capacity.
+        - generic [ref=f4e172]: services.py:583-606
+      - generic [ref=f4e173]:
+        - strong [ref=f4e174]: select_for_update
+        - generic [ref=f4e175]: A row lock on the MarketplaceResource, taken before anything is read, plus a second lock on the overlapping slots.
+        - generic [ref=f4e176]: services.py:576
+      - generic [ref=f4e177]:
+        - strong [ref=f4e178]: the database vendor
+        - generic [ref=f4e179]: Migration 0003 adds a GiST exclusion constraint that refuses overlapping active bookings. Its first statement is a vendor check.
+        - generic [ref=f4e180]: migrations/0003_postgres_booking_overlap_constraint.py:8-9
+      - paragraph [ref=f4e181]:
+        - text: "Right now:"
+        - strong [ref=f4e182]: slots
+        - text: ","
+        - strong [ref=f4e183]: select-for-update
+        - text: ", on"
+        - strong [ref=f4e184]: sqlite
+        - text: .
+    - generic [ref=f4e185]:
+      - heading "What is coming" [level=3] [ref=f4e186]
+      - generic [ref=f4e187]:
+        - term [ref=f4e188]: stage 1
+        - definition [ref=f4e189]: one rule becoming one slot row, and the four columns that do the work.
+        - term [ref=f4e190]: stage 2
+        - definition [ref=f4e191]: the pipeline, the two locks, and the two constraints, with the map as the surface.
+        - term [ref=f4e192]: stage 3
+        - definition [ref=f4e193]: six ways it costs you, including two that are quiet.
+        - term [ref=f4e194]: stage 4
+        - definition [ref=f4e195]: build it in SQL and then Django, one race at a time.
+      - paragraph [ref=f4e196]: How the right-hand lane turns a recurring rule into that counter is stage 1. Until then it is allowed to be a black box.
+  - generic [ref=f4e197]:
+    - button "probes" [ref=f4e198] [cursor=pointer]
+    - button "history ·1" [ref=f4e206] [cursor=pointer]:
+      - text: history
+      - generic [ref=f4e207]: ·1
+    - button "compare" [ref=f4e200] [cursor=pointer]

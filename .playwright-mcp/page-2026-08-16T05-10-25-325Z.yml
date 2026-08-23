@@ -1,0 +1,137 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - button "Notifications" [ref=f1e81] [cursor=pointer]
+        - link [ref=f1e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e23]
+        - button "Log out" [ref=f1e84] [cursor=pointer]
+        - button "Open menu" [ref=f1e26] [cursor=pointer]
+  - generic [ref=f1e87]:
+    - banner [ref=f1e88]:
+      - generic [ref=f1e90]:
+        - link "A" [ref=f1e91] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e93]:
+          - button "Questions?" [ref=f1e94] [cursor=pointer]
+          - button "Save & exit" [ref=f1e95] [cursor=pointer]
+    - main [ref=f1e98]:
+      - generic [ref=f1e99]:
+        - generic [ref=f1e100]:
+          - generic [ref=f1e101]:
+            - paragraph [ref=f1e102]: Step 1 of 8
+            - heading "Tell us about your event" [level=1] [ref=f1e103]
+            - paragraph [ref=f1e104]: Let's get the basics down. The more detail you provide, the better we can help you find the perfect audience and resources.
+          - generic [ref=f1e106]:
+            - img "Event Inspiration" [ref=f1e203]
+            - img "Event Inspiration" [ref=f1e204]
+        - generic [ref=f1e109]:
+          - generic [ref=f1e110]:
+            - heading "Event Details" [level=2] [ref=f1e111]
+            - generic [ref=f1e113]:
+              - generic [ref=f1e114]: Event Name
+              - textbox "e.g., Afrobeat Summer Fest" [ref=f1e115]: Flow Map Test Fest
+              - paragraph [ref=f1e116]: 18 / 70
+            - generic [ref=f1e117]:
+              - generic [ref=f1e118]: Description
+              - textbox "Describe your event in detail. What makes it special?" [ref=f1e119]: A test event created to map the creation flow end to end.
+            - generic [ref=f1e120]:
+              - generic [ref=f1e121]:
+                - generic [ref=f1e122]: Genres
+                - textbox "Add genres (e.g., Amapiano, R&B)" [ref=f1e124]
+              - generic [ref=f1e125]:
+                - generic [ref=f1e126]: Tags / Keywords
+                - textbox "Add tags (e.g., Outdoor, LGBTQ-friendly)" [ref=f1e128]
+            - generic [ref=f1e129]:
+              - generic [ref=f1e130]:
+                - generic [ref=f1e131]: 🌐 Region
+                - combobox [ref=f1e132]:
+                  - option "Select a Province" [disabled]
+                  - option "Gauteng" [selected]
+                  - option "Western Cape"
+                  - option "KwaZulu-Natal"
+                  - option "Eastern Cape"
+                  - option "Free State"
+                  - option "Limpopo"
+                  - option "Mpumalanga"
+                  - option "North West"
+                  - option "Northern Cape"
+              - generic [ref=f1e133]:
+                - generic [ref=f1e134]: Theme / Style
+                - textbox "e.g., Black Tie, Bohemian" [ref=f1e135]: Casual
+              - generic [ref=f1e136]:
+                - generic [ref=f1e137]: Expected Capacity
+                - spinbutton "e.g., 500" [ref=f1e138]: "250"
+              - generic [ref=f1e139]:
+                - generic [ref=f1e140]: Promo Video URL
+                - textbox "https://youtube.com/watch?v=..." [ref=f1e141]
+            - generic [ref=f1e142]:
+              - generic [ref=f1e143]:
+                - generic [ref=f1e144]: Start Date & Time
+                - generic [ref=f1e145]:
+                  - textbox [ref=f1e146]: 2026-09-20
+                  - textbox [ref=f1e147]: 18:00
+              - generic [ref=f1e148]:
+                - generic [ref=f1e149]: End Date & Time
+                - generic [ref=f1e150]:
+                  - textbox [ref=f1e151]: 2026-09-20
+                  - textbox [ref=f1e152]: 23:00
+            - generic [ref=f1e153]:
+              - generic [ref=f1e154]: Additional Notes
+              - textbox "Any other details? (e.g., parking info, specific instructions)" [ref=f1e155]
+          - generic [ref=f1e156]:
+            - heading "Which of these best describes your event?" [level=2] [ref=f1e157]
+            - generic [ref=f1e158]:
+              - button [active] [ref=f1e160] [cursor=pointer]:
+                - img "Concert" [ref=f1e161]: 🎤
+                - paragraph [ref=f1e162]: Concert
+              - button [ref=f1e164] [cursor=pointer]:
+                - img "Festival" [ref=f1e165]: 🎪
+                - paragraph [ref=f1e166]: Festival
+              - button [ref=f1e168] [cursor=pointer]:
+                - img "Wedding" [ref=f1e169]: 💍
+                - paragraph [ref=f1e170]: Wedding
+              - button [ref=f1e172] [cursor=pointer]:
+                - img "Birthday Party" [ref=f1e173]: 🎂
+                - paragraph [ref=f1e174]: Birthday Party
+              - button [ref=f1e176] [cursor=pointer]:
+                - img "Conference" [ref=f1e177]: 💼
+                - paragraph [ref=f1e178]: Conference
+              - button [ref=f1e180] [cursor=pointer]:
+                - img "Club Night" [ref=f1e181]: 🪩
+                - paragraph [ref=f1e182]: Club Night
+              - button [ref=f1e184] [cursor=pointer]:
+                - img "Gala / Formal" [ref=f1e185]: 🥂
+                - paragraph [ref=f1e186]: Gala / Formal
+              - button [ref=f1e188] [cursor=pointer]:
+                - img "Food & Wine" [ref=f1e189]: 🍷
+                - paragraph [ref=f1e190]: Food & Wine
+              - button [ref=f1e192] [cursor=pointer]:
+                - img "Workshop" [ref=f1e193]: 🛠️
+                - paragraph [ref=f1e194]: Workshop
+    - contentinfo [ref=f1e195]:
+      - generic [ref=f1e196]:
+        - button "Back" [ref=f1e197] [cursor=pointer]
+        - button "Save & Continue" [ref=f1e199] [cursor=pointer]

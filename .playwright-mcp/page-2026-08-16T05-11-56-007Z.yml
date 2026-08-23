@@ -1,0 +1,129 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - button "Notifications" [ref=f1e81] [cursor=pointer]
+        - link [ref=f1e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e23]
+        - button "Log out" [ref=f1e84] [cursor=pointer]
+        - button "Open menu" [ref=f1e26] [cursor=pointer]
+  - generic [ref=f1e1326]:
+    - banner [ref=f1e1327]:
+      - generic [ref=f1e1329]:
+        - link "A" [ref=f1e1330] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e1332]:
+          - button "Open booking summary" [ref=f1e1333] [cursor=pointer]:
+            - generic [ref=f1e1334]: Booking Summary
+            - generic [ref=f1e1335]: "1"
+          - generic [ref=f1e1336]:
+            - banner [ref=f1e1337]:
+              - generic [ref=f1e1338]:
+                - generic [ref=f1e1339]:
+                  - heading "Event Booking Summary" [level=2] [ref=f1e1340]
+                  - paragraph [ref=f1e1341]: 1 request across your draft
+                - button "Close booking summary" [ref=f1e1343] [cursor=pointer]
+            - generic [ref=f1e1346]:
+              - generic [ref=f1e1347]:
+                - paragraph [ref=f1e1348]: Accepted
+                - paragraph [ref=f1e1349]: "0"
+              - generic [ref=f1e1350]:
+                - paragraph [ref=f1e1351]: Ready
+                - paragraph [ref=f1e1352]: "0"
+              - generic [ref=f1e1353]:
+                - paragraph [ref=f1e1354]: Deposit due now
+                - paragraph [ref=f1e1355]: R 0,00
+            - generic [ref=f1e1357]:
+              - heading "Awaiting Response" [level=3] [ref=f1e1360]
+              - generic [ref=f1e1363]:
+                - link "R" [ref=f1e1364] [cursor=pointer]:
+                  - /url: /venues/79
+                - generic [ref=f1e1366]:
+                  - generic [ref=f1e1367]:
+                    - generic [ref=f1e1368]:
+                      - link "Rise Rooftop, Sandton" [ref=f1e1369] [cursor=pointer]:
+                        - /url: /booking-request/37
+                      - paragraph [ref=f1e1370]: venue
+                    - generic [ref=f1e1371]:
+                      - paragraph [ref=f1e1372]: Deposit due
+                      - paragraph [ref=f1e1373]: R 0,00
+                  - generic [ref=f1e1374]: Awaiting response
+                  - link "View request" [ref=f1e1377] [cursor=pointer]:
+                    - /url: /booking-request/37
+          - button "Save & exit" [ref=f1e1378] [cursor=pointer]
+    - main [ref=f1e1381]:
+      - generic [ref=f1e1382]:
+        - generic [ref=f1e1383]:
+          - generic [ref=f1e1384]:
+            - heading "Set your ticket price and options" [level=1] [ref=f1e1385]
+            - paragraph [ref=f1e1386]: Configure pricing, seating, and access controls for your event.
+          - generic [ref=f1e1387]:
+            - heading "📦 Ticket Options" [level=2] [ref=f1e1388]
+            - generic [ref=f1e1389]:
+              - generic [ref=f1e1390]:
+                - generic [ref=f1e1391]: Base Price per Ticket
+                - generic [ref=f1e1392]:
+                  - spinbutton [ref=f1e1393]: "150"
+                  - generic [ref=f1e1394]: ZAR 🇿🇦
+              - generic [ref=f1e1395]:
+                - generic [ref=f1e1396]: Max Tickets Per Buyer
+                - generic [ref=f1e1397]:
+                  - button "-" [ref=f1e1398] [cursor=pointer]
+                  - generic [ref=f1e1399]: "10"
+                  - button "+" [ref=f1e1400] [cursor=pointer]
+              - button "Tiered Pricing" [ref=f1e1402] [cursor=pointer]
+              - button "Promo Codes & Discounts" [ref=f1e1407] [cursor=pointer]
+              - generic [ref=f1e1411]:
+                - generic [ref=f1e1412]: Refund Policy
+                - combobox [ref=f1e1413]:
+                  - option "Full Refund (up to 24 hours before)" [selected]
+                  - option "Partial Refund"
+                  - option "No Refunds"
+                  - option "Custom Policy"
+          - generic [ref=f1e1414]:
+            - heading "🪑 Seating Options" [level=2] [ref=f1e1415]
+            - generic [ref=f1e1417]:
+              - generic [ref=f1e1418]: Assigned Seating
+              - button [ref=f1e1419] [cursor=pointer]
+          - generic [ref=f1e1421]:
+            - heading "🎟️ Audience & Access Controls" [level=2] [ref=f1e1422]
+            - generic [ref=f1e1423]:
+              - generic [ref=f1e1424]:
+                - generic [ref=f1e1425]: Age Restricted (18+)
+                - button [ref=f1e1426] [cursor=pointer]
+              - generic [ref=f1e1428]:
+                - generic [ref=f1e1429]: Invite-Only Access
+                - button [ref=f1e1430] [cursor=pointer]
+              - button "Custom Registration Questions" [ref=f1e1433] [cursor=pointer]
+        - generic [ref=f1e1438]:
+          - img "Concert" [ref=f1e1439]
+          - generic [ref=f1e1440]:
+            - paragraph [ref=f1e1441]: Potential Revenue (Est.)
+            - paragraph [ref=f1e1442]: R 15,000
+            - paragraph [ref=f1e1443]: Based on 100 tickets at the base price. Does not include tiered pricing or discounts.
+    - contentinfo [ref=f1e1444]:
+      - generic [ref=f1e1445]:
+        - button "Back" [ref=f1e1446] [cursor=pointer]
+        - button "Next" [ref=f1e1447] [cursor=pointer]

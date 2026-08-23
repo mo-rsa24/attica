@@ -1,0 +1,127 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - 'heading "Attica: a REST-first backend and its WebSocket overlay" [level=1] [ref=e5]'
+    - generic [ref=e6]: the row is committed before anyone is told, so every real-time path is droppable
+    - button "tour" [ref=e7] [cursor=pointer]
+  - navigation [ref=e8]:
+    - button "0the map" [ref=e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=e10] [cursor=pointer]
+    - button "2the mechanism" [ref=e11] [cursor=pointer]
+    - button "3where it costs you" [ref=e12] [cursor=pointer]
+    - button "4build it" [ref=e13] [cursor=pointer]
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - button "the four processes" [ref=e18] [cursor=pointer]
+        - generic [ref=e287]:
+          - generic [ref=e288]: ›
+          - button "Daphne :8000" [ref=e289] [cursor=pointer]
+        - generic [ref=e19]: SYSTEM · ProtocolTypeRouter splitting two protocols across one process and one port
+      - img [ref=e20]:
+        - generic: inside Daphne :8000
+        - 'generic "scope[\"type\"] == \"http\": every REST request" [ref=e290] [cursor=pointer]': http
+        - 'generic "scope[\"type\"] == \"websocket\": every socket handshake" [ref=e296] [cursor=pointer]': websocket
+        - generic "click to inspect" [ref=e302] [cursor=pointer]:
+          - generic [ref=e304]: ProtocolTypeRouter
+          - generic [ref=e305]: The fork in the road. Reads the ASGI
+          - generic [ref=e306]: scope type and hands the connection to
+          - generic [ref=e307]: one of two stacks.
+        - generic "click to inspect, double-click to open" [ref=e308] [cursor=pointer]:
+          - generic [ref=e310]: the http branch
+          - generic [ref=e311]: "get_asgi_application(): the ordinary Django stack."
+          - generic [ref=e312]: MIDDLEWARE, then urls.py, then the DRF view. This is
+          - generic [ref=e313]: where every write happens.
+          - generic [ref=e314]: HTTP 201
+        - generic "click to inspect, double-click to open" [ref=e316] [cursor=pointer]:
+          - generic [ref=e318]: the websocket branch
+          - generic [ref=e319]: "Three wrappers before a consumer sees anything: the JWT"
+          - generic [ref=e320]: middleware, the session/auth stack, then the URL router.
+          - generic [ref=e321]: token valid
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e79]: row committed
+            - generic [ref=e80]: yes, 4 rows
+          - generic [ref=e81]:
+            - generic [ref=e83]: second browser sees it
+            - generic [ref=e84]: no, not until reload
+          - generic [ref=e85]:
+            - generic [ref=e87]: database ahead of screen by
+            - generic [ref=e88]: 1 row
+          - generic [ref=e89]:
+            - generic [ref=e91]: delivered by
+            - generic [ref=e92]: nothing
+      - paragraph [ref=e93]: The row is committed and the POST returned 201, but the broadcast was swallowed and nothing told the client it was degraded. The second browser stays stale until it reloads.
+    - generic [ref=e94]:
+      - generic [ref=e95]:
+        - heading "one message, all the way through" [level=3] [ref=e96]
+        - generic [ref=e97]: 8 of 14 steps ran
+        - generic [ref=e98]: 10 ms to the last push step, illustrative
+      - generic [ref=e99]:
+        - button "01" [ref=e172] [cursor=pointer]
+        - button "02" [ref=e174] [cursor=pointer]
+        - button "03" [ref=e176] [cursor=pointer]
+        - button "04" [ref=e178] [cursor=pointer]
+        - button "05" [ref=e180] [cursor=pointer]
+        - button "06" [ref=e182] [cursor=pointer]
+        - button "07" [ref=e184] [cursor=pointer]
+        - button "08" [ref=e186] [cursor=pointer]
+        - button "09" [ref=e188] [cursor=pointer]
+        - button "10" [ref=e190] [cursor=pointer]
+        - button "11" [ref=e192] [cursor=pointer]
+        - button "12" [ref=e194] [cursor=pointer]
+        - button "13" [ref=e196] [cursor=pointer]
+        - button "14" [ref=e198] [cursor=pointer]
+      - generic [ref=e115]:
+        - text: Click any step to see what it did, and the line of Attica that did it. The four that matter most are
+        - strong [ref=e116]: the row is written
+        - text: and
+        - strong [ref=e117]: send to the room group
+        - text: ": the first always comes before the second, which is the whole argument."
+    - generic [ref=e119]:
+      - heading "Four processes, and one of them is optional" [level=2] [ref=e120]
+      - paragraph [ref=e121]: "Attica is a Django REST API with a WebSocket overlay bolted alongside it. The map above is the whole system: a browser, one ASGI server holding both protocols, Redis, and the database. Everything the scene argues comes down to which of those four you can lose without losing data."
+      - paragraph [ref=e122]: "Click any box to see what it is and what it is doing right now. Boxes with a corner mark open: double-click, or use the button in the panel, and the map becomes what is inside them."
+    - generic [ref=e123]:
+      - heading "The two line styles, and they never change meaning" [level=3] [ref=e124]
+      - generic [ref=e125]:
+        - term [ref=e126]: solid
+        - definition [ref=e127]: a durable path. It either completed or the request failed loudly. The write to SQLite is the only one on this board.
+        - term [ref=e128]: dashed
+        - definition [ref=e129]: best effort. It can fail and nothing upstream will learn about it. Every real-time path in Attica is one of these, on purpose.
+      - paragraph [ref=e130]: That asymmetry is the design. A dashed line is allowed to fail precisely because a solid one already finished.
+    - generic [ref=e131]:
+      - heading "Where you can go from here" [level=3] [ref=e132]
+      - generic [ref=e133]:
+        - text: ECOSYSTEM
+        - generic [ref=e134]:
+          - strong [ref=e135]: four processes, four ports.
+          - text: which config line declares each one, and the proxy hop between them
+      - generic [ref=e136]:
+        - text: SYSTEM
+        - generic [ref=e137]:
+          - strong [ref=e138]: inside Daphne.
+          - text: ProtocolTypeRouter splitting two protocols across one process and one port
+      - generic [ref=e139]:
+        - text: COMPONENT
+        - generic [ref=e140]:
+          - strong [ref=e141]: the parts that do the work.
+          - text: each one owns live state you can read right now
+      - generic [ref=e142]:
+        - text: MECHANISM
+        - generic [ref=e143]:
+          - strong [ref=e144]: group membership and dispatch.
+          - text: the membership set lives in Redis, which is the entire reason a channel layer exists
+      - generic [ref=e145]:
+        - generic [ref=e146]: jump to
+        - button "inside Daphne :8000" [ref=e147] [cursor=pointer]
+        - button "inside Browser + Vite :5173" [ref=e148] [cursor=pointer]
+    - generic [ref=e149]:
+      - heading "The one asymmetry worth carrying with you" [level=3] [ref=e150]
+      - paragraph [ref=e151]:
+        - text: Redis holds no messages. Not one. It holds the set of sockets currently in each room, and it copies envelopes between processes. If it vanished this second, every message ever sent in Attica would still be in
+        - code [ref=e152]: db.sqlite3
+        - text: . Kill it from the map and watch which readout at the bottom moves and which one does not.
+  - generic [ref=e153]:
+    - button "probes" [active] [ref=e154] [cursor=pointer]
+    - button "history" [ref=e410] [cursor=pointer]
+    - button "compare" [ref=e156] [cursor=pointer]

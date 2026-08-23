@@ -1,0 +1,92 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - button "Notifications" [ref=f1e81] [cursor=pointer]
+        - link [ref=f1e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e23]
+        - button "Log out" [ref=f1e84] [cursor=pointer]
+        - button "Open menu" [ref=f1e26] [cursor=pointer]
+  - generic [ref=f1e1994]:
+    - banner [ref=f1e1995]:
+      - generic [ref=f1e1996]:
+        - link [ref=f1e1997] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e2000]:
+          - button "Open booking summary" [ref=f1e2001] [cursor=pointer]:
+            - generic [ref=f1e2002]: Booking Summary
+            - generic [ref=f1e2003]: "1"
+          - generic [ref=f1e2004]:
+            - banner [ref=f1e2005]:
+              - generic [ref=f1e2006]:
+                - generic [ref=f1e2007]:
+                  - heading "Event Booking Summary" [level=2] [ref=f1e2008]
+                  - paragraph [ref=f1e2009]: 1 request across your draft
+                - button "Close booking summary" [ref=f1e2011] [cursor=pointer]
+            - generic [ref=f1e2014]:
+              - generic [ref=f1e2015]:
+                - paragraph [ref=f1e2016]: Accepted
+                - paragraph [ref=f1e2017]: "0"
+              - generic [ref=f1e2018]:
+                - paragraph [ref=f1e2019]: Ready
+                - paragraph [ref=f1e2020]: "0"
+              - generic [ref=f1e2021]:
+                - paragraph [ref=f1e2022]: Deposit due now
+                - paragraph [ref=f1e2023]: R 0,00
+            - generic [ref=f1e2025]:
+              - heading "Awaiting Response" [level=3] [ref=f1e2028]
+              - generic [ref=f1e2031]:
+                - link "R" [ref=f1e2032] [cursor=pointer]:
+                  - /url: /venues/79
+                - generic [ref=f1e2034]:
+                  - generic [ref=f1e2035]:
+                    - generic [ref=f1e2036]:
+                      - link "Rise Rooftop, Sandton" [ref=f1e2037] [cursor=pointer]:
+                        - /url: /booking-request/37
+                      - paragraph [ref=f1e2038]: venue
+                    - generic [ref=f1e2039]:
+                      - paragraph [ref=f1e2040]: Deposit due
+                      - paragraph [ref=f1e2041]: R 0,00
+                  - generic [ref=f1e2042]: Awaiting response
+                  - link "View request" [ref=f1e2045] [cursor=pointer]:
+                    - /url: /booking-request/37
+          - button "Save & exit" [ref=f1e2046] [cursor=pointer]
+    - main [ref=f1e2047]:
+      - generic [ref=f1e2048]:
+        - heading "Add photos & video for your event" [level=1] [ref=f1e2049]
+        - paragraph [ref=f1e2050]: Start with a high-quality event poster or photos from past events. Videos are a great way to generate excitement.
+        - generic [ref=f1e2051]: Uploads save to this draft immediately. Your first two uploaded images are used as the poster and banner when you publish.
+        - button [ref=f1e2052] [cursor=pointer]:
+          - generic [ref=f1e2053]:
+            - generic [ref=f1e2057]:
+              - paragraph [ref=f1e2058]: Drag your media here to upload
+              - paragraph [ref=f1e2059]: High-quality posters, photos, and short videos work best.
+            - generic [ref=f1e2060]:
+              - button "Browse files" [ref=f1e2061]
+              - paragraph [ref=f1e2062]: Images (JPG, PNG) or videos (MP4, MOV). Max 100MB each.
+    - contentinfo [ref=f1e2063]:
+      - generic [ref=f1e2066]:
+        - button "Back" [ref=f1e2067] [cursor=pointer]
+        - button "Next" [ref=f1e2068] [cursor=pointer]

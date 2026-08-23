@@ -1,0 +1,134 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - 'heading "Attica: a REST-first backend and its WebSocket overlay" [level=1] [ref=e5]'
+    - generic [ref=e6]: the row is committed before anyone is told, so every real-time path is droppable
+    - button "tour" [ref=e7] [cursor=pointer]
+  - navigation [ref=e8]:
+    - button "0the map" [ref=e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=e10] [cursor=pointer]
+    - button "2the mechanism" [ref=e11] [cursor=pointer]
+    - button "3where it costs you" [ref=e12] [cursor=pointer]
+    - button "4build it" [ref=e13] [cursor=pointer]
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - button "the four processes" [ref=e18] [cursor=pointer]
+        - generic [ref=e19]: ECOSYSTEM · which config line declares each one, and the proxy hop between them
+      - img [ref=e20]:
+        - 'generic "POST /api/…: the message body and the Bearer token" [ref=e21] [cursor=pointer]': POST /api
+        - 'generic "ws://…/ws/chat/rooms/7/?token=: the JWT in the query string, then one JSON frame per event" [ref=e25] [cursor=pointer]': ws upgrade
+        - 'generic "INSERT, then UPDATE delivered_at: the row itself" [ref=e29] [cursor=pointer]': INSERT
+        - 'generic "group_send, DB 0: {\"type\": \"chat.event\", \"payload\": {...}} addressed to chat_room_7" [ref=e35] [cursor=pointer]': group_send
+        - 'generic "cache, DB 1: cached user permissions, 15 minute timeout" [ref=e41] [cursor=pointer]': cache
+        - generic "click to inspect, double-click to open" [ref=e47] [cursor=pointer]:
+          - generic [ref=e51]: Browser + Vite :5173
+          - generic [ref=e52]: React 19 under the Vite dev
+          - generic [ref=e53]: server. It is also the proxy that
+          - generic [ref=e54]: makes :5173 look like :8000.
+          - generic [ref=e55]: 4 rows on screen
+        - generic "click to inspect, double-click to open" [ref=e57] [cursor=pointer]:
+          - generic [ref=e61]: Daphne :8000
+          - generic [ref=e62]: The ASGI server. One process holds
+          - generic [ref=e63]: both the HTTP API and every open
+          - generic [ref=e64]: WebSocket.
+          - generic [ref=e65]: daphne
+        - generic "click to inspect, double-click to open" [ref=e67] [cursor=pointer]:
+          - generic [ref=e71]: Redis :6379
+          - generic [ref=e72]: "Two unrelated jobs on one server:"
+          - generic [ref=e73]: DB 0 is the channel layer that
+          - generic [ref=e74]: fans messages out, DB 1 is the
+          - generic [ref=e75]: reachable
+        - generic "click to inspect" [ref=e77] [cursor=pointer]:
+          - generic [ref=e81]: SQLite db.sqlite3
+          - generic [ref=e82]: The source of truth. Every message
+          - generic [ref=e83]: is here before any socket hears
+          - generic [ref=e84]: about it.
+          - generic [ref=e85]: 4 rows in room 7
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e89]: row committed
+            - generic [ref=e90]: yes, 4 rows
+          - generic [ref=e91]:
+            - generic [ref=e93]: second browser sees it
+            - generic [ref=e94]: yes, after 16 ms
+          - generic [ref=e95]:
+            - generic [ref=e97]: database ahead of screen by
+            - generic [ref=e98]: 0 rows
+          - generic [ref=e99]:
+            - generic [ref=e101]: delivered by
+            - generic [ref=e102]: the socket
+      - paragraph [ref=e103]: Committed, then broadcast. The second browser rendered it about 16 ms later (illustrative).
+    - generic [ref=e104]:
+      - generic [ref=e105]:
+        - heading "one message, all the way through" [level=3] [ref=e106]
+        - generic [ref=e107]: 13 of 14 steps ran
+        - generic [ref=e108]: 20 ms to the last push step, illustrative
+      - generic [ref=e109]:
+        - button "01" [ref=e110] [cursor=pointer]
+        - button "02" [ref=e113] [cursor=pointer]
+        - button "03" [ref=e116] [cursor=pointer]
+        - button "04" [ref=e119] [cursor=pointer]
+        - button "05" [ref=e122] [cursor=pointer]
+        - button "06" [ref=e125] [cursor=pointer]
+        - button "07" [ref=e128] [cursor=pointer]
+        - button "08" [ref=e131] [cursor=pointer]
+        - button "09" [ref=e134] [cursor=pointer]
+        - button "10" [ref=e137] [cursor=pointer]
+        - button "11" [ref=e140] [cursor=pointer]
+        - button "12" [ref=e143] [cursor=pointer]
+        - button "13" [ref=e146] [cursor=pointer]
+        - button "14" [ref=e149] [cursor=pointer]
+      - generic [ref=e153]:
+        - text: Click any step to see what it did, and the line of Attica that did it. The four that matter most are
+        - strong [ref=e154]: the row is written
+        - text: and
+        - strong [ref=e155]: send to the room group
+        - text: ": the first always comes before the second, which is the whole argument."
+    - generic [ref=e157]:
+      - heading "Four processes, and one of them is optional" [level=2] [ref=e158]
+      - paragraph [ref=e159]: "Attica is a Django REST API with a WebSocket overlay bolted alongside it. The map above is the whole system: a browser, one ASGI server holding both protocols, Redis, and the database. Everything the scene argues comes down to which of those four you can lose without losing data."
+      - paragraph [ref=e160]: "Click any box to see what it is and what it is doing right now. Boxes with a corner mark open: double-click, or use the button in the panel, and the map becomes what is inside them."
+    - generic [ref=e161]:
+      - heading "The two line styles, and they never change meaning" [level=3] [ref=e162]
+      - generic [ref=e163]:
+        - term [ref=e164]: solid
+        - definition [ref=e165]: a durable path. It either completed or the request failed loudly. The write to SQLite is the only one on this board.
+        - term [ref=e166]: dashed
+        - definition [ref=e167]: best effort. It can fail and nothing upstream will learn about it. Every real-time path in Attica is one of these, on purpose.
+      - paragraph [ref=e168]: That asymmetry is the design. A dashed line is allowed to fail precisely because a solid one already finished.
+    - generic [ref=e169]:
+      - heading "Where you can go from here" [level=3] [ref=e170]
+      - generic [ref=e171]:
+        - text: ECOSYSTEM
+        - generic [ref=e172]:
+          - strong [ref=e173]: four processes, four ports.
+          - text: which config line declares each one, and the proxy hop between them
+      - generic [ref=e174]:
+        - text: SYSTEM
+        - generic [ref=e175]:
+          - strong [ref=e176]: inside Daphne.
+          - text: ProtocolTypeRouter splitting two protocols across one process and one port
+      - generic [ref=e177]:
+        - text: COMPONENT
+        - generic [ref=e178]:
+          - strong [ref=e179]: the parts that do the work.
+          - text: each one owns live state you can read right now
+      - generic [ref=e180]:
+        - text: MECHANISM
+        - generic [ref=e181]:
+          - strong [ref=e182]: group membership and dispatch.
+          - text: the membership set lives in Redis, which is the entire reason a channel layer exists
+      - generic [ref=e183]:
+        - generic [ref=e184]: jump to
+        - button "inside Daphne :8000" [ref=e185] [cursor=pointer]
+        - button "inside Browser + Vite :5173" [ref=e186] [cursor=pointer]
+    - generic [ref=e187]:
+      - heading "The one asymmetry worth carrying with you" [level=3] [ref=e188]
+      - paragraph [ref=e189]:
+        - text: Redis holds no messages. Not one. It holds the set of sockets currently in each room, and it copies envelopes between processes. If it vanished this second, every message ever sent in Attica would still be in
+        - code [ref=e190]: db.sqlite3
+        - text: . Kill it from the map and watch which readout at the bottom moves and which one does not.
+  - generic [ref=e191]:
+    - button "probes" [ref=e192] [cursor=pointer]
+    - button "history" [ref=e193] [cursor=pointer]
+    - button "compare" [ref=e194] [cursor=pointer]

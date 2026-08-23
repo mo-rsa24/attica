@@ -1,0 +1,10 @@
+node_modules
+dist
+*.local
+.DS_Store
+
+# build artefact from tsc -b
+tsconfig.tsbuildinfo
+
+# build artefact from tsc -b
+tsconfig.tsbuildinfo

@@ -1,0 +1,286 @@
+- generic [ref=f1e3]:
+  - banner [ref=f1e4]:
+    - 'heading "Attica: a REST-first backend and its WebSocket overlay" [level=1] [ref=f1e5]'
+    - generic [ref=f1e6]: the row is committed before anyone is told, so every real-time path is droppable
+    - button "tour" [ref=f1e7] [cursor=pointer]
+  - navigation [ref=f1e8]:
+    - button "0the map" [ref=f1e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=f1e10] [cursor=pointer]
+    - button "2the mechanism" [ref=f1e11] [cursor=pointer]
+    - button "3where it costs you" [ref=f1e12] [cursor=pointer]
+    - button "4build it" [ref=f1e13] [cursor=pointer]
+  - generic [ref=f1e15]:
+    - generic [ref=f1e16]:
+      - generic [ref=f1e17]:
+        - button "the four processes" [ref=f1e18] [cursor=pointer]
+        - generic [ref=f1e19]: ECOSYSTEM · which config line declares each one, and the proxy hop between them
+      - img [ref=f1e20]:
+        - 'generic "POST /api/…: the message body and the Bearer token" [ref=f1e21] [cursor=pointer]': POST /api
+        - 'generic "ws://…/ws/chat/rooms/7/?token=: the JWT in the query string, then one JSON frame per event" [ref=f1e25] [cursor=pointer]': ws upgrade
+        - 'generic "INSERT, then UPDATE delivered_at: the row itself" [ref=f1e29] [cursor=pointer]': INSERT
+        - 'generic "group_send, DB 0: {\"type\": \"chat.event\", \"payload\": {...}} addressed to chat_room_7" [ref=f1e35] [cursor=pointer]': group_send
+        - 'generic "cache, DB 1: cached user permissions, 15 minute timeout" [ref=f1e41] [cursor=pointer]': cache
+        - generic "click to inspect, double-click to open" [ref=f1e47] [cursor=pointer]:
+          - generic [ref=f1e51]: Browser + Vite :5173
+          - generic [ref=f1e52]: React 19 under the Vite dev
+          - generic [ref=f1e53]: server. It is also the proxy that
+          - generic [ref=f1e54]: makes :5173 look like :8000.
+          - generic [ref=f1e55]: 4 rows on screen
+        - generic "click to inspect, double-click to open" [ref=f1e57] [cursor=pointer]:
+          - generic [ref=f1e61]: Daphne :8000
+          - generic [ref=f1e62]: The ASGI server. One process holds
+          - generic [ref=f1e63]: both the HTTP API and every open
+          - generic [ref=f1e64]: WebSocket.
+          - generic [ref=f1e65]: daphne
+        - generic "click to inspect, double-click to open" [ref=f1e67] [cursor=pointer]:
+          - generic [ref=f1e71]: Redis :6379
+          - generic [ref=f1e72]: "Two unrelated jobs on one server:"
+          - generic [ref=f1e73]: DB 0 is the channel layer that
+          - generic [ref=f1e74]: fans messages out, DB 1 is the
+          - generic [ref=f1e75]: reachable
+        - generic "click to inspect" [ref=f1e77] [cursor=pointer]:
+          - generic [ref=f1e81]: SQLite db.sqlite3
+          - generic [ref=f1e82]: The source of truth. Every message
+          - generic [ref=f1e83]: is here before any socket hears
+          - generic [ref=f1e84]: about it.
+          - generic [ref=f1e85]: 4 rows in room 7
+        - generic [ref=f1e86]:
+          - generic [ref=f1e87]:
+            - generic [ref=f1e89]: row committed
+            - generic [ref=f1e90]: yes, 4 rows
+          - generic [ref=f1e91]:
+            - generic [ref=f1e93]: second browser sees it
+            - generic [ref=f1e94]: yes, after 16 ms
+          - generic [ref=f1e95]:
+            - generic [ref=f1e97]: database ahead of screen by
+            - generic [ref=f1e98]: 0 rows
+          - generic [ref=f1e99]:
+            - generic [ref=f1e101]: delivered by
+            - generic [ref=f1e102]: the socket
+      - paragraph [ref=f1e103]: Committed, then broadcast. The second browser rendered it about 16 ms later (illustrative).
+    - generic [ref=f1e104]:
+      - generic [ref=f1e105]:
+        - heading "one message, all the way through" [level=3] [ref=f1e106]
+        - generic [ref=f1e107]: 13 of 14 steps ran
+        - generic [ref=f1e108]: 20 ms to the last push step, illustrative
+      - generic [ref=f1e109]:
+        - button "01" [ref=f1e110] [cursor=pointer]
+        - button "02" [ref=f1e113] [cursor=pointer]
+        - button "03" [ref=f1e116] [cursor=pointer]
+        - button "04" [ref=f1e119] [cursor=pointer]
+        - button "05" [ref=f1e122] [cursor=pointer]
+        - button "06" [ref=f1e125] [cursor=pointer]
+        - button "07" [ref=f1e128] [cursor=pointer]
+        - button "08" [ref=f1e131] [cursor=pointer]
+        - button "09" [ref=f1e134] [cursor=pointer]
+        - button "10" [ref=f1e137] [cursor=pointer]
+        - button "11" [ref=f1e140] [cursor=pointer]
+        - button "12" [ref=f1e143] [cursor=pointer]
+        - button "13" [ref=f1e146] [cursor=pointer]
+        - button "14" [ref=f1e149] [cursor=pointer]
+      - generic [ref=f1e153]:
+        - text: Click any step to see what it did, and the line of Attica that did it. The four that matter most are
+        - strong [ref=f1e154]: the row is written
+        - text: and
+        - strong [ref=f1e155]: send to the room group
+        - text: ": the first always comes before the second, which is the whole argument."
+    - generic [ref=f1e157]:
+      - heading "Why not just poll?" [level=2] [ref=f1e158]
+      - paragraph [ref=f1e159]: "This is the comparison the architecture is making, and Attica has already made it in both directions: the socket is the fast path, and a GET every eight seconds is the fallback it keeps in the same file. Both lanes below deliver the same message from the same committed row."
+      - generic [ref=f1e160]:
+        - generic [ref=f1e161]:
+          - strong [ref=f1e162]: the socket carries it
+          - generic [ref=f1e163]: 16 ms
+        - generic [ref=f1e166]: 16 ms, illustrative
+      - generic [ref=f1e167]:
+        - generic [ref=f1e168]:
+          - strong [ref=f1e169]: the poll carries it
+          - generic [ref=f1e170]: 8000 ms
+        - generic [ref=f1e173]: "up to 8000 ms, and this number is real: it is the 8000 in DirectMessagePage.jsx:260"
+      - generic [ref=f1e174]:
+        - term [ref=f1e175]: same POST
+        - definition [ref=f1e176]: both lanes start from one HTTP 201 and one committed row. The write is not the variable.
+        - term [ref=f1e177]: the cost
+        - definition [ref=f1e178]:
+          - text: the poll lane issues
+          - strong [ref=f1e179]: 750 GETs per minute
+          - text: across 100 open rooms, nearly all of them returning rows the browser already has. The push lane issues none.
+        - term [ref=f1e180]: the catch
+        - definition [ref=f1e181]: the poll lane cannot be wrong for long. The push lane can be silently wrong forever, which is stage 3.
+      - generic [ref=f1e182]:
+        - generic [ref=f1e183]: open rooms
+        - button "1" [ref=f1e184] [cursor=pointer]
+        - button "100" [pressed] [ref=f1e185] [cursor=pointer]
+        - button "500" [ref=f1e186] [cursor=pointer]
+    - generic [ref=f1e187]:
+      - heading "What a channel layer is actually for" [level=3] [ref=f1e188]
+      - paragraph [ref=f1e189]: "The obvious question about the fast path: the view already knows the message, and the consumer already holds the socket, so why does a message need to go out to Redis and come back?"
+      - paragraph [ref=f1e190]: Because they are not the same thing. The POST is handled by whichever worker picked it up. The counterpart's socket is held by whichever worker accepted that handshake. In one dev process they happen to coincide; under any real deployment they do not, and a consumer has no way to reach a socket it is not holding.
+      - paragraph [ref=f1e191]:
+        - text: So membership is kept outside every worker.
+        - code [ref=f1e192]: group_add
+        - text: writes this socket's channel name into a set in Redis named
+        - code [ref=f1e193]: chat_room_7
+        - text: . Any process at all can then address that set.
+      - generic [ref=f1e194]:
+        - generic [ref=f1e195]:
+          - generic [ref=f1e196]: backend/main/main/settings.py
+          - generic [ref=f1e197]: lines 90–99 · running line 94
+        - code [ref=f1e200]:
+          - generic [ref=f1e201]: ASGI_APPLICATION = 'main.asgi.application'
+          - generic [ref=f1e202]: "CHANNEL_LAYERS = {"
+          - generic [ref=f1e203]: "'default': {"
+          - generic [ref=f1e204]: "'BACKEND': 'channels_redis.core.RedisChannelLayer',"
+          - generic [ref=f1e205]: "'CONFIG': {"
+          - generic [ref=f1e206]: "\"hosts\": [('127.0.0.1', 6379)],"
+          - generic [ref=f1e207]: "},"
+          - generic [ref=f1e208]: "},"
+          - generic [ref=f1e209]: "}"
+        - generic [ref=f1e210]: One line of settings decides whether the system can have a second worker.
+      - paragraph [ref=f1e211]:
+        - text: Right now the group has
+        - strong [ref=f1e212]: "2"
+        - text: "members: specific.<sender channel>, specific.<counterpart channel>."
+        - button "open the channel layer →" [ref=f1e213] [cursor=pointer]
+    - generic [ref=f1e214]:
+      - heading "The dot becomes an underscore" [level=3] [ref=f1e215]
+      - paragraph [ref=f1e216]:
+        - text: The one piece of Channels machinery that is not obvious from reading either file alone. The envelope carries a
+        - code [ref=f1e217]: "\"type\""
+        - text: ", and Channels turns that string into a method name by replacing dots with underscores, then calls it on every consumer in the group."
+      - generic [ref=f1e218]:
+        - generic [ref=f1e219]:
+          - generic [ref=f1e220]:
+            - generic [ref=f1e221]: backend/main/chat/utils.py
+            - generic [ref=f1e222]: lines 10–37 · running line 40
+          - code [ref=f1e225]:
+            - generic [ref=f1e226]: "def _safe_group_send(channel_layer: BaseChannelLayer, group_name: str, payload: Dict[str, Any]) -> None:"
+            - generic [ref=f1e227]: "\"\"\"Attempt to send to a group but swallow channel-layer errors."
+            - generic [ref=f1e228]: If Redis or the configured channel layer is unavailable, we log the failure
+            - generic [ref=f1e229]: and return without raising so that REST/API handlers can continue and the
+            - generic [ref=f1e230]: message remains persisted in the database.
+            - generic [ref=f1e231]: "\"\"\""
+            - generic [ref=f1e232]: "try:"
+            - generic [ref=f1e233]: async_to_sync(channel_layer.group_send)(group_name, payload)
+            - generic [ref=f1e234]: "except Exception as exc: # pragma: no cover - defensive safety"
+            - generic [ref=f1e235]: "logger.warning(\"Chat broadcast skipped: %s\", exc)"
+            - generic [ref=f1e236]: "def broadcast_room_event(room_id: int, payload: dict) -> None:"
+            - generic [ref=f1e237]: "\"\"\"Send a payload to all websocket subscribers for the given room.\"\"\""
+            - generic [ref=f1e238]: "channel_layer: Optional[BaseChannelLayer] = get_channel_layer()"
+            - generic [ref=f1e239]: "if not channel_layer:"
+            - generic [ref=f1e240]: "logger.info(\"Chat broadcast skipped: no channel layer configured\")"
+            - generic [ref=f1e241]: return
+            - generic [ref=f1e242]: _safe_group_send(
+            - generic [ref=f1e243]: channel_layer,
+            - generic [ref=f1e244]: "f\"chat_room_{room_id}\","
+            - generic [ref=f1e245]: "{"
+            - generic [ref=f1e246]: "\"type\": \"chat.event\","
+            - generic [ref=f1e247]: "\"payload\": payload,"
+            - generic [ref=f1e248]: "},"
+            - generic [ref=f1e249]: )
+        - generic [ref=f1e250]:
+          - generic [ref=f1e251]:
+            - generic [ref=f1e252]: backend/main/chat/consumers.py
+            - generic [ref=f1e253]: lines 137–138 · running line 137
+          - code [ref=f1e256]:
+            - generic [ref=f1e257]: "async def chat_event(self, event):"
+            - generic [ref=f1e258]: await self.send(text_data=json.dumps(event['payload']))
+      - paragraph [ref=f1e259]:
+        - code [ref=f1e260]: "\"chat.event\""
+        - text: on the left.
+        - code [ref=f1e261]: chat_event
+        - text: on the right. Nothing else connects those two files, and if you rename one without the other the message is delivered to Redis, fanned out correctly, and then silently dropped by every consumer.
+    - generic [ref=f1e262]:
+      - 'heading "The seam: where durable stops and best effort starts" [level=3] [ref=f1e263]'
+      - paragraph [ref=f1e264]:
+        - text: One function marks the boundary, and its docstring states the whole architecture in a sentence. Read the
+        - code [ref=f1e265]: except
+        - text: .
+      - generic [ref=f1e266]:
+        - generic [ref=f1e267]:
+          - generic [ref=f1e268]: backend/main/chat/utils.py
+          - generic [ref=f1e269]: lines 10–37 · running line 19
+        - code [ref=f1e272]:
+          - generic [ref=f1e273]: "def _safe_group_send(channel_layer: BaseChannelLayer, group_name: str, payload: Dict[str, Any]) -> None:"
+          - generic [ref=f1e274]: "\"\"\"Attempt to send to a group but swallow channel-layer errors."
+          - generic [ref=f1e275]: If Redis or the configured channel layer is unavailable, we log the failure
+          - generic [ref=f1e276]: and return without raising so that REST/API handlers can continue and the
+          - generic [ref=f1e277]: message remains persisted in the database.
+          - generic [ref=f1e278]: "\"\"\""
+          - generic [ref=f1e279]: "try:"
+          - generic [ref=f1e280]: async_to_sync(channel_layer.group_send)(group_name, payload)
+          - generic [ref=f1e281]: "except Exception as exc: # pragma: no cover - defensive safety"
+          - generic [ref=f1e282]: "logger.warning(\"Chat broadcast skipped: %s\", exc)"
+          - generic [ref=f1e283]: "def broadcast_room_event(room_id: int, payload: dict) -> None:"
+          - generic [ref=f1e284]: "\"\"\"Send a payload to all websocket subscribers for the given room.\"\"\""
+          - generic [ref=f1e285]: "channel_layer: Optional[BaseChannelLayer] = get_channel_layer()"
+          - generic [ref=f1e286]: "if not channel_layer:"
+          - generic [ref=f1e287]: "logger.info(\"Chat broadcast skipped: no channel layer configured\")"
+          - generic [ref=f1e288]: return
+          - generic [ref=f1e289]: _safe_group_send(
+          - generic [ref=f1e290]: channel_layer,
+          - generic [ref=f1e291]: "f\"chat_room_{room_id}\","
+          - generic [ref=f1e292]: "{"
+          - generic [ref=f1e293]: "\"type\": \"chat.event\","
+          - generic [ref=f1e294]: "\"payload\": payload,"
+          - generic [ref=f1e295]: "},"
+          - generic [ref=f1e296]: )
+        - generic [ref=f1e297]: A bare except around the only line that can fail, and a log call instead of a raise.
+      - paragraph [ref=f1e298]:
+        - text: "That is a deliberate decision, not an oversight. It says: a failure to"
+        - emphasis [ref=f1e299]: tell
+        - text: people must never become a failure to
+        - emphasis [ref=f1e300]: record
+        - text: . The caller carries on, the response is 201, and the row is exactly as durable as it would have been on a perfect day.
+      - paragraph [ref=f1e301]: It also has a cost, and the cost is that nobody upstream can distinguish a delivered message from an undelivered one. Stage 3 is what that buys you.
+      - generic [ref=f1e302]:
+        - heading "VS Code" [level=4] [ref=f1e303]
+        - generic [ref=f1e304]:
+          - generic [ref=f1e305]: where
+          - paragraph [ref=f1e306]: VS Code, at backend/main/chat/utils.py lines 10 to 20
+          - generic [ref=f1e307]: do
+          - paragraph [ref=f1e308]: "Read _safe_group_send. Note which exceptions it catches and what it does with them. Then answer: when Redis is unreachable, what HTTP status does POST /api/chat/rooms/7/messages/ return?"
+          - generic [ref=f1e309]: bring back
+          - paragraph [ref=f1e310]: type the status code. The scene compares it against the model's httpStatus observable.
+          - generic [ref=f1e311]: what it means
+          - paragraph [ref=f1e312]: "If you said 500, you were reading the code as if the broadcast were part of the write. It is not, and that bare `except Exception` is the line that decides it."
+        - generic [ref=f1e313]:
+          - textbox "the HTTP status the POST returns" [ref=f1e314]
+          - button "check it" [ref=f1e315] [cursor=pointer]
+    - generic [ref=f1e316]:
+      - heading "The merge is why arrival order does not matter" [level=3] [ref=f1e317]
+      - paragraph [ref=f1e318]:
+        - text: The client never trusts the wire for ordering. Every message that arrives, by socket or by poll or in a POST response, goes through one function that keys by id and sorts by
+        - code [ref=f1e319]: created_at
+        - text: .
+      - generic [ref=f1e320]:
+        - generic [ref=f1e321]:
+          - generic [ref=f1e322]: frontend/src/pages/DirectMessagePage.jsx
+          - generic [ref=f1e323]: lines 126–138 · running line 135
+        - code [ref=f1e326]:
+          - generic [ref=f1e327]: "const appendMessages = useCallback((incoming = []) => {"
+          - generic [ref=f1e328]: "setMessages((prev) => {"
+          - generic [ref=f1e329]: const byId = new Map(prev.map((m) => [m.id, m]));
+          - generic [ref=f1e330]: "incoming.forEach((msg) => {"
+          - generic [ref=f1e331]: "if (msg?.id) {"
+          - generic [ref=f1e332]: "byId.set(msg.id, {...(byId.get(msg.id) || {}), ...msg});"
+          - generic [ref=f1e333]: "}"
+          - generic [ref=f1e334]: "});"
+          - generic [ref=f1e335]: const merged = Array.from(byId.values());
+          - generic [ref=f1e336]: merged.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          - generic [ref=f1e337]: return merged;
+          - generic [ref=f1e338]: "});"
+          - generic [ref=f1e339]: "}, []);"
+      - paragraph [ref=f1e340]:
+        - text: "Two things fall out of this for free. Duplicate delivery is harmless, which matters because the sender genuinely does receive its own message twice: once in the 201 body and once through its own fan-out."
+        - generic [ref=f1e341]: happening right now in this configuration
+      - paragraph [ref=f1e342]:
+        - text: "And out-of-order arrival is corrected on render rather than prevented on the wire. The one leak:"
+        - code [ref=f1e343]: Array.prototype.sort
+        - text: is stable, so two messages with an identical
+        - code [ref=f1e344]: created_at
+        - text: keep the order they arrived in. That tie is the only case where the socket's ordering reaches the screen.
+  - generic [ref=f1e345]:
+    - button "probes" [ref=f1e346] [cursor=pointer]
+    - button "history" [ref=f1e347] [cursor=pointer]
+    - button "compare" [ref=f1e348] [cursor=pointer]

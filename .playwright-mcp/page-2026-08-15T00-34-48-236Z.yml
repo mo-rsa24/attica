@@ -1,0 +1,106 @@
+- generic [ref=f4e2]:
+  - banner [ref=f4e3]:
+    - heading "Attica Runtime Shape" [level=1] [ref=f4e4]
+    - paragraph [ref=f4e5]:
+      - text: Three pictures of how the running system fits together, read out of the code as it stands on
+      - code [ref=f4e6]: main
+      - text: . Solid amber is REST, dashed teal is WebSocket, violet is auth. Every label on a diagram is a real identifier you can grep for.
+  - tablist "Pictures" [ref=f4e7]:
+    - tab "01 Request and socket topology" [selected] [ref=f4e8] [cursor=pointer]:
+      - generic [ref=f4e9]: "01"
+      - text: Request and socket topology
+    - tab "02 The JWT loop" [ref=f4e10] [cursor=pointer]:
+      - generic [ref=f4e11]: "02"
+      - text: The JWT loop
+    - tab "03 Room and bid lifecycle" [ref=f4e12] [cursor=pointer]:
+      - generic [ref=f4e13]: "03"
+      - text: Room and bid lifecycle
+  - tabpanel "01 Request and socket topology" [ref=f4e14]:
+    - generic [ref=f4e15]:
+      - group "Mode" [ref=f4e16]:
+        - button "Guided walk" [pressed] [ref=f4e17] [cursor=pointer]
+        - button "Explore" [ref=f4e18] [cursor=pointer]
+      - generic [ref=f4e19]: 1 / 6
+    - img "Topology of browser, Vite, Daphne, Redis and SQLite" [ref=f4e21]:
+      - generic [ref=f4e22]:
+        - generic [ref=f4e24]: Browser
+        - generic [ref=f4e25]: React 19
+        - generic [ref=f4e27]: AuthProvider
+        - generic [ref=f4e29]: DirectMessagePage
+      - generic [ref=f4e30]:
+        - generic [ref=f4e32]: Vite dev server
+        - generic [ref=f4e33]: :5173
+        - generic [ref=f4e34]: proxy → :8000
+        - generic [ref=f4e35]: /api /vendors
+        - generic [ref=f4e36]: /cart /checkout
+        - generic [ref=f4e37]: /ws ws:true
+      - generic [ref=f4e38]:
+        - generic [ref=f4e40]: Daphne (one process)
+        - generic [ref=f4e41]: :8000 · main.asgi:application
+        - generic [ref=f4e43]: ProtocolTypeRouter
+        - generic [ref=f4e44]:
+          - generic [ref=f4e45]: "\"http\""
+          - generic [ref=f4e47]: get_asgi_application
+          - generic [ref=f4e49]: DRF views
+          - generic [ref=f4e50]: chat/views.py
+        - generic [ref=f4e51]:
+          - generic [ref=f4e52]: "\"websocket\""
+          - generic [ref=f4e54]: JWTAuthMiddleware
+          - generic [ref=f4e56]: ChatConsumer
+          - generic [ref=f4e57]: chat_room_<id>
+        - generic: broadcast_room_event()
+      - generic [ref=f4e58]:
+        - generic [ref=f4e60]: Redis
+        - generic [ref=f4e61]: :6379
+        - generic [ref=f4e63]: db 0 · channel layer
+        - generic [ref=f4e64]: group_add, group_send,
+        - generic [ref=f4e65]: chat.event fan-out
+        - generic [ref=f4e67]: db 1 · cache
+        - generic [ref=f4e68]: permissions, 15 min
+      - generic [ref=f4e69]:
+        - generic [ref=f4e71]: SQLite
+        - generic [ref=f4e72]: db.sqlite3
+        - generic [ref=f4e73]: source of truth
+      - generic [ref=f4e74]: /api/…
+      - generic [ref=f4e76]: /ws/…
+      - generic: useAxios.js baseURL = 'http://127.0.0.1:8000', skipping the proxy
+      - generic: Message.objects.create
+      - generic: frame down the open socket, only to whoever is connected
+      - generic: GET …/messages/ every 8s
+      - generic: Redis down
+      - generic:
+        - generic: "_safe_group_send: except Exception → logger.warning"
+        - generic: REST still returns 201. The row is saved.
+        - generic: Nothing is raised, and nobody is told.
+    - generic [ref=f4e79]:
+      - generic [ref=f4e80]: "01"
+      - paragraph [ref=f4e81]:
+        - text: In development the browser only ever talks to Vite on
+        - code [ref=f4e82]: :5173
+        - text: . Vite forwards
+        - code [ref=f4e83]: /api
+        - text: ","
+        - code [ref=f4e84]: /vendors
+        - text: ","
+        - code [ref=f4e85]: /cart
+        - text: and
+        - code [ref=f4e86]: /checkout
+        - text: to Django, and forwards
+        - code [ref=f4e87]: /ws
+        - text: with
+        - code [ref=f4e88]: ws:true
+        - text: so the socket upgrade survives the hop.
+    - generic [ref=f4e89]:
+      - button "← Prev" [disabled] [ref=f4e90]
+      - group "Frames" [ref=f4e91]:
+        - button "Frame 1" [ref=f4e92] [cursor=pointer]
+        - button "Frame 2" [ref=f4e93] [cursor=pointer]
+        - button "Frame 3" [ref=f4e94] [cursor=pointer]
+        - button "Frame 4" [ref=f4e95] [cursor=pointer]
+        - button "Frame 5" [ref=f4e96] [cursor=pointer]
+        - button "Frame 6" [ref=f4e97] [cursor=pointer]
+      - button "Next →" [ref=f4e98] [cursor=pointer]
+  - paragraph [ref=f4e99]:
+    - text: Every path, line number, status value and setting on these pictures was read out of the working tree, not from the onboarding docs. Where the code and
+    - code [ref=f4e100]: onboarding-docs/plans/04-architecture-diagrams.md
+    - text: disagree, the picture follows the code and says so on the frame.

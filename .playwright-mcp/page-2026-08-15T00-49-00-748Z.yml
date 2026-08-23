@@ -1,0 +1,158 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - 'heading "Attica: a REST-first backend and its WebSocket overlay" [level=1] [ref=e5]'
+    - generic [ref=e6]: the row is committed before anyone is told, so every real-time path is droppable
+    - button "tour" [ref=e7] [cursor=pointer]
+  - navigation [ref=e8]:
+    - button "0the map" [ref=e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=e10] [cursor=pointer]
+    - button "2the mechanism" [ref=e11] [cursor=pointer]
+    - button "3where it costs you" [ref=e12] [cursor=pointer]
+    - button "4build it" [ref=e13] [cursor=pointer]
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - button "the four processes" [ref=e18] [cursor=pointer]
+        - generic [ref=e19]: ECOSYSTEM · which config line declares each one, and the proxy hop between them
+      - img [ref=e20]:
+        - 'generic "POST /api/…: the message body and the Bearer token" [ref=e21] [cursor=pointer]': POST /api
+        - 'generic "ws://…/ws/chat/rooms/7/?token=: the JWT in the query string, then one JSON frame per event" [ref=e23] [cursor=pointer]': ws upgrade
+        - 'generic "INSERT, then UPDATE delivered_at: the row itself" [ref=e25] [cursor=pointer]': INSERT
+        - 'generic "group_send, DB 0: {\"type\": \"chat.event\", \"payload\": {...}} addressed to chat_room_7" [ref=e29] [cursor=pointer]': group_send
+        - 'generic "cache, DB 1: cached user permissions, 15 minute timeout" [ref=e33] [cursor=pointer]': cache
+        - generic "click to inspect, double-click to open" [ref=e37] [cursor=pointer]:
+          - generic [ref=e41]: Browser + Vite :5173
+          - generic [ref=e42]: React 19 under the Vite dev
+          - generic [ref=e43]: server. It is also the proxy that
+          - generic [ref=e44]: makes :5173 look like :8000.
+          - generic [ref=e45]: 4 rows on screen
+        - generic "click to inspect, double-click to open" [ref=e47] [cursor=pointer]:
+          - generic [ref=e51]: Daphne :8000
+          - generic [ref=e52]: The ASGI server. One process holds
+          - generic [ref=e53]: both the HTTP API and every open
+          - generic [ref=e54]: WebSocket.
+          - generic [ref=e55]: daphne
+        - generic "click to inspect, double-click to open" [ref=e57] [cursor=pointer]:
+          - generic [ref=e61]: Redis :6379
+          - generic [ref=e62]: "Two unrelated jobs on one server:"
+          - generic [ref=e63]: DB 0 is the channel layer that
+          - generic [ref=e64]: fans messages out, DB 1 is the
+          - generic [ref=e65]: reachable
+        - generic "click to inspect" [ref=e67] [cursor=pointer]:
+          - generic [ref=e71]: SQLite db.sqlite3
+          - generic [ref=e72]: The source of truth. Every message
+          - generic [ref=e73]: is here before any socket hears
+          - generic [ref=e74]: about it.
+          - generic [ref=e75]: 4 rows in room 7
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e79]: row committed
+            - generic [ref=e80]: yes, 4 rows
+          - generic [ref=e81]:
+            - generic [ref=e83]: second browser sees it
+            - generic [ref=e84]: yes, after 16 ms
+          - generic [ref=e85]:
+            - generic [ref=e87]: database ahead of screen by
+            - generic [ref=e88]: 0 rows
+          - generic [ref=e89]:
+            - generic [ref=e91]: delivered by
+            - generic [ref=e92]: the socket
+      - paragraph [ref=e93]: Committed, then broadcast. The second browser rendered it about 16 ms later (illustrative).
+    - generic [ref=e94]:
+      - generic [ref=e95]:
+        - heading "one message, all the way through" [level=3] [ref=e96]
+        - generic [ref=e97]: 13 of 14 steps ran
+        - generic [ref=e98]: 20 ms to the last push step, illustrative
+      - generic [ref=e99]:
+        - button "01" [ref=e172] [cursor=pointer]
+        - button "02" [ref=e174] [cursor=pointer]
+        - button "03" [ref=e176] [cursor=pointer]
+        - button "04" [ref=e178] [cursor=pointer]
+        - button "05" [ref=e180] [cursor=pointer]
+        - button "06" [ref=e182] [cursor=pointer]
+        - button "07" [ref=e184] [cursor=pointer]
+        - button "08" [ref=e186] [cursor=pointer]
+        - button "09" [ref=e188] [cursor=pointer]
+        - button "10" [ref=e190] [cursor=pointer]
+        - button "11" [ref=e192] [cursor=pointer]
+        - button "12" [ref=e194] [cursor=pointer]
+        - button "13" [ref=e196] [cursor=pointer]
+        - button "14" [ref=e198] [cursor=pointer]
+      - generic [ref=e115]:
+        - text: Click any step to see what it did, and the line of Attica that did it. The four that matter most are
+        - strong [ref=e116]: the row is written
+        - text: and
+        - strong [ref=e117]: send to the room group
+        - text: ": the first always comes before the second, which is the whole argument."
+    - generic [ref=e119]:
+      - heading "Four processes, and one of them is optional" [level=2] [ref=e120]
+      - paragraph [ref=e121]: "Attica is a Django REST API with a WebSocket overlay bolted alongside it. The map above is the whole system: a browser, one ASGI server holding both protocols, Redis, and the database. Everything the scene argues comes down to which of those four you can lose without losing data."
+      - paragraph [ref=e122]: "Click any box to see what it is and what it is doing right now. Boxes with a corner mark open: double-click, or use the button in the panel, and the map becomes what is inside them."
+    - generic [ref=e123]:
+      - heading "The two line styles, and they never change meaning" [level=3] [ref=e124]
+      - generic [ref=e125]:
+        - term [ref=e126]: solid
+        - definition [ref=e127]: a durable path. It either completed or the request failed loudly. The write to SQLite is the only one on this board.
+        - term [ref=e128]: dashed
+        - definition [ref=e129]: best effort. It can fail and nothing upstream will learn about it. Every real-time path in Attica is one of these, on purpose.
+      - paragraph [ref=e130]: That asymmetry is the design. A dashed line is allowed to fail precisely because a solid one already finished.
+    - generic [ref=e131]:
+      - heading "Where you can go from here" [level=3] [ref=e132]
+      - generic [ref=e133]:
+        - text: ECOSYSTEM
+        - generic [ref=e134]:
+          - strong [ref=e135]: four processes, four ports.
+          - text: which config line declares each one, and the proxy hop between them
+      - generic [ref=e136]:
+        - text: SYSTEM
+        - generic [ref=e137]:
+          - strong [ref=e138]: inside Daphne.
+          - text: ProtocolTypeRouter splitting two protocols across one process and one port
+      - generic [ref=e139]:
+        - text: COMPONENT
+        - generic [ref=e140]:
+          - strong [ref=e141]: the parts that do the work.
+          - text: each one owns live state you can read right now
+      - generic [ref=e142]:
+        - text: MECHANISM
+        - generic [ref=e143]:
+          - strong [ref=e144]: group membership and dispatch.
+          - text: the membership set lives in Redis, which is the entire reason a channel layer exists
+      - generic [ref=e145]:
+        - generic [ref=e146]: jump to
+        - button "inside Daphne :8000" [ref=e147] [cursor=pointer]
+        - button "inside Browser + Vite :5173" [ref=e148] [cursor=pointer]
+    - generic [ref=e149]:
+      - heading "The one asymmetry worth carrying with you" [level=3] [ref=e150]
+      - paragraph [ref=e151]:
+        - text: Redis holds no messages. Not one. It holds the set of sockets currently in each room, and it copies envelopes between processes. If it vanished this second, every message ever sent in Attica would still be in
+        - code [ref=e152]: db.sqlite3
+        - text: . Kill it from the map and watch which readout at the bottom moves and which one does not.
+  - generic [ref=e153]:
+    - button "probes" [ref=e154] [cursor=pointer]
+    - button "history" [ref=e155] [cursor=pointer]
+    - button "compare" [ref=e156] [cursor=pointer]
+  - dialog [ref=e221]:
+    - button "close" [ref=e222] [cursor=pointer]: ×
+    - heading "Redis :6379" [level=3] [ref=e223]
+    - generic [ref=e226]: "Two unrelated jobs on one server: DB 0 is the channel layer that fans messages out, DB 1 is the Django cache."
+    - generic [ref=e227]: right now
+    - generic [ref=e228]: 2 channel(s) in chat_room_7; group_send ran
+    - generic [ref=e229]: reads
+    - generic [ref=e230]: Daphne :8000
+    - generic [ref=e231]: changes when it changes
+    - generic [ref=e232]: Browser + Vite :5173
+    - generic [ref=e233]: the real thing
+    - generic [ref=e234]: "settings.py:92-99 'BACKEND': 'channels_redis.core.RedisChannelLayer'"
+    - generic [ref=e235]: break it
+    - generic [ref=e236]: kill it after the sockets joined and group_send raises. broadcast_room_event swallows the error, the POST still returns 201, and nobody is told anything.
+    - generic [ref=e237]: "WARNING Chat broadcast skipped: Error 111 connecting to 127.0.0.1:6379. Connection refused."
+    - generic [ref=e238]:
+      - generic [ref=e239]: channel layer
+      - button "reachable" [pressed] [ref=e240] [cursor=pointer]
+      - button "died after connect" [ref=e241] [cursor=pointer]
+      - button "down at connect" [ref=e242] [cursor=pointer]
+      - button "CHANNEL_LAYERS removed" [ref=e243] [cursor=pointer]
+    - generic [ref=e244]: without it
+    - generic [ref=e245]: "outcome: delivered-push becomes delivered-poll; it saw it after: 16 ms becomes 8000 ms; warning frame sent: no becomes yes; broadcast_enabled: yes becomes no; members of chat_room_7: 2 becomes 0; fallback poll running: no becomes yes; steps that ran: 13 becomes 8; steps that failed: 0 becomes 2; GETs per minute: 0 becomes 750."
+    - button "open Redis :6379 →" [ref=e246] [cursor=pointer]

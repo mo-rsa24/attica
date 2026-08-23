@@ -1,0 +1,32 @@
+- generic [ref=f3e2]:
+  - navigation [ref=f3e3]:
+    - generic [ref=f3e5]:
+      - generic [ref=f3e6]:
+        - link [ref=f3e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f3e8]
+        - generic [ref=f3e9]:
+          - link "Explore" [ref=f3e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f3e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f3e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f3e13]:
+            - button "Artists ▾" [ref=f3e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f3e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f3e20]
+      - generic [ref=f3e21]:
+        - link [ref=f3e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f3e23]
+        - link "Log in" [ref=f3e24] [cursor=pointer]:
+          - /url: /login
+        - button "Open menu" [ref=f3e26] [cursor=pointer]
+  - generic [ref=f3e29]: Loading profile...

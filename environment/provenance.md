@@ -1,0 +1,49 @@
+# 🗺️ Attica: Provenance
+
+How every fact in this folder was established, and when. One row per fact.
+
+Every fact carries one of three marks. `verified` means probed live on the date given and the
+result seen. `stated` means a person said it and it was not probed. `inferred` means it was read out
+of the repository and confirmed by neither a person nor a run.
+
+Back to [00-INDEX.md](00-INDEX.md) | [overview.md](overview.md)
+
+| Fact | Mark | How it was established |
+|---|---|---|
+| The app runs from `/home/molef/lobola` | verified | User stated it 2026-08-22; probed the same day: Python 3.12.9, Django 5.2.3, `daphne` present, 122 packages, site-packages last written 2026-05-02 |
+| Django is 5.2.3 | verified | Probed 2026-08-22 in `/home/molef/lobola` and `backend/venv`; pinned at `backend/main/requirements.txt:17` |
+| `backend/venv` and `/home/molef/.virtualenvs/lobola` are unused; the root venv has no `bin/` | verified | Probed 2026-08-22 |
+| Redis is up on `127.0.0.1:6379` | verified | `redis-cli ping` returned `PONG` 2026-08-22; confirmed listening via `ss -ltn` |
+| Channel layer on the default Redis database, cache on database 1 | verified | Read `backend/main/main/settings.py:92-120` 2026-08-22 |
+| The database is SQLite at `backend/main/db.sqlite3` | verified | Read `settings.py:156-160`; opened the file directly 2026-08-22 |
+| `useAxios` hardcodes `http://127.0.0.1:8000` | verified | Read `frontend/src/utils/useAxios.js:10` 2026-08-22 |
+| The Vite proxy forwards `/api`, `/vendors`, `/cart`, `/checkout` and `/ws` | verified | Read `frontend/vite.config.js:13-25`; the `/ws` rule was committed 2026-01-27 in `39e2e59` and is unmodified in the working tree |
+| `CORS_ALLOWED_ORIGINS` defaults to ports 5173 and 3000 | verified | Read `settings.py:140-144` 2026-08-22 |
+| Websockets authenticate by `?token=` through `WebSocketJWTAuthMiddleware` | verified | Read `backend/main/main/routing.py` 2026-08-22 |
+| `MAX_UPLOAD_SIZE_BYTES` defaults to 50 MB | verified | Read `settings.py:230` 2026-08-22 |
+| The outbox dispatcher clears a backlog in one pass | verified | Ran `python manage.py dispatch_scheduling_outbox` 2026-08-22 against a 23-row backlog: `processed=23 failed=0 dead_lettered=0` |
+| The backend suite is 43 tests with 1 failure and 1 error | verified | Ran `python manage.py test` 2026-08-22 |
+| No working pytest exists in this project | verified | Checked `/home/molef/lobola/bin`, `backend/venv/bin`, `requirements.txt` and `which pytest` 2026-08-22; ran it and saw collection fail |
+| No Celery anywhere; the outbox worker is a management command | verified | Searched the tree for `celery*.py` 2026-08-22, no results; listed `scheduling/management/commands/` |
+| `.env.example` holds a live Sentry token and was never committed | verified | Read the file and ran `git log --all -- .env.example` 2026-08-22, empty |
+| Vite binds 5174 when 5173 is occupied, breaking the hardcoded-baseURL calls | stated | Observed during the event-creation mapping session 2026-08-16, recorded in the journey's flow map. Not reproduced since |
+| Tokens live in `localStorage` under the key `tokens`; simplejwt keeps no token table | stated | Recorded in the flow map 2026-08-16, Step 0. The `localStorage` key has not been re-checked |
+| The booking write path never calls `group_send` | stated | Recorded in the flow map 2026-08-16, Step 4, marked traced rather than observed. `services.py:2658` resolves to `_create_in_app_notification` as claimed, but the absence of a push was not reproduced |
+| Geocoding and map tiles are called browser-direct | stated | Recorded in the flow map 2026-08-16, Step 6. Not reproduced |
+| Media lands on local disk under `media/event_draft_assets/...` and is served at `/media/` | inferred | Read from the repository. The path shape was recorded in the flow map but no upload was run this session |
+| The upload screen says "Max 100MB each" | inferred | Recorded in the flow map 2026-08-16, Step 10. The on-screen copy was not re-read |
+| Nothing auto-starts; four processes are needed | inferred | Assembled from `CLAUDE.md`, `settings.py` and the management commands. Only the Redis half was probed |
+
+### Still open
+
+**One recorded observation is refuted and stays recorded here so nobody re-derives it.**
+
+The flow map's Step 0 states that `frontend/vite.config.js` has no `/ws` proxy rule and that every
+websocket path is therefore dead in development. The rule has been in the file since 2026-01-27,
+seven months before that session. The claim is wrong rather than stale, and the flow map still
+carries it.
+
+**Whether the two failing backend tests are known and accepted, or regressions nobody has seen.**
+
+Both are in `events/tests.py` and both look like real defects rather than flaky tests. Nothing in
+the repository records them. Would settle it: the product owner.

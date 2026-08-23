@@ -1,0 +1,86 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - button "Notifications" [ref=f1e81] [cursor=pointer]
+        - link [ref=f1e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e23]
+        - button "Log out" [ref=f1e84] [cursor=pointer]
+        - button "Open menu" [ref=f1e26] [cursor=pointer]
+  - generic [ref=f1e1448]:
+    - banner [ref=f1e1449]:
+      - generic [ref=f1e1450]:
+        - link [ref=f1e1451] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e1454]:
+          - button "Open booking summary" [ref=f1e1455] [cursor=pointer]:
+            - generic [ref=f1e1456]: Booking Summary
+            - generic [ref=f1e1457]: "1"
+          - generic [ref=f1e1458]:
+            - banner [ref=f1e1459]:
+              - generic [ref=f1e1460]:
+                - generic [ref=f1e1461]:
+                  - heading "Event Booking Summary" [level=2] [ref=f1e1462]
+                  - paragraph [ref=f1e1463]: 1 request across your draft
+                - button "Close booking summary" [ref=f1e1465] [cursor=pointer]
+            - generic [ref=f1e1468]:
+              - generic [ref=f1e1469]:
+                - paragraph [ref=f1e1470]: Accepted
+                - paragraph [ref=f1e1471]: "0"
+              - generic [ref=f1e1472]:
+                - paragraph [ref=f1e1473]: Ready
+                - paragraph [ref=f1e1474]: "0"
+              - generic [ref=f1e1475]:
+                - paragraph [ref=f1e1476]: Deposit due now
+                - paragraph [ref=f1e1477]: R 0,00
+            - generic [ref=f1e1479]:
+              - heading "Awaiting Response" [level=3] [ref=f1e1482]
+              - generic [ref=f1e1485]:
+                - link "R" [ref=f1e1486] [cursor=pointer]:
+                  - /url: /venues/79
+                - generic [ref=f1e1488]:
+                  - generic [ref=f1e1489]:
+                    - generic [ref=f1e1490]:
+                      - link "Rise Rooftop, Sandton" [ref=f1e1491] [cursor=pointer]:
+                        - /url: /booking-request/37
+                      - paragraph [ref=f1e1492]: venue
+                    - generic [ref=f1e1493]:
+                      - paragraph [ref=f1e1494]: Deposit due
+                      - paragraph [ref=f1e1495]: R 0,00
+                  - generic [ref=f1e1496]: Awaiting response
+                  - link "View request" [ref=f1e1499] [cursor=pointer]:
+                    - /url: /booking-request/37
+          - button "Save & exit" [ref=f1e1500] [cursor=pointer]
+    - main [ref=f1e1501]:
+      - generic [ref=f1e1503]:
+        - generic [ref=f1e1504]:
+          - paragraph [ref=f1e1505]: Step 2
+          - heading "Make your event stand out" [level=1] [ref=f1e1506]
+          - paragraph [ref=f1e1507]: In this step, you’ll add your event's key features, plus 5 or more photos. Then, you’ll create a catchy title and a compelling description.
+        - img "A crowd enjoying a live music event" [ref=f1e1509]
+    - contentinfo [ref=f1e1510]:
+      - generic [ref=f1e1513]:
+        - button "Back" [ref=f1e1514] [cursor=pointer]
+        - button "Next" [ref=f1e1515] [cursor=pointer]

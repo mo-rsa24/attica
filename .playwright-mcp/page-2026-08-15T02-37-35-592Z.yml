@@ -1,0 +1,150 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - heading "The organizer journey, as it actually runs" [level=1] [ref=f5e5]
+    - generic [ref=f5e6]: /home/molef/Work/attica
+    - generic [ref=f5e7]:
+      - button "source" [ref=f5e8] [cursor=pointer]
+      - button "probes" [ref=f5e9] [cursor=pointer]
+      - button "history" [ref=f5e10] [cursor=pointer]
+      - button "fork" [ref=f5e11] [cursor=pointer]
+      - button "tour" [ref=f5e12] [cursor=pointer]
+  - generic [ref=f5e13]:
+    - complementary [ref=f5e14]:
+      - heading "Stage 1 · login" [level=2] [ref=f5e15]
+      - generic [ref=f5e16]:
+        - generic [ref=f5e17]: user_type in UserSerializer.fieldsrepo
+        - generic [ref=f5e18]:
+          - button "absent" [ref=f5e19] [cursor=pointer]
+          - button "present" [ref=f5e20] [cursor=pointer]
+        - generic [ref=f5e21]: Meta.fields lists roles and not user_type. Two role systems exist; one crosses the API.
+      - heading "Stage 2 · profile" [level=2] [ref=f5e22]
+      - generic [ref=f5e23]:
+        - generic [ref=f5e24]: Artist row for this userrepo
+        - generic [ref=f5e25]:
+          - button "none" [ref=f5e26] [cursor=pointer]
+          - button "found by query" [ref=f5e27] [cursor=pointer]
+          - button "on user object" [ref=f5e28] [cursor=pointer]
+        - generic [ref=f5e29]: /profile asks only this. An organizer has no Artist row, so it always falls through to /profile/edit.
+      - generic [ref=f5e30]:
+        - generic [ref=f5e31]: a link to /organizers/:idrepo
+        - generic [ref=f5e32]:
+          - button "none" [ref=f5e33] [cursor=pointer]
+          - button "exists" [ref=f5e34] [cursor=pointer]
+        - generic [ref=f5e35]: "grep finds one hit: the route in App.jsx:148. OrganizerProfilePage is built and unreachable."
+      - heading "Stage 4 · booking" [level=2] [ref=f5e36]
+      - generic [ref=f5e37]:
+        - generic [ref=f5e38]: MarketplaceResource for the artistrepo
+        - generic [ref=f5e39]:
+          - button "absent" [ref=f5e40] [cursor=pointer]
+          - button "opted in" [ref=f5e41] [cursor=pointer]
+        - generic [ref=f5e42]: Nothing creates it when an Artist is created. The artist must POST it from ProviderAvailabilityPage.
+      - generic [ref=f5e43]:
+        - generic [ref=f5e44]: my-events payload shaperepo
+        - generic [ref=f5e45]:
+          - 'button "{drafts,published}" [ref=f5e46] [cursor=pointer]'
+          - button "[ ... ]" [ref=f5e47] [cursor=pointer]
+          - 'button "{results}" [ref=f5e48] [cursor=pointer]'
+        - generic [ref=f5e49]: BookArtistPage tests for an array then for .results. The real payload is neither, so the dropdown is empty.
+      - generic [ref=f5e50]:
+        - generic [ref=f5e51]: Idempotency-Key headerrepo
+        - generic [ref=f5e52]:
+          - button "sent" [ref=f5e53] [cursor=pointer]
+          - button "omitted" [ref=f5e54] [cursor=pointer]
+        - generic [ref=f5e55]: schedulingApi generates one per call. Without it a double submit writes a second BookingRequest.
+      - generic [ref=f5e56]:
+        - generic [ref=f5e57]: a BookingRequest the bid can matchrepo
+        - generic [ref=f5e58]:
+          - button "no match" [ref=f5e59] [cursor=pointer]
+          - button "match" [ref=f5e60] [cursor=pointer]
+        - generic [ref=f5e61]: On no match chat/signals.py logs at debug and returns. It never creates a BookingRequest.
+      - heading "The fork axis" [level=2] [ref=f5e62]
+      - generic [ref=f5e63]:
+        - generic [ref=f5e64]: booking submitted fromrepo
+        - generic [ref=f5e65]:
+          - button "BookArtistPage" [ref=f5e66] [cursor=pointer]
+          - button "ProviderCard" [ref=f5e67] [cursor=pointer]
+        - generic [ref=f5e68]: Only ProviderCard sends event_draft_id, and only event_draft_id survives to a Booking at publish.
+    - main [ref=f5e69]:
+      - generic [ref=f5e70]:
+        - button "run next request" [ref=f5e71] [cursor=pointer]
+        - generic [ref=f5e72]:
+          - text: Submit the login form
+          - generic [ref=f5e73]: stage login · login
+        - generic [ref=f5e74]:
+          - generic "Submit the login form" [ref=f5e75]
+          - generic "AuthProvider re-reads the user" [ref=f5e76]
+          - generic "Open /profile" [ref=f5e77]
+          - generic "Land on /profile/edit" [ref=f5e78]
+          - generic "Open /my-events" [ref=f5e79]
+          - generic "Start a new event" [ref=f5e80]
+          - generic "Save step1 (name, date, capacity)" [ref=f5e81]
+          - generic "Save step3 (location, artists, vendors)" [ref=f5e82]
+          - generic "Save step4 (chosen location)" [ref=f5e83]
+          - generic "Save step5 (budget, seating)" [ref=f5e84]
+          - generic "Upload the banner image" [ref=f5e85]
+          - generic "Close the tab" [ref=f5e86]
+          - generic "Resume from /my-events" [ref=f5e87]
+          - generic "Save step6 (tiered prices)" [ref=f5e88]
+          - generic "Save step7 (features)" [ref=f5e89]
+          - generic "Save step8" [ref=f5e90]
+          - generic "Publish" [ref=f5e91]
+          - generic "Open the artist profile" [ref=f5e92]
+          - generic "Click Request Booking" [ref=f5e93]
+          - generic "Submit the booking request" [ref=f5e94]
+          - generic "Double-click submit" [ref=f5e95]
+          - generic "Accept a ChatBid in DM" [ref=f5e96]
+      - button "journey" [ref=f5e98] [cursor=pointer]
+      - generic [ref=f5e99]:
+        - button "1 Login POST /api/accounts/login/ the names say LoginAPIView authenticates and tells the app who this person is. the trace says not run yet 0/2 steps run · 0 requests" [ref=f5e100] [cursor=pointer]:
+          - generic [ref=f5e101]:
+            - generic [ref=f5e102]: "1"
+            - generic [ref=f5e103]: Login
+            - generic [ref=f5e104]: POST /api/accounts/login/
+          - generic [ref=f5e105]:
+            - generic [ref=f5e106]: the names say
+            - text: LoginAPIView authenticates and tells the app who this person is.
+          - generic [ref=f5e107]:
+            - generic [ref=f5e108]: the trace says
+            - text: not run yet
+          - generic [ref=f5e109]: 0/2 steps run · 0 requests
+        - button "2 Profile /profile and /my-events the names say ProfileRedirect sends you to your profile. OrganizerProfilePage is the organizer's. the trace says not run yet 0/3 steps run · 0 requests" [ref=f5e110] [cursor=pointer]:
+          - generic [ref=f5e111]:
+            - generic [ref=f5e112]: "2"
+            - generic [ref=f5e113]: Profile
+            - generic [ref=f5e114]: /profile and /my-events
+          - generic [ref=f5e115]:
+            - generic [ref=f5e116]: the names say
+            - text: ProfileRedirect sends you to your profile. OrganizerProfilePage is the organizer's.
+          - generic [ref=f5e117]:
+            - generic [ref=f5e118]: the trace says
+            - text: not run yet
+          - generic [ref=f5e119]: 0/3 steps run · 0 requests
+        - button "3 Create and resume one JSON column, eight steps the names say The wizard fills in an event step by step and publish turns the draft into it. the trace says not run yet 0/12 steps run · 0 requests" [ref=f5e120] [cursor=pointer]:
+          - generic [ref=f5e121]:
+            - generic [ref=f5e122]: "3"
+            - generic [ref=f5e123]: Create and resume
+            - generic [ref=f5e124]: one JSON column, eight steps
+          - generic [ref=f5e125]:
+            - generic [ref=f5e126]: the names say
+            - text: The wizard fills in an event step by step and publish turns the draft into it.
+          - generic [ref=f5e127]:
+            - generic [ref=f5e128]: the trace says
+            - text: not run yet
+          - generic [ref=f5e129]: 0/12 steps run · 0 requests
+        - button "4 Book an artist a separate app entirely the names say Request Booking creates a booking request against the artist. the trace says not run yet 0/5 steps run · 0 requests" [ref=f5e130] [cursor=pointer]:
+          - generic [ref=f5e131]:
+            - generic [ref=f5e132]: "4"
+            - generic [ref=f5e133]: Book an artist
+            - generic [ref=f5e134]: a separate app entirely
+          - generic [ref=f5e135]:
+            - generic [ref=f5e136]: the names say
+            - text: Request Booking creates a booking request against the artist.
+          - generic [ref=f5e137]:
+            - generic [ref=f5e138]: the trace says
+            - text: not run yet
+          - generic [ref=f5e139]: 0/5 steps run · 0 requests
+      - generic [ref=f5e140]:
+        - generic [ref=f5e141]:
+          - generic [ref=f5e142]: Changeset
+          - generic [ref=f5e143]: nothing has happened yet
+        - generic [ref=f5e144]: Run a step or flip a switch. Whatever moves shows up here, with the line that moved it.

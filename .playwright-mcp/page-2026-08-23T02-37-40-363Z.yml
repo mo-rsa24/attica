@@ -1,0 +1,113 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - generic "Logged in as Event Organizer" [ref=f1e22]: Event Organizer
+        - button "Notifications" [ref=f1e23] [cursor=pointer]
+        - link "My Bookings" [ref=f1e26] [cursor=pointer]:
+          - /url: /dashboard/organizer
+        - link [ref=f1e27] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e28]
+        - button "Log out" [ref=f1e29] [cursor=pointer]
+        - button "Open menu" [ref=f1e31] [cursor=pointer]
+  - generic [ref=f1e34]:
+    - generic [ref=f1e35]:
+      - generic [ref=f1e36]:
+        - paragraph [ref=f1e37]: Explore
+        - heading "Welcome back, Test_organizer" [level=1] [ref=f1e38]
+        - paragraph [ref=f1e39]: Discover work from venues, artists, and service providers across Attica. Share your portfolio updates and engage with the network.
+      - generic [ref=f1e40]:
+        - generic [ref=f1e41]:
+          - generic [ref=f1e42]:
+            - button "For You" [ref=f1e43] [cursor=pointer]
+            - button "Following" [ref=f1e44] [cursor=pointer]
+          - generic [ref=f1e45]:
+            - generic [ref=f1e46]: Create a post
+            - textbox "Share an update, portfolio highlight, or venue availability..." [ref=f1e47]
+            - generic [ref=f1e48]:
+              - generic [ref=f1e49] [cursor=pointer]: Add image
+              - button "Post" [disabled] [ref=f1e52]
+          - generic [ref=f1e53]:
+            - article [ref=f1e54]:
+              - generic [ref=f1e55]:
+                - generic [ref=f1e56]:
+                  - button [ref=f1e57] [cursor=pointer]:
+                    - img "tfuller" [ref=f1e58]
+                  - generic [ref=f1e59]:
+                    - button "tfuller" [ref=f1e60] [cursor=pointer]
+                    - paragraph [ref=f1e61]: 2mo ago
+                - paragraph [ref=f1e62]: Not sure if this is going to work
+              - img "Post" [ref=f1e64]
+              - generic [ref=f1e65]:
+                - button "1" [ref=f1e66] [cursor=pointer]
+                - button "1" [ref=f1e70] [cursor=pointer]
+                - button "1" [ref=f1e74] [cursor=pointer]
+            - article [ref=f1e78]:
+              - generic [ref=f1e79]:
+                - generic [ref=f1e80]:
+                  - link [ref=f1e81] [cursor=pointer]:
+                    - /url: /artists/16
+                    - img "blxckie" [ref=f1e82]
+                  - generic [ref=f1e83]:
+                    - link "blxckie" [ref=f1e84] [cursor=pointer]:
+                      - /url: /artists/16
+                    - paragraph [ref=f1e85]: Artist · 6mo ago
+                - paragraph [ref=f1e86]: Blxckie
+              - img "Post" [ref=f1e88]
+              - generic [ref=f1e89]:
+                - button "1" [ref=f1e90] [cursor=pointer]
+                - button "1" [ref=f1e94] [cursor=pointer]
+                - button "1" [ref=f1e98] [cursor=pointer]
+            - article [ref=f1e102]:
+              - generic [ref=f1e103]:
+                - generic [ref=f1e104]:
+                  - button [ref=f1e105] [cursor=pointer]:
+                    - img "naledi.organizer" [ref=f1e106]
+                  - generic [ref=f1e107]:
+                    - button "naledi.organizer" [ref=f1e108] [cursor=pointer]
+                    - paragraph [ref=f1e109]: Event Organizer · 6mo ago
+                - paragraph [ref=f1e110]: Hello There
+              - img "Post" [ref=f1e112]
+              - generic [ref=f1e113]:
+                - button "2" [ref=f1e114] [cursor=pointer]
+                - button "0" [ref=f1e118] [cursor=pointer]
+                - button "0" [ref=f1e122] [cursor=pointer]
+            - paragraph [ref=f1e127]: You reached the end of the feed.
+        - complementary [ref=f1e128]:
+          - generic [ref=f1e129]:
+            - heading "Quick Navigation" [level=2] [ref=f1e130]
+            - generic [ref=f1e131]:
+              - link "Browse services" [ref=f1e132] [cursor=pointer]:
+                - /url: /services
+              - link "Service marketplace" [ref=f1e133] [cursor=pointer]:
+                - /url: /services
+              - link "Artist network" [ref=f1e134] [cursor=pointer]:
+                - /url: /artists
+              - link "Upcoming events" [ref=f1e135] [cursor=pointer]:
+                - /url: /events
+          - generic [ref=f1e136]:
+            - heading "Portfolio tip" [level=3] [ref=f1e137]
+            - paragraph [ref=f1e138]: Post project photos and short context so event organizers can understand your style and availability quickly.
+    - button "Add Event" [ref=f1e139] [cursor=pointer]

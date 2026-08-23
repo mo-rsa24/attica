@@ -1,0 +1,68 @@
+- generic [ref=e2]:
+  - navigation [ref=e28]:
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - link [ref=e32] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=e33]
+        - generic [ref=e34]:
+          - link "Explore" [ref=e35] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=e36] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=e37] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=e38]:
+            - button "Artists ▾" [ref=e39] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=e40]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=e45]
+      - generic [ref=e46]:
+        - button "Notifications" [ref=e47] [cursor=pointer]
+        - link [ref=e50] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=e51]
+        - button "Log out" [ref=e52] [cursor=pointer]
+        - button "Open menu" [ref=e54] [cursor=pointer]
+  - generic [ref=e57]:
+    - generic [ref=e58]:
+      - generic [ref=e59]:
+        - paragraph [ref=e60]: Explore
+        - heading "Welcome back, E2e-organizer" [level=1] [ref=e61]
+        - paragraph [ref=e62]: Discover work from venues, artists, and service providers across Attica. Share your portfolio updates and engage with the network.
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - button "For You" [ref=e66] [cursor=pointer]
+            - button "Following" [ref=e67] [cursor=pointer]
+          - generic [ref=e68]:
+            - generic [ref=e69]: Create a post
+            - textbox "Share an update, portfolio highlight, or venue availability..." [ref=e70]
+            - generic [ref=e71]:
+              - generic [ref=e72] [cursor=pointer]: Add image
+              - button "Post" [disabled] [ref=e75]
+          - generic [ref=e76]: Could not load explore feed right now.
+          - generic [ref=e77]:
+            - heading "No posts in your feed yet" [level=2] [ref=e78]
+            - paragraph [ref=e79]: Be the first to share your latest portfolio update.
+        - complementary [ref=e80]:
+          - generic [ref=e81]:
+            - heading "Quick Navigation" [level=2] [ref=e82]
+            - generic [ref=e83]:
+              - link "Browse services" [ref=e84] [cursor=pointer]:
+                - /url: /services
+              - link "Service marketplace" [ref=e85] [cursor=pointer]:
+                - /url: /services
+              - link "Artist network" [ref=e86] [cursor=pointer]:
+                - /url: /artists
+              - link "Upcoming events" [ref=e87] [cursor=pointer]:
+                - /url: /events
+          - generic [ref=e88]:
+            - heading "Portfolio tip" [level=3] [ref=e89]
+            - paragraph [ref=e90]: Post project photos and short context so event organizers can understand your style and availability quickly.
+    - button "Add Event" [ref=e91] [cursor=pointer]

@@ -1,0 +1,181 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - 'heading "Attica: a REST-first backend and its WebSocket overlay" [level=1] [ref=f3e5]'
+    - generic [ref=f3e6]: the row is committed before anyone is told, so every real-time path is droppable
+    - button "tour" [ref=f3e7] [cursor=pointer]
+  - navigation [ref=f3e8]:
+    - button "0the map" [ref=f3e9] [cursor=pointer]
+    - button "1the smallest version that works" [ref=f3e10] [cursor=pointer]
+    - button "2the mechanism" [ref=f3e11] [cursor=pointer]
+    - button "3where it costs you" [ref=f3e12] [cursor=pointer]
+    - button "4build it" [ref=f3e13] [cursor=pointer]
+  - generic [ref=f3e15]:
+    - generic [ref=f3e16]:
+      - heading "Build it, in the order the failures force" [level=2] [ref=f3e17]
+      - paragraph [ref=f3e18]: Seven steps, each one starting from the previous step's failure. If you type them out you end up with Attica's chat path, and more usefully you end up knowing why each line is there.
+      - generic [ref=f3e19]:
+        - button "1" [pressed] [ref=f3e20] [cursor=pointer]
+        - button "2" [ref=f3e21] [cursor=pointer]
+        - button "3" [ref=f3e22] [cursor=pointer]
+        - button "4" [ref=f3e23] [cursor=pointer]
+        - button "5" [ref=f3e24] [cursor=pointer]
+        - button "6" [ref=f3e25] [cursor=pointer]
+        - button "7" [ref=f3e26] [cursor=pointer]
+    - generic [ref=f3e27]:
+      - generic [ref=f3e28]: STEP 1 OF 7 · THE FAILURE THIS ANSWERS
+      - paragraph [ref=f3e29]: "Nothing exists yet. Two people cannot exchange anything, so start with the only part that is not optional: making a message durable."
+      - heading "One endpoint that writes a row" [level=3] [ref=f3e30]
+      - paragraph [ref=f3e31]: A plain DRF view. It checks that you belong in the room, writes, and returns the row. No sockets, no Redis, no real-time anything. This is the entire foundation and it never changes again for the rest of the build.
+      - generic [ref=f3e32]:
+        - generic [ref=f3e33]: chat/views.py
+        - code [ref=f3e52]:
+          - generic [ref=f3e53]: "class ChatMessageListCreateView(APIView):"
+          - generic [ref=f3e54]: permission_classes = [IsAuthenticated]
+          - generic [ref=f3e55]: "def get(self, request, room_id):"
+          - generic [ref=f3e56]: room = get_object_or_404(ChatRoom, id=room_id)
+          - generic [ref=f3e57]: "if request.user not in [room.organizer, room.vendor]:"
+          - generic [ref=f3e58]: "return Response({\"detail\": \"Forbidden\"}, status=403)"
+          - generic [ref=f3e59]: messages = room.messages.order_by('created_at')
+          - generic [ref=f3e60]: return Response(MessageSerializer(messages, many=True).data)
+          - generic [ref=f3e61]: "def post(self, request, room_id):"
+          - generic [ref=f3e62]: room = get_object_or_404(ChatRoom, id=room_id)
+          - generic [ref=f3e63]: "if request.user not in [room.organizer, room.vendor]:"
+          - generic [ref=f3e64]: "return Response({\"detail\": \"Forbidden\"}, status=403)"
+          - generic [ref=f3e65]: payload = request.data.copy()
+          - generic [ref=f3e66]: payload['room'] = room.id
+          - generic [ref=f3e67]: payload['sender'] = request.user.id
+          - generic [ref=f3e68]: serializer = MessageSerializer(data=payload)
+          - generic [ref=f3e69]: serializer.is_valid(raise_exception=True)
+          - generic [ref=f3e70]: message = serializer.save()
+          - generic [ref=f3e71]: return Response(MessageSerializer(message).data, status=201)
+      - generic [ref=f3e38]: RUN IT
+      - generic [ref=f3e39]: "$ curl -X POST localhost:8000/api/chat/rooms/7/messages/ \\ -H \"Authorization: Bearer $TOKEN\" -H \"Content-Type: application/json\" \\ -d '{\"text\": \"can you do the 14th?\"}' {\"id\":4,\"room\":7,\"sender\":2,\"text\":\"can you do the 14th?\",\"created_at\":\"...\"}"
+      - generic [ref=f3e40]: THE SAME SCENARIO, NOW
+      - paragraph [ref=f3e41]: "The row is in the database. Restart the server, drop every connection, come back tomorrow: it is still there. That is the property everything else in this build is allowed to lack."
+      - generic [ref=f3e42]: WHAT IT CHARGED
+      - paragraph [ref=f3e43]: The other person has no idea it happened. They will see it the next time they ask, and nothing makes them ask.
+      - generic [ref=f3e44]:
+        - button "← previous" [disabled] [ref=f3e45]
+        - button "next step →" [ref=f3e46] [cursor=pointer]
+  - generic [ref=f3e47]:
+    - button "probes" [ref=f3e48] [cursor=pointer]
+    - button "history" [ref=f3e49] [cursor=pointer]
+    - button "compare" [active] [pressed] [ref=f3e50] [cursor=pointer]
+  - dialog "two worlds, one difference" [ref=f3e73]:
+    - generic [ref=f3e74]:
+      - heading "two worlds, one difference" [level=3] [ref=f3e75]
+      - button "close" [ref=f3e76] [cursor=pointer]: ×
+    - generic [ref=f3e77]:
+      - paragraph [ref=f3e78]: Both worlds start from exactly the state you have now. B differs by one thing and nothing else.
+      - generic [ref=f3e79]:
+        - 'button "no channel layer at all: the poll is the only delivery" [pressed] [ref=f3e80] [cursor=pointer]'
+        - button "Redis dies after the sockets joined" [ref=f3e81] [cursor=pointer]
+        - button "started with manage.py runserver" [ref=f3e82] [cursor=pointer]
+        - button "the Vite proxy is off" [ref=f3e83] [cursor=pointer]
+        - button "the socket does the writing" [ref=f3e84] [cursor=pointer]
+      - generic [ref=f3e85]:
+        - generic [ref=f3e86]:
+          - 'heading "A: as you have it" [level=4] [ref=f3e87]'
+          - generic [ref=f3e88]:
+            - term [ref=f3e89]: outcome
+            - definition [ref=f3e90]: delivered-push
+            - term [ref=f3e91]: row
+            - definition [ref=f3e92]: committed, 4 rows
+            - term [ref=f3e93]: seen
+            - definition [ref=f3e94]: after 16 ms
+            - term [ref=f3e95]: gap
+            - definition [ref=f3e96]: 0 rows
+            - term [ref=f3e97]: first stop
+            - definition [ref=f3e98]: the fallback poll (skipped)
+          - generic [ref=f3e99]:
+            - generic "the organizer types" [ref=f3e100]
+            - generic "Vite forwards the POST" [ref=f3e101]
+            - generic "is this user in the room" [ref=f3e102]
+            - generic "the row is written" [ref=f3e103]
+            - generic "delivered_at is stamped" [ref=f3e104]
+            - generic "the row becomes JSON" [ref=f3e105]
+            - generic "is there a channel layer" [ref=f3e106]
+            - generic "send to the room group" [ref=f3e107]
+            - generic "Redis fans out to the group" [ref=f3e108]
+            - generic "chat.event becomes chat_event" [ref=f3e109]
+            - generic "the second browser merges it" [ref=f3e110]
+            - generic "the notification badge" [ref=f3e111]
+            - generic "the sender gets its copy" [ref=f3e112]
+            - generic "the fallback poll" [ref=f3e113]
+        - generic [ref=f3e114]:
+          - 'heading "B: no channel layer at all: the poll is the only delivery" [level=4] [ref=f3e115]'
+          - generic [ref=f3e116]:
+            - term [ref=f3e117]: outcome
+            - definition [ref=f3e118]: delivered-poll
+            - term [ref=f3e119]: row
+            - definition [ref=f3e120]: committed, 4 rows
+            - term [ref=f3e121]: seen
+            - definition [ref=f3e122]: after 8000 ms
+            - term [ref=f3e123]: gap
+            - definition [ref=f3e124]: 0 rows
+            - term [ref=f3e125]: first stop
+            - definition [ref=f3e126]: is there a channel layer (failed)
+          - generic [ref=f3e127]:
+            - generic "the organizer types" [ref=f3e128]
+            - generic "Vite forwards the POST" [ref=f3e129]
+            - generic "is this user in the room" [ref=f3e130]
+            - generic "the row is written" [ref=f3e131]
+            - generic "delivered_at is stamped" [ref=f3e132]
+            - generic "the row becomes JSON" [ref=f3e133]
+            - generic "is there a channel layer" [ref=f3e134]
+            - generic "send to the room group" [ref=f3e135]
+            - generic "Redis fans out to the group" [ref=f3e136]
+            - generic "chat.event becomes chat_event" [ref=f3e137]
+            - generic "the second browser merges it" [ref=f3e138]
+            - generic "the notification badge" [ref=f3e139]
+            - generic "the sender gets its copy" [ref=f3e140]
+            - generic "the fallback poll" [ref=f3e141]
+      - generic [ref=f3e142]:
+        - heading "WHERE THEY DIVERGE" [level=4] [ref=f3e143]
+        - generic [ref=f3e144]:
+          - generic [ref=f3e145]:
+            - generic [ref=f3e146]: outcome
+            - generic [ref=f3e147]: delivered-push
+            - generic [ref=f3e148]: →
+            - generic [ref=f3e149]: delivered-poll
+          - generic [ref=f3e150]:
+            - generic [ref=f3e151]: it saw it after
+            - generic [ref=f3e152]: 16 ms
+            - generic [ref=f3e153]: →
+            - generic [ref=f3e154]: 8000 ms
+          - generic [ref=f3e155]:
+            - generic [ref=f3e156]: warning frame sent
+            - generic [ref=f3e157]: "no"
+            - generic [ref=f3e158]: →
+            - generic [ref=f3e159]: "yes"
+          - generic [ref=f3e160]:
+            - generic [ref=f3e161]: broadcast_enabled
+            - generic [ref=f3e162]: "yes"
+            - generic [ref=f3e163]: →
+            - generic [ref=f3e164]: "no"
+          - generic [ref=f3e165]:
+            - generic [ref=f3e166]: members of chat_room_7
+            - generic [ref=f3e167]: "2"
+            - generic [ref=f3e168]: →
+            - generic [ref=f3e169]: 0, unreadable
+          - generic [ref=f3e170]:
+            - generic [ref=f3e171]: fallback poll running
+            - generic [ref=f3e172]: "no"
+            - generic [ref=f3e173]: →
+            - generic [ref=f3e174]: "yes"
+          - generic [ref=f3e175]:
+            - generic [ref=f3e176]: steps that ran
+            - generic [ref=f3e177]: "13"
+            - generic [ref=f3e178]: →
+            - generic [ref=f3e179]: "8"
+          - generic [ref=f3e180]:
+            - generic [ref=f3e181]: steps that failed
+            - generic [ref=f3e182]: "0"
+            - generic [ref=f3e183]: →
+            - generic [ref=f3e184]: "2"
+          - generic [ref=f3e185]:
+            - generic [ref=f3e186]: GETs per minute
+            - generic [ref=f3e187]: "0"
+            - generic [ref=f3e188]: →
+            - generic [ref=f3e189]: "750"
+        - paragraph [ref=f3e190]: the row is committed in both

@@ -1,0 +1,130 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - button "Notifications" [ref=f1e81] [cursor=pointer]
+        - link [ref=f1e22] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e23]
+        - button "Log out" [ref=f1e84] [cursor=pointer]
+        - button "Open menu" [ref=f1e26] [cursor=pointer]
+  - generic [ref=f1e1516]:
+    - banner [ref=f1e1517]:
+      - heading "What does your event offer?" [level=1] [ref=f1e1518]
+      - paragraph [ref=f1e1519]: Select all the amenities and perks available to your guests.
+    - main [ref=f1e1520]:
+      - generic [ref=f1e1521]:
+        - heading "Event Amenities" [level=2] [ref=f1e1522]
+        - generic [ref=f1e1524]:
+          - button [ref=f1e1858] [cursor=pointer]:
+            - generic [ref=f1e1869]:
+              - heading "Food Trucks" [level=3] [ref=f1e1870]
+              - paragraph [ref=f1e1871]: Gourmet street food options
+          - button [ref=f1e1872] [cursor=pointer]:
+            - generic [ref=f1e1880]:
+              - heading "Bar Available" [level=3] [ref=f1e1881]
+              - paragraph [ref=f1e1882]: Alcoholic & non-alcoholic drinks
+          - button [ref=f1e1883] [cursor=pointer]:
+            - generic [ref=f1e1892]:
+              - heading "Merch Stall" [level=3] [ref=f1e1893]
+              - paragraph [ref=f1e1894]: Space for selling merchandise
+          - button [ref=f1e1895] [cursor=pointer]:
+            - generic [ref=f1e1907]:
+              - heading "Wheelchair Accessible" [level=3] [ref=f1e1908]
+              - paragraph [ref=f1e1909]: Ramps and accessible facilities
+          - button [ref=f1e1910] [cursor=pointer]:
+            - generic [ref=f1e1919]:
+              - heading "Outdoor Seating" [level=3] [ref=f1e1920]
+              - paragraph [ref=f1e1921]: Comfortable open-air spots
+          - button [ref=f1e1922] [cursor=pointer]:
+            - generic [ref=f1e1930]:
+              - heading "Accepts Cards" [level=3] [ref=f1e1931]
+              - paragraph [ref=f1e1932]: Cashless payment options
+      - generic [ref=f1e1600]:
+        - heading "Exclusive Perks" [level=2] [ref=f1e1601]
+        - generic [ref=f1e1603]:
+          - button [ref=f1e1933] [cursor=pointer]:
+            - generic [ref=f1e1941]:
+              - heading "Special Guest Appearance" [level=3] [ref=f1e1942]
+              - paragraph [ref=f1e1943]: Celebrity or industry expert
+          - button [ref=f1e1944] [cursor=pointer]:
+            - generic [ref=f1e1952]:
+              - heading "VIP Area" [level=3] [ref=f1e1953]
+              - paragraph [ref=f1e1954]: Exclusive lounge access
+          - button [ref=f1e1955] [cursor=pointer]:
+            - generic [ref=f1e1966]:
+              - heading "Meet & Greet" [level=3] [ref=f1e1967]
+              - paragraph [ref=f1e1968]: Photo ops with talent
+          - button [ref=f1e1969] [cursor=pointer]:
+            - generic [ref=f1e1979]:
+              - heading "Live Q&A" [level=3] [ref=f1e1980]
+              - paragraph [ref=f1e1981]: Interactive audience sessions
+          - button [ref=f1e1982] [cursor=pointer]:
+            - generic [ref=f1e1991]:
+              - heading "Photo Booth" [level=3] [ref=f1e1992]
+              - paragraph [ref=f1e1993]: Fun props and instant prints
+    - contentinfo [ref=f1e1665]:
+      - generic [ref=f1e1668]:
+        - button "Back" [ref=f1e1669] [cursor=pointer]
+        - generic [ref=f1e1670]:
+          - button "Open booking summary" [ref=f1e1671] [cursor=pointer]:
+            - generic [ref=f1e1672]: Booking Summary
+            - generic [ref=f1e1673]: "1"
+          - generic [ref=f1e1674]:
+            - banner [ref=f1e1675]:
+              - generic [ref=f1e1676]:
+                - generic [ref=f1e1677]:
+                  - heading "Event Booking Summary" [level=2] [ref=f1e1678]
+                  - paragraph [ref=f1e1679]: 1 request across your draft
+                - button "Close booking summary" [ref=f1e1681] [cursor=pointer]
+            - generic [ref=f1e1684]:
+              - generic [ref=f1e1685]:
+                - paragraph [ref=f1e1686]: Accepted
+                - paragraph [ref=f1e1687]: "0"
+              - generic [ref=f1e1688]:
+                - paragraph [ref=f1e1689]: Ready
+                - paragraph [ref=f1e1690]: "0"
+              - generic [ref=f1e1691]:
+                - paragraph [ref=f1e1692]: Deposit due now
+                - paragraph [ref=f1e1693]: R 0,00
+            - generic [ref=f1e1695]:
+              - heading "Awaiting Response" [level=3] [ref=f1e1698]
+              - generic [ref=f1e1701]:
+                - link "R" [ref=f1e1702] [cursor=pointer]:
+                  - /url: /venues/79
+                - generic [ref=f1e1704]:
+                  - generic [ref=f1e1705]:
+                    - generic [ref=f1e1706]:
+                      - link "Rise Rooftop, Sandton" [ref=f1e1707] [cursor=pointer]:
+                        - /url: /booking-request/37
+                      - paragraph [ref=f1e1708]: venue
+                    - generic [ref=f1e1709]:
+                      - paragraph [ref=f1e1710]: Deposit due
+                      - paragraph [ref=f1e1711]: R 0,00
+                  - generic [ref=f1e1712]: Awaiting response
+                  - link "View request" [ref=f1e1715] [cursor=pointer]:
+                    - /url: /booking-request/37
+          - button "Save & exit" [ref=f1e1716] [cursor=pointer]
+          - generic [ref=f1e1717]: 2 items selected
+          - button "Next Step" [ref=f1e1718] [cursor=pointer]

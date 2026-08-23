@@ -1,0 +1,28 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img "Event atmosphere" [ref=e5]
+    - generic [ref=e7]:
+      - link [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "Attica" [ref=e9]
+      - generic [ref=e10]:
+        - heading "Welcome back. Your events await." [level=2] [ref=e11]: Welcome back.Your events await.
+        - paragraph [ref=e12]: Pick up right where you left off — manage your events, connect with vendors, and bring your vision to life.
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - heading "Log in to Attica" [level=1] [ref=e16]
+      - paragraph [ref=e17]:
+        - text: Don't have an account?
+        - link "Sign up" [ref=e18] [cursor=pointer]:
+          - /url: /register
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: Username
+        - textbox "Username" [ref=e22]:
+          - /placeholder: Enter your username
+      - generic [ref=e23]:
+        - generic [ref=e24]: Password
+        - textbox "Password" [ref=e25]:
+          - /placeholder: Enter your password
+      - button "Log in" [ref=e26] [cursor=pointer]
+    - paragraph [ref=e27]: By logging in, you agree to Attica's Terms of Service and Privacy Policy.

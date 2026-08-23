@@ -1,0 +1,37 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link [ref=f1e7] [cursor=pointer]:
+          - /url: /
+          - img "Attica" [ref=f1e8]
+        - generic [ref=f1e9]:
+          - link "Explore" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Events" [ref=f1e11] [cursor=pointer]:
+            - /url: /events
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: /services
+          - generic [ref=f1e13]:
+            - button "Artists ▾" [ref=f1e14] [cursor=pointer]:
+              - text: Artists
+              - generic [ref=f1e15]: ▾
+            - generic:
+              - link "Browse Artists":
+                - /url: /artists
+              - link "Tours":
+                - /url: /tours
+      - searchbox "Search artists, events… ⌘K" [ref=f1e20]
+      - generic [ref=f1e21]:
+        - generic "Logged in as Event Organizer" [ref=f1e22]: Event Organizer
+        - button "Notifications" [ref=f1e23] [cursor=pointer]
+        - link "My Bookings" [active] [ref=f1e26] [cursor=pointer]:
+          - /url: /dashboard/organizer
+        - link [ref=f1e27] [cursor=pointer]:
+          - /url: /profile
+          - img "Profile" [ref=f1e28]
+        - button "Log out" [ref=f1e29] [cursor=pointer]
+        - button "Open menu" [ref=f1e31] [cursor=pointer]
+  - generic [ref=f1e144]:
+    - paragraph [ref=f1e145]: Failed to fetch data
+    - button "Try Again" [ref=f1e146] [cursor=pointer]
