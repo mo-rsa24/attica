@@ -12,7 +12,11 @@ A third thing is startable now and waits on neither:
 which establishes what the code actually does. It is worth starting early because three of the
 pictures it leads to are the evidence the first three open decisions get taken on.
 
-The remaining nine sub-scopes are named below and not yet decomposed.
+A fourth is decomposed and waiting rather than startable:
+[running-the-workers](plans/running-the-workers/MASTER_PLAN.md) has its master plan and needs
+`populate-plans`, but the work itself waits on `one-booking-truth`.
+
+The remaining eight sub-scopes are named below and not yet decomposed.
 
 ## Running order
 
@@ -31,9 +35,17 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 8 | [Draw the layers map](plans/the-system-in-layers/plans/02-draw-the-layers-map.md) | Give `environment/` its first pictures: the folder's map, the layers prompt, and the slot in `overview.md` | ⚠️ not started | 7 |
 | 9 | [Brief the other eight](plans/the-system-in-layers/plans/03-brief-the-other-eight.md) | The four the reviews ask for, the four already briefed in `onboarding-docs`, and a failure beside every one | ⚠️ not started | 7, 8 |
 | 10 | [Render it, check it, and write down how](plans/the-system-in-layers/plans/04-render-check-and-write-it-down.md) | Nine images made, each read back against its note before filing, and the two recipes for doing it again | ⚠️ not started | 8, 9 |
+| 11 | [running-the-workers](plans/running-the-workers/MASTER_PLAN.md) | Decide what runs the recurring work, put the scheduling commands on it, and close the two places an event is lost after being safely written | ⚠️ plans not authored yet | `one-booking-truth` |
 
 Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
+
+Step 11 is a placeholder for a whole sub-scope rather than a plan. It is one row because
+`running-the-workers` has a master plan and no plan files yet; `populate-plans` replaces this row
+with its real plans, interleaved at the step numbers they belong at. Its "Waits on" cell names
+`one-booking-truth` in words because that scope is not decomposed either, so there is no step number
+to point at. Two other undecomposed domain scopes, `one-booking-truth` and `contention-and-holds`,
+sit between step 10 and step 11 in the sub-scope order below and contribute no rows here yet.
 
 Steps 7 to 10 are grouped after the two blockers in this table rather than interleaved through them,
 because nothing in either direction gates the other: the layers scope needs no login and no green
@@ -123,7 +135,7 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 | 3 | [the-system-in-layers](plans/the-system-in-layers/MASTER_PLAN.md) | cross | nothing |
 | 4 | `one-booking-truth` | domain | 1, 2 |
 | 5 | `contention-and-holds` | domain | 4 |
-| 6 | `running-the-workers` | domain | 4 |
+| 6 | [running-the-workers](plans/running-the-workers/MASTER_PLAN.md) | domain | 4 |
 | 7 | `availability-that-is-true` | domain | 5, 6 |
 | 8 | `the-booking-journey` | domain | 5, 6 |
 | 9 | `performance-architecture` | performance | 7, 8 |
@@ -135,8 +147,9 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 Scopes 1, 2, 3 and 12 start immediately. After 8 lands, the performance and experience planes run in
 parallel.
 
-`fixing-create-event`, `getting-in` and `the-system-in-layers` have plan files. The other nine are
-named here and not yet decomposed.
+`fixing-create-event`, `getting-in` and `the-system-in-layers` have plan files.
+`running-the-workers` has a master plan and no plan files yet. The other eight are named here and
+not yet decomposed.
 
 ---
 
