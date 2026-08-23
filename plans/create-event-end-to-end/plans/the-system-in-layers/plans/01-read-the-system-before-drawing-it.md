@@ -305,7 +305,7 @@ and 2, so it can be done at the same time.
     channel layer or writes a row and returns. If it writes and returns, that is the single most
     important fact in the real-time delivery diagram and it goes in bold.
 
-- [ ] **3.3 Establish which of the eleven scheduling commands has a runner**
+- [ ] **3.3 Establish which scheduling commands have a runner**
   ```
   cd /home/molef/Work/attica/backend/main
   ls scheduling/management/commands/

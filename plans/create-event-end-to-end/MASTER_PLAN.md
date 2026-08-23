@@ -63,7 +63,7 @@ Attica's create-event path works end to end for every role, and every claim abou
 something someone ran or saw.
 
 Today it works for one role on a happy path. Most of what is wrong is invisible until you drive it,
-and a substantial amount of what is right is built and inert: eleven scheduling commands that nothing
+and a substantial amount of what is right is built and inert: ten scheduling commands that nothing
 runs, and a notification channel wired at one end only.
 
 ---

@@ -71,7 +71,7 @@ which value chooses which behaviour.
 
 **Visual thesis.** The machinery exists and nothing turns it.
 
-An application-tier panel holding eleven command glyphs in a row, all drawn in muted grey with no
+An application-tier panel holding ten command glyphs in a row, all drawn in muted grey with no
 outbound arrows. Beside them an outbox tray glyph, full, with an orange dashed arrow that stops at a
 gap. In the browser tier, a socket glyph connected at the client end and open at the server end, with
 a chip reading "subscribed, nothing publishes". A single missing gear glyph in the centre, drawn as

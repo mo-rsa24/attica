@@ -25,12 +25,22 @@ two outbox workers, three seeds", and there are four expiry commands, not five. 
 count forward would have made the scope's first plan spend its time looking for a command that does
 not exist.
 
-**What was done about the parent.** Both documents that carry the wrong count are corrected, so
-nobody plans against it a second time.
+**What was done about the parent.** Every document that carries the wrong count is corrected, so
+nobody plans against it a second time. Four of them.
 [The scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#6-running-the-workers)
-now says ten and names the seeds-versus-runner split.
+says ten and names the seeds-versus-runner split.
 [Where we landed](../../../../ideas/enhancing-create-event-end-to-end/WHERE-WE-LANDED.md#2-the-state-of-the-world)
-now says ten, four expiry, two outbox, and names the two commands that are broken as well as inert.
+says ten, four expiry, two outbox, and names the two commands that are broken as well as inert. The
+[parent master plan](../../MASTER_PLAN.md)'s mission says ten scheduling commands that nothing runs.
+And piece 4 of [the parent's subject lane](../../diagram-prompts.md), which draws exactly this scope's
+machinery, now specifies ten command glyphs rather than eleven.
+
+**Why the parent's picture had to move too.** This scope's map is the zoom-in on that glyph, and a
+zoom-in that shows ten where the wide shot shows eleven is a contradiction a reader has to resolve
+by picking one. Piece 4 is `[planned]` and unrendered, so the correction costs a word and no image.
+The parent stays coarse: the seven-versus-three split lives in
+[this scope's piece 1](diagram-prompts.md#subject-lane) and is not pushed upward, because the child
+map is where the detail belongs and the parent adds no vocabulary it does not need.
 
 **Why correct them rather than leave the correction here.** Both are present-tense sources somebody
 reads before planning, and a count that is wrong in the source gets copied into the next scope that
@@ -357,3 +367,43 @@ assumed from the fact that nothing had been renumbered.
 plans resolves to something that exists, checked by script rather than by eye. All five plans carry
 their `▶ Next` and `◀ Needs` pointers on every task and instruction group, and every section number
 they cite resolves. Nothing was broken, so nothing was repaired.
+
+## The sibling plan's count was removed rather than corrected
+
+**Decision.** Task 3.3 of
+[Read the system before drawing it](../the-system-in-layers/plans/01-read-the-system-before-drawing-it.md)
+was "Establish which of the eleven scheduling commands has a runner" and is now "Establish which
+scheduling commands have a runner". The number is gone, not replaced with ten.
+
+**Why touch a sibling scope's plan at all.** It asked a reader to account for eleven of a thing there
+are ten of. The reader would have run the `ls` that task already carries, counted ten, and spent
+their time looking for the eleventh. That is a defect this scope had the evidence to fix and the
+sibling had no way to notice.
+
+**Why remove the number rather than correct it.** That task's own job is to produce the count by
+running `ls scheduling/management/commands/`. Any number in its title pre-supposes the answer the
+task exists to establish, so ten would have been the same mistake with a currently-true value. A
+count baked into a heading also goes stale the first time somebody adds a command.
+
+**What was deliberately not touched.** Nothing else in that scope. This is one word in one task
+title, not a re-population of a sibling, and the rest of that plan is its own scope's to change.
+
+## What this run found already done
+
+**Decision.** `populate-plans` was re-run against this scope and wrote no plan file, because the five
+it would have written are on disk and cover the scope.
+
+**What was checked, and by what.** Every mark in
+[item 6 of the scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#6-running-the-workers)
+resolves to at least one task: the **decide** to plan 01, the **wire up** of the ten commands to plan
+03, the **wire up** of the outbox worker to plans 03 and 05, and the **build** of persist-then-push to
+plans 02 and 04. Every one of the fourteen Definition-of-Done items resolves to at least one task or
+instruction, including the three named seeds, the reaper, both by-hand walks, the dead-letter replay,
+the `drip-runbook` and `runbook-pulse` pair, the Stack § 4 update and `env-pulse`. The Owes line's
+three obligations each land in a task: the execution-model fact in plan 05, the start-and-stop recipe
+in plan 03, and the finish of the drain-the-outbox recipe rather than a duplicate of it in plan 05.
+All five plans carry group 0 and a close out with this scope's real path already in the prompt.
+
+**Why record a run that changed nothing here.** A second unattended pass that finds the work done
+looks identical to a pass that never happened. Saying which coverage was checked and against what is
+what makes the difference readable later.
