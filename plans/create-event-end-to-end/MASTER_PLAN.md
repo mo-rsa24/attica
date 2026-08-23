@@ -4,8 +4,13 @@
 
 Two blockers, and they can run at the same time. Open
 [Unblock the truth](plans/fixing-create-event/plans/01-unblock-the-truth.md), which makes the
-browser suite tell the truth, or run `populate-plans` on
-[getting-in](plans/getting-in/MASTER_PLAN.md), which makes the other three roles reachable.
+browser suite tell the truth, or [Settle what a role is](plans/getting-in/plans/01-settle-what-a-role-is.md),
+which starts making the other three roles reachable.
+
+A third thing is startable now and waits on neither:
+[Read the system before drawing it](plans/the-system-in-layers/plans/01-read-the-system-before-drawing-it.md),
+which establishes what the code actually does. It is worth starting early because three of the
+pictures it leads to are the evidence the first three open decisions get taken on.
 
 The remaining nine sub-scopes are named below and not yet decomposed.
 
@@ -22,14 +27,18 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 4 | [Settle what a role is](plans/getting-in/plans/01-settle-what-a-role-is.md) | Decide which of the two classifications decides what a user may see | ⚠️ not started | nothing |
 | 5 | [Grant every role](plans/getting-in/plans/02-grant-every-role.md) | Seeds grant the three ungranted roles and give the nine marketplace users theirs | ⚠️ not started | 4 |
 | 6 | [Prove it and write it down](plans/getting-in/plans/03-prove-it-and-write-it-down.md) | Five logins, five screenshots, the runbook pair, the verified credentials table | ⚠️ not started | 5 |
-| 7 | [the-system-in-layers](plans/the-system-in-layers/MASTER_PLAN.md) | Plans not authored yet. The layers map for `environment/`, the four diagrams the reviews ask for, and the four already written as briefs in `onboarding-docs` | ⚠️ not started | nothing |
+| 7 | [Read the system before drawing it](plans/the-system-in-layers/plans/01-read-the-system-before-drawing-it.md) | Establish what a booking is, what happens under contention, what reaches a screen, and whether convergence exists, with a `path:line` on every claim | ⚠️ not started | nothing |
+| 8 | [Draw the layers map](plans/the-system-in-layers/plans/02-draw-the-layers-map.md) | Give `environment/` its first pictures: the folder's map, the layers prompt, and the slot in `overview.md` | ⚠️ not started | 7 |
+| 9 | [Brief the other eight](plans/the-system-in-layers/plans/03-brief-the-other-eight.md) | The four the reviews ask for, the four already briefed in `onboarding-docs`, and a failure beside every one | ⚠️ not started | 7, 8 |
+| 10 | [Render it, check it, and write down how](plans/the-system-in-layers/plans/04-render-check-and-write-it-down.md) | Nine images made, each read back against its note before filing, and the two recipes for doing it again | ⚠️ not started | 8, 9 |
 
 Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
 
-Step 7 is one row for a whole sub-scope because its plan files do not exist yet. It sits last in
-the table only for that reason, not because anything gates it. `populate-plans` replaces the row
-with the real plans and interleaves them where they belong.
+Steps 7 to 10 are grouped after the two blockers in this table rather than interleaved through them,
+because nothing in either direction gates the other: the layers scope needs no login and no green
+suite, and no blocker needs a diagram. Three of its outputs are the evidence D1, D2 and D3 get
+decided on, so running it early is worth more than running it in order.
 
 ---
 
@@ -126,9 +135,8 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 Scopes 1, 2, 3 and 12 start immediately. After 8 lands, the performance and experience planes run in
 parallel.
 
-`fixing-create-event` is the only sub-scope with plan files. `getting-in` and
-`the-system-in-layers` each have a master plan and an empty `plans/`. The other nine are named here
-and not yet decomposed.
+`fixing-create-event`, `getting-in` and `the-system-in-layers` have plan files. The other nine are
+named here and not yet decomposed.
 
 ---
 

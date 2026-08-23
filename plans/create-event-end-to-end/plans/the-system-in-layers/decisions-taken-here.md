@@ -181,3 +181,65 @@ session, rather than left as a suggestion for a later one.
 the run this scope was written inside is a decompose-and-populate run, not a decompose-only one.
 Stopping at the master plan would have left the scope in the same state as `getting-in` was before its
 plans were authored, which is the state the checkpoint exists to move past.
+
+## Prerequisite inference: automatic
+
+**Decision.** The populate run inferred unstated setup work and folded it in, marked `[inferred]`,
+rather than drafting only from what the Definition of Done spells out.
+
+**Why.** The skill offers three modes and defaults to asking. With nobody to ask, automatic is the
+mode that fails safest: an inferred task is visible and can be struck, whereas an omitted one is
+invisible. What it inferred is [plan 01](plans/01-read-the-system-before-drawing-it.md) as a whole,
+plus two tasks inside it. The Definition of Done says the briefs are "checked against the code" and
+never says the reading is its own deliverable, which would have left eight briefs each re-deriving
+the same facts.
+
+## Four plans, not three or six
+
+**Decision.** Read, draw the layers map, brief the other eight, then render and write it down.
+
+**Why.** Each has its own deliverable and its own gate. The two splits worth naming: the layers map
+is separate from the other eight because it is filed in `environment/` under a different format
+contract for a different reader, and rendering is separate from briefing because a prompt nobody
+renders is invisible, which is the failure the whole render-status machinery exists for. Rendering
+and writing the runbook pair were merged into one plan, following the sibling `getting-in`, whose
+plan 03 does the same.
+
+## A count in a brief must carry the command that printed it
+
+**Decision.** Plan 01 requires every count to be written beside the command that produced it, and no
+count was carried forward from the planning documents into the plans.
+
+**Why.** The state counts and reference counts are the evidence D1 gets decided on. A number nobody
+can reproduce is decoration, and a number carried from a planning note inherits that note's age. The
+plan therefore asserts state counts only where this run read them out of the model file, and cites
+those as starting points to confirm rather than as facts.
+
+## A finding that corrects the planning notes
+
+**Decision.** Plan 01 is written to test the claim that nothing publishes to the notification
+channel, rather than to draw it.
+
+**Why.** `notifications/utils.py:25` does publish to the per-user group, and `chat/views.py` calls
+it. Separately, `scheduling/services.py::_create_in_app_notification` writes a `Notification` row and
+returns without touching the channel layer. So the blanket claim in
+[where we landed](../../../../ideas/enhancing-create-event-end-to-end/WHERE-WE-LANDED.md) is too
+broad, and the real-time delivery diagram is a different picture depending on which half is true.
+Plan 01 settles it by reading and then by watching, and plan 03 draws whatever it found. This run did
+not edit the planning notes, because they are the record of what that session concluded; the
+disagreement is recorded in the findings file instead.
+
+## The four plans sit after the blockers in the parent's running order
+
+**Decision.** Steps 7 to 10, grouped, rather than interleaved through steps 1 to 6.
+
+**Why.** Nothing gates in either direction: the layers scope needs no login and no green browser
+suite, and no blocker needs a diagram. Interleaving would imply a dependency that does not exist. The
+prose under the table and the `Do this next` block both say it is startable now, which is the fact
+that matters.
+
+## The placeholder file was removed
+
+**Decision.** `plans/.gitkeep` is gone, as the earlier entry said it would be.
+
+**Why.** Four real plan files now hold the folder open.

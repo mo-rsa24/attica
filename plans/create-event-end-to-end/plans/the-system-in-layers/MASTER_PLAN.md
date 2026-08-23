@@ -147,8 +147,15 @@ draws the same diagram twice, and nobody is taught something the code does not d
 
 ## Plans
 
-Not authored yet. `populate-plans` writes them into [`plans/`](plans/). The order that matters when
-they exist is the [parent's running order](../../MASTER_PLAN.md#running-order).
+This folder's contents. The order that matters is the
+[parent's running order](../../MASTER_PLAN.md#running-order).
+
+| Plan | What it does | Status |
+|---|---|---|
+| [01 Read the system before drawing it](plans/01-read-the-system-before-drawing-it.md) | Establish, with a `path:line` on every claim, what a booking is, what happens under contention, what reaches a screen, and whether convergence exists | ⚠️ not started |
+| [02 Draw the layers map](plans/02-draw-the-layers-map.md) | Give `environment/` its first pictures: the folder's map, the layers prompt, and the slot in `overview.md` | ⚠️ not started |
+| [03 Brief the other eight](plans/03-brief-the-other-eight.md) | The four the reviews ask for, the four already briefed in `onboarding-docs`, and a failure beside every one | ⚠️ not started |
+| [04 Render it, check it, and write down how](plans/04-render-check-and-write-it-down.md) | Nine images made, each read back against its note before filing, and the two recipes for doing it again | ⚠️ not started |
 
 ---
 
