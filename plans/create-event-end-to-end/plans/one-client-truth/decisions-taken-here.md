@@ -1,8 +1,9 @@
 # Decisions taken while writing this scope
 
-This scope was written in one unattended pass, with nobody to ask. Every choice below could have gone
+This scope is written in unattended passes, with nobody to ask. Every choice below could have gone
 the other way, and each is recorded with its reason so it can be reversed by someone who disagrees
-rather than rediscovered by someone who is confused.
+rather than rediscovered by someone who is confused. The decomposition's choices come first, then the
+plan set's.
 
 The source for the scope's content is item 10 of
 [the scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#10-one-client-truth),
@@ -322,3 +323,192 @@ prompts rather than quietly fixed.
 **What was deliberately not done.** The missing sixth image was not generated. Rendering unattended is
 the thing this run already declined to do for its own map, and doing it for somebody else's scope
 would be worse.
+
+---
+
+# Decisions taken while writing the plan set
+
+The same rule applies to the six plan files: nobody to ask, so every choice is taken and recorded
+rather than deferred.
+
+## Six plans, split at the contract
+
+**Decision.** Six plan files: the cache decision, the envelope contract, the server side, the client
+side, the transport, and the proving. Steps 18 and 19 in
+[the parent's running order](../../MASTER_PLAN.md#running-order) are the two sides of one contract
+and run at the same time.
+
+**Why.** Each of the six has its own deliverable that a person could hand over: a decision record, an
+interface contract, a set of frames carrying a version, a cache with a tested apply rule, a transport
+with one policy, and a set of by-hand results with two recipes. Collapsing the server and client
+halves into one plan would have lost the thing that makes them parallelisable, which is that both
+read the contract rather than each other.
+
+**The alternative rejected.** Four plans, folding the two defect fixes (`ChatRoom`'s permanent
+fallback and the badge-versus-list disagreement) into a single "close the client defects" plan. Both
+defects are consequences of the two architectural changes rather than separate work: the badge fix is
+cache work and lands in the cache plan; the `ChatRoom` fix is transport work and lands in the
+transport plan. A plan collecting them would have been a plan about symptoms.
+
+## Prerequisite inference was run automatically, and four things came out of it
+
+**Decision.** Unstated setup work was inferred and written into the plans as real tasks, rather than
+left for whoever executes to discover.
+
+**Why.** The skill's default is to ask which mode to use, and there is nobody to ask. Inferring and
+marking is recoverable; not inferring leaves a plan that stops halfway through a session for a
+reason nobody wrote down.
+
+**What was inferred.** A staff account for the Django admin, because no seed creates one and the
+duplicate test replays an outbox row from there
+([06, task 1.1](plans/06-prove-it-and-write-it-down.md#1--set-the-stage-for-three-tests-that-need-a-person)).
+The frontend having no unit test runner at all, which decides where the apply rule's proof can run
+([01, task 3.3](plans/01-read-the-answer-and-choose-the-cache.md#3--write-the-decision-record)).
+Recording which two backend tests are already red before touching the backend, so a red run afterwards
+means something
+([03, task 1.1](plans/03-put-the-envelope-on-the-wire.md#1--record-the-starting-state-so-after-means-something)).
+And amending the project's own instructions when a third file lands in `docs/`, because that file
+otherwise becomes a finding the moment it is written
+([02, task 2.3](plans/02-define-the-envelope.md#2--write-the-contract)).
+
+## The direct-fetch count is pinned to a command rather than to a number
+
+**Decision.** The plans record the counting command and its answer, and name which of the two
+circulating numbers is the ruler. The scope's definition of done keeps its baseline of 132 across 38
+files, and nothing about it is rewritten.
+
+**Why.** `grep -rn "fetch(" frontend/src --include=*.js --include=*.jsx | wc -l` answers 144 across
+40 files on the same tree, while 110 total JavaScript files and 73 files holding `useState` both
+reproduce exactly. So the fetch figure came from a differently worded search and the two others did
+not. Picking whichever number flatters the after-comparison is how a migration reports progress it
+did not make.
+
+**What was not done, and why.** The definition of done was not edited to say 144. That criterion is
+the scope's, and changing a number in it while authoring the plans that will be measured against it
+is the wrong direction of travel. The discrepancy is written into
+[01](plans/01-read-the-answer-and-choose-the-cache.md) where the measurement is taken, and both
+numbers go into the notes file.
+
+## The envelope's contract lives in `docs/`, and the project's own instructions move with it
+
+**Decision.** `docs/realtime_event_envelope.md`, and
+[02](plans/02-define-the-envelope.md) edits the sentence in the project's instructions that names
+two qualifying files so it names three.
+
+**Why.** The project's instructions say `docs/` holds interface contracts and nothing else, and call
+anything else that lands there a finding. A payload shape both sides of a socket integrate against is
+exactly an interface contract, so it belongs there rather than in `artifacts/`, which holds what the
+work produced rather than what another system builds against.
+
+**Why the amendment is in the same plan.** A third file in `docs/` under a sentence that says two is
+a finding by the repository's own rule, and a finding left for `tidy-repo` to report is a finding
+somebody has to re-derive the answer to.
+
+## The apply rule's proof route is recommended, not taken
+
+**Decision.** [01](plans/01-read-the-answer-and-choose-the-cache.md) records a recommendation to add
+`vitest`, and [instruction 4.4](plans/01-read-the-answer-and-choose-the-cache.md#4--take-the-cache-decision-and-sign-it)
+is where a person takes or overrules it.
+
+**Why the recommendation is vitest.** The apply rule is a pure function of two version numbers. Vite
+is already the build tool, so the runner needs no new configuration file, and it is a development
+dependency that ships nothing, so it does not touch D10. Proving a pure function through a browser is
+slower, less precise, and needs a running backend and a seeded database.
+
+**Why it is not taken here.** It adds a dependency to `frontend/package.json`, and the one criterion
+this scope owes `the-design-system` is a statement of what ships in the bundle. A dependency decision
+taken silently in a plan file is exactly the kind that is impossible to revisit later.
+
+## The three by-hand tests are all in the last plan
+
+**Decision.** The duplicate test, the gap test and the refresh test are all instructions in
+[06](plans/06-prove-it-and-write-it-down.md), rather than each sitting in the plan that built the
+thing it checks.
+
+**Why.** All three need the whole system: the duplicate test needs an envelope with a version and a
+cache that compares it, the gap test needs a transport that refetches into a cache, and the refresh
+test needs all of it. Putting the duplicate test in the cache plan would mean running it before the
+envelope carries a version, which proves that nothing arrived rather than that a duplicate was
+ignored.
+
+**What the earlier plans keep.** Each still has its own narrower manual check: reading a frame
+([03](plans/03-put-the-envelope-on-the-wire.md)), watching the badge and the list agree
+([04](plans/04-build-the-one-cache.md)), and breaking the socket once
+([05](plans/05-one-transport-that-recovers.md)). Those are checks that the plan's own work landed,
+not the scope's acceptance.
+
+## `useNotifications` keeps its own socket until the transport plan
+
+**Decision.** [04](plans/04-build-the-one-cache.md) rebuilds that file's state on the cache and
+leaves its `new WebSocket` and its 5000ms reconnect alone.
+[05](plans/05-one-transport-that-recovers.md) replaces all three sockets together.
+
+**Why.** Replacing one socket while two others keep their own policies means writing a fourth policy
+and then deleting it. The file's state and the file's socket are separable, and the state half is
+what the cache plan is actually about.
+
+## The runbook pair goes into the theme that already exists
+
+**Decision.** Both recipes land under `runbook/driving-the-app/` rather than in a new theme folder.
+
+**Why.** The runbook's themes are grouped by the kind of work being done, and watching a frame arrive
+and forcing a reconnect are both things done while driving the app with it running. A new theme for
+two recipes would be a folder created for one group of two, and the existing theme is where somebody
+looking for them would look first.
+
+## The subject lane was refined rather than extended
+
+**Decision.** The five subject pieces stay at five. Piece 1's counter chip now names the two numbers
+the pinned command answers, and the lane opens with one paragraph mapping each piece to the plan that
+closes it.
+
+**Why.** The lane's five pieces are each a picture of one thing that is wrong today, and the capstone
+already draws the end state the six plans add up to. Adding a piece for the cache or the transport
+would draw the capstone twice at lower resolution, and the map's own rule keeps a lane at six pieces
+or fewer.
+
+## The parent capstone was not amended, because it did not need to be
+
+**Decision.** No change to [the parent's map](../../diagram-prompts.md).
+
+**Why.** Its experience panel already holds three labelled component glyphs, one of them "one client
+truth", from the amendment made when this scope was decomposed. A scope with no glyph in the parent
+capstone amends it in the same commit; this scope has one, so there is nothing to amend. This was
+checked by reading the capstone's prompt rather than assumed from the earlier decision record.
+
+## No image was rendered, and no sibling scope's files were touched
+
+**Decision.** All nine prompts in this scope's map stay `[planned]` and unrendered, and nothing under
+`running-the-workers`, `getting-in`, `fixing-create-event` or `the-system-in-layers` was edited.
+
+**Why.** Rendering unattended files images nobody compared against their faithfulness notes, which is
+the same call the decomposition made and the same one the parent map makes. And the plans here point
+at sibling scopes several times, in every case to read something rather than to change it, so no
+sibling file needed an edit to keep a link honest.
+
+## The empty-folder placeholder was removed
+
+**Decision.** `plans/.gitkeep` is deleted now that the folder holds six files.
+
+**Why.** It existed so git would track an otherwise empty directory. The two sibling scopes that have
+plan files carry no such file, so removing it matches the convention rather than inventing one. It is
+tracked by git, so the removal is recoverable.
+
+## The plan set was committed, on `main`, as one unit
+
+**Decision.** One commit carrying the six plan files, the process lane and its first snapshot, the
+scope's Plans table, the parent's running order, and this record. Committed to `main` rather than to
+a branch.
+
+**Why one commit.** The six plan files, the lane that draws them as stages and the running-order rows
+that sequence them are one statement. Split across commits, any one of them is a tree that disagrees
+with itself: a lane drawing plans that are not there, or a running order pointing at files that do
+not exist.
+
+**Why `main` rather than a branch.** Every commit that built this plan tree is on `main`, this repo
+has one author, and the parent map and the child map have to move together. A branch nobody merges
+would leave the parent's running order and the child's plan files in two places, which is the exact
+disagreement the single commit exists to prevent.
+
+**What this does not include.** No rendered image, and no change to any sibling scope. Both were
+declined for reasons recorded above, and neither is affected by the commit.

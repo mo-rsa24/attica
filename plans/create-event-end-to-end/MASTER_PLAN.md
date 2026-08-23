@@ -16,8 +16,8 @@ A fourth is planned and waiting rather than startable:
 [running-the-workers](plans/running-the-workers/MASTER_PLAN.md) has its master plan and its five
 plan files, but the work itself waits on `one-booking-truth`.
 
-A fifth, [one-client-truth](plans/one-client-truth/MASTER_PLAN.md), has its master plan and no plan
-files yet. It waits on `running-the-workers`, and its plan files are authored by `populate-plans`.
+A fifth, [one-client-truth](plans/one-client-truth/MASTER_PLAN.md), has its master plan and its six
+plan files. The work itself waits on `running-the-workers`.
 
 The remaining seven sub-scopes are named below and not yet decomposed.
 
@@ -43,7 +43,12 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 13 | [Build the runner](plans/running-the-workers/plans/03-build-the-runner.md) | Every non-seed scheduling command on the runner, with a log that answers "is it moving" | ⚠️ not started | 11, 12 |
 | 14 | [Close the two silent losses](plans/running-the-workers/plans/04-close-the-two-silent-losses.md) | The reaper for stranded `processing` rows, and one notification path that pushes as well as persists | ⚠️ not started | 13 |
 | 15 | [Prove it and write it down](plans/running-the-workers/plans/05-prove-it-and-write-it-down.md) | The two runbook questions nothing answers, and the two environment facts this scope made false | ⚠️ not started | 14 |
-| 16 | [one-client-truth](plans/one-client-truth/MASTER_PLAN.md) | One cache the client reads, an envelope carrying an entity version, and a reconnect that recovers. Plans not authored yet | ⚠️ not started | 15 |
+| 16 | [Read the answer and choose the cache](plans/one-client-truth/plans/01-read-the-answer-and-choose-the-cache.md) | Quote what `one-booking-truth` decided, pin the counting command, and take the cache decision with the candidates that lost | ⚠️ not started | 15 |
+| 17 | [Define the envelope](plans/one-client-truth/plans/02-define-the-envelope.md) | The shape every real-time message carries, the apply rule, and the event catalogue as a list a person edits | ⚠️ not started | 16 |
+| 18 | [Put the envelope on the wire](plans/one-client-truth/plans/03-put-the-envelope-on-the-wire.md) | Resolve the two version bumps that cannot be read back, and make three push sites send the envelope after commit | ⚠️ not started | 17 |
+| 19 | [Build the one cache](plans/one-client-truth/plans/04-build-the-one-cache.md) | One cache the reads go through, the apply rule as a tested pure function, and the badge derived from the list | ⚠️ not started | 17 |
+| 20 | [One transport that recovers](plans/one-client-truth/plans/05-one-transport-that-recovers.md) | One socket, one reconnect policy, a fresh token per connect, and a reconnect that refetches | ⚠️ not started | 18, 19 |
+| 21 | [Prove it and write it down](plans/one-client-truth/plans/06-prove-it-and-write-it-down.md) | The duplicate, gap and refresh tests by hand, the two runbook recipes, and the word this scope introduced | ⚠️ not started | 20 |
 
 Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
@@ -54,11 +59,11 @@ point at. Steps 11 and 12 wait on it and on each other for nothing, so they run 
 Two undecomposed domain scopes, `one-booking-truth` and `contention-and-holds`, sit between step 10
 and step 11 in the sub-scope order below and contribute no rows here yet.
 
-Step 16 is a scope rather than a plan. `one-client-truth` has a master plan and no plan files, so it
-holds one placeholder row until `populate-plans` runs there and replaces it with a row per plan. It
-sits directly after step 15 because it waits on `running-the-workers` and on nothing else; the three
-undecomposed domain scopes between them in the sub-scope order will push it down when they are
-decomposed.
+Steps 16 to 21 are `one-client-truth`. They sit directly after step 15 because that scope waits on
+`running-the-workers` and on nothing else; the three undecomposed domain scopes between them in the
+sub-scope order will push them down when they are decomposed. Steps 18 and 19 are the server half and
+the client half of one contract, so they wait on step 17 and not on each other, and they run at the
+same time.
 
 Steps 7 to 10 are grouped after the two blockers in this table rather than interleaved through them,
 because nothing in either direction gates the other: the layers scope needs no login and no green
@@ -160,9 +165,8 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 Scopes 1, 2, 3 and 12 start immediately. After 8 lands, the performance and experience planes run in
 parallel.
 
-`fixing-create-event`, `getting-in`, `the-system-in-layers` and `running-the-workers` have plan
-files. `one-client-truth` has a master plan and no plan files yet. The other seven are named here and
-not yet decomposed.
+`fixing-create-event`, `getting-in`, `the-system-in-layers`, `running-the-workers` and
+`one-client-truth` have plan files. The other seven are named here and not yet decomposed.
 
 ---
 

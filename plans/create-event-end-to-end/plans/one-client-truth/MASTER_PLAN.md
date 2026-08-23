@@ -285,9 +285,17 @@ screen contradicts anything else on it.
 
 ## Plans
 
-(none yet. This scope's plan files are authored by `populate-plans`. When they exist they are added
-to the [parent's running order](../../MASTER_PLAN.md#running-order), which is the order that
-matters, and listed here as this folder's contents.)
+This folder's contents. The order that matters is the
+[parent's running order](../../MASTER_PLAN.md#running-order).
+
+| Plan | What it does | Status |
+|---|---|---|
+| [01 Read the answer and choose the cache](plans/01-read-the-answer-and-choose-the-cache.md) | Quote what `one-booking-truth` decided, pin the counting command, and take the cache decision with the candidates that lost | ⚠️ not started |
+| [02 Define the envelope](plans/02-define-the-envelope.md) | The shape every real-time message carries, the apply rule, and the event catalogue as a list a person edits | ⚠️ not started |
+| [03 Put the envelope on the wire](plans/03-put-the-envelope-on-the-wire.md) | Resolve the two version bumps that cannot be read back, and make three push sites send the envelope after commit | ⚠️ not started |
+| [04 Build the one cache](plans/04-build-the-one-cache.md) | One cache the reads go through, the apply rule as a tested pure function, and the badge derived from the list | ⚠️ not started |
+| [05 One transport that recovers](plans/05-one-transport-that-recovers.md) | One socket, one reconnect policy, a fresh token per connect, and a reconnect that refetches | ⚠️ not started |
+| [06 Prove it and write it down](plans/06-prove-it-and-write-it-down.md) | The duplicate, gap and refresh tests by hand, the two runbook recipes, and the word this scope introduced | ⚠️ not started |
 
 ---
 
@@ -378,5 +386,6 @@ of its own. It is the zoom-in on the client-truth glyph in
 [the parent's subject capstone](../../diagram-prompts.md), which keeps it as one glyph in the
 experience panel.
 
-The map carries the subject lane and its capstone. The process lane is drawn once this scope has plan
-files, because its stages are those plans; drawing it now means drawing it again.
+The map carries both lanes. The process lane's stages are the six plans above, drawn in the parent's
+running-order numbers 16 to 21, and each changed regeneration is stamped into
+`diagrams/process-versions/`. Nine prompts, none rendered.
