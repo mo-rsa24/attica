@@ -221,3 +221,39 @@ is measurable rather than aesthetic. A master plan that says "the styles are inc
 points at a plan file for the evidence asks the reader to take the scope's whole premise on trust
 through one more hop. The counts are the argument, so they sit where the argument is made. Plan 01
 carries the commands, which is the part that has to be repeatable.
+
+## Populating this scope a second time writes nothing
+
+**Decision.** A repeat `populate-plans` run over this scope adds no plan file, renumbers nothing and
+rewrites nothing. It audits what is here and stops.
+
+**Why.** The seven plans already cover every mark in
+[item 12 of the scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#12-the-design-system)
+and every item in [the definition of done](MASTER_PLAN.md#definition-of-done), so a new plan file
+could only duplicate a deliverable one of the seven already owns. The numbering is what makes this
+matter rather than tidiness: these plans are steps 22 to 28 in
+[the parent's running order](../../MASTER_PLAN.md#running-order), and those numbers are written into
+the plan files, into this scope's map and into the parent's own prose. A plan 08 authored so that a
+run has something to show would move none of them, and would leave the next reader working out which
+of two plans owns the tokens.
+
+**What the audit covers**, recorded so it is not repeated. Every mark in item 12 has an owning plan:
+the four `build` marks belong to plans 02, 03, 04, 05 and 06, and the `decide` mark, D10, belongs to
+plan 01. Every Definition-of-Done item maps to at least one task line, and the four
+`[owner: human]` checks each have a numbered Instruction group rather than a task line pretending a
+person's judgement is Claude's to execute: the drawer test and the mobile walk in
+[plan 06](plans/06-cards-that-answer-to-their-container.md), the ten-minute test in
+[plan 05](plans/05-the-components-that-own-the-styles.md), the reduced-motion check in
+[plan 04](plans/04-say-what-moves-and-what-does-not.md). The seven plans' section lists are identical
+to those of the sibling scope [one client truth](../one-client-truth/MASTER_PLAN.md), so the template
+is the same one across both. Every relative link in this scope resolves to a file that exists, and
+every heading anchor a link points at resolves to a heading that exists, checked across the master
+plan, this file, the map, all seven plans and the process snapshot.
+
+**The parent capstone owes this scope no amendment.** It already names "the design system" as one of
+the three component glyphs in its experience panel, which is the glyph
+[this scope's map](diagram-prompts.md) zooms into.
+
+**What is genuinely outstanding**, and is not a planning skill's to close. Ten prompts in the map
+with no rendered image. The map says so in its own closing section, no Definition-of-Done item asks
+for a rendered picture, and rendering is drawing work rather than planning work.
