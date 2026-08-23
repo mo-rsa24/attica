@@ -18,9 +18,9 @@ API calls returning real data, WebSocket connected.
 The backend must be on `:8000` before the login step. npm install and Vite startup
 can happen while the backend is still starting.
 
-See [backend-setup.md](backend-setup.md) if the backend is not yet running. On a
-machine with no Node/Python/Redis installed at all, start at
-[00-machine-setup.md](00-machine-setup.md) instead.
+See [the backend setup guide](backend-setup.md) if the backend is not yet running. On a
+machine with no Node/Python/Redis installed at all, start at [the machine setup
+guide](00-machine-setup.md) instead.
 
 ---
 

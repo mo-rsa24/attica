@@ -3,9 +3,9 @@
 How to do the recurring things here by hand. You have done these before; this is where the
 forgettable detail lives so you do not rediscover it.
 
-What the system *is* lives in [../environment/00-INDEX.md](../environment/00-INDEX.md). What any of
-it *means* lives in [../context/00-INDEX.md](../context/00-INDEX.md). This folder is only what to
-type and where to click.
+What the system *is* lives in the [environment index](../environment/00-INDEX.md). What any of it
+*means* lives in the [context index](../context/00-INDEX.md). This folder is only what to type and
+where to click.
 
 ## I want to...
 
@@ -57,7 +57,7 @@ is for when you want to read a whole theme.
 | [walking-the-event-wizard.md](driving-the-app/walking-the-event-wizard.md) | the browser, as an organizer | 3 |
 | [driving-the-booking-flow.md](driving-the-app/driving-the-booking-flow.md) | the browser, as both parties | 3 |
 
-Where these recipes came from is [sources.md](sources.md).
+Where these recipes came from is in [the sources list](sources.md).
 
 ## Screenshots wanted
 
@@ -90,5 +90,5 @@ exact output.
 `requirements.txt`.
 
 **Everything else here is `unverified`**: assembled from the repository and from the two documents
-in [sources.md](sources.md), not run. Each recipe carries its own mark. The browser recipes in
+in [the sources list](sources.md), not run. Each recipe carries its own mark. The browser recipes in
 particular have never been driven, and the seed commands have not been run against a clean database.

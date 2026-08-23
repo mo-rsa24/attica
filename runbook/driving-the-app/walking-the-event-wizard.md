@@ -72,8 +72,8 @@ which walks the five things that have to exist, in dependency order.
 
 ❌ **Results appear, and creating the request fails.** That is the policy, not the availability:
 `min_notice_hours` defaults to 24, so a request for tomorrow is refused after the slot showed as
-free. See
-[../../environment/django-admin/scheduling-availability.md](../../environment/django-admin/scheduling-availability.md#the-fields-that-silently-block-a-request).
+free. See [the fields that silently block a
+request](../../environment/django-admin/scheduling-availability.md#the-fields-that-silently-block-a-request).
 
 ✅ Requests created. What the provider sees next, and how to answer as them, is
 [Driving the booking flow § 2](driving-the-booking-flow.md#2-answer-a-request-as-a-provider).

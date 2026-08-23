@@ -3,8 +3,8 @@
 Get the Attica Django backend running on `localhost:8000` with WebSocket support.
 
 Related artifacts:
-- **Procedure diagram:** [`../../figures/onboarding-a-new-developer/backend-setup-procedure.md`](../../figures/onboarding-a-new-developer/backend-setup-procedure.md) — the shape of this process at a glance
-- **Slide deck:** [`../../decks/onboarding-a-new-developer/backend-setup.md`](../../decks/onboarding-a-new-developer/backend-setup.md) — the "why" behind each step
+- **Procedure diagram:** [the backend setup flowchart](../../figures/onboarding-a-new-developer/backend-setup-procedure.md), the shape of this process at a glance
+- **Slide deck:** [the backend setup deck](../../decks/onboarding-a-new-developer/backend-setup.md), the "why" behind each step
 
 ---
 
@@ -16,12 +16,12 @@ Before starting, confirm:
 - **Redis on localhost:6379** — `redis-cli ping` should return `PONG`
 - **Repo cloned** — you're in the `attica/` directory
 
-If any of these aren't in place yet — including on a fresh Windows machine with
-nothing installed — start at [00-machine-setup.md](00-machine-setup.md) instead,
+If any of these aren't in place yet (including on a fresh Windows machine with
+nothing installed), start at [the machine setup guide](00-machine-setup.md) instead,
 which walks through installing WSL2, Python 3.12, Node, and Redis from scratch.
 
 If Redis is installed but not running: `redis-server` (macOS/Linux), start the
-Redis Windows service, or on WSL2 see [00-machine-setup.md](00-machine-setup.md#6-install-and-start-redis).
+Redis Windows service, or on WSL2 see [installing and starting Redis](00-machine-setup.md#6-install-and-start-redis).
 
 ---
 

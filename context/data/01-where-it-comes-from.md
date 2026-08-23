@@ -105,8 +105,8 @@ Navigation: ⬅️ [What is real and what is seeded](#what-is-real-and-what-is-s
 | What | How it was established | When |
 |---|---|---|
 | Wizard state is saved as JSON and converted at publish | Read `backend/main/events/models.py:99-126` and `_upsert_event_from_draft` at `events/views.py:415` | 2026-08-22 |
-| The asset upload path shape | Recorded in [sources.md § 1](../sources.md#1-the-event-creation-flow-map), Step 10, observed live 2026-08-16 | 2026-08-16 |
-| Geocoding is called browser-direct | Recorded in [sources.md § 1](../sources.md#1-the-event-creation-flow-map), Step 6. Not reproduced this session | 2026-08-16 |
+| The asset upload path shape | Recorded in [Sources § 1](../sources.md#1-the-event-creation-flow-map), Step 10, observed live 2026-08-16 | 2026-08-16 |
+| Geocoding is called browser-direct | Recorded in [Sources § 1](../sources.md#1-the-event-creation-flow-map), Step 6. Not reproduced this session | 2026-08-16 |
 | The seed commands that exist | Listed `management/commands/` under `scheduling/`, `artists/`, `locations/`, `vendors/` and `events/` | 2026-08-22 |
 | No ingestion or cleaning step exists | Searched the tree for pipeline, loader and transform code; found only the seed commands above | 2026-08-22 |
 | Whether any row was created by a real user | Not established, and not answerable from the schema | 2026-08-22 |

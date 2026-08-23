@@ -40,8 +40,8 @@ claims in it with the same suspicion.
 The repository. Nothing judged it.
 **Held since 2026-08-23.** No plan names it. Kept because it is the only written account of the
 production gap, and because
-[`../../../environment/overview.md`](../../../environment/overview.md) now carries the verified subset of the same
-facts and the two should be read together.
+[the environment overview](../../../environment/overview.md) now carries the verified subset of
+the same facts and the two should be read together.
 
 ### api-design-review
 

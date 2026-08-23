@@ -148,8 +148,8 @@ up, the dispatch path is fine and the worker was simply never run.
 
 Two of its 43 tests fail, both in `events/tests.py`, so the suite cannot tell you whether a change
 broke something: you have to know the two expected failures by name first. What each one is and who
-owns fixing them is
-[plans/fixing-create-event/plans/03-reconcile-suite-and-runbook.md](../plans/fixing-create-event/plans/03-reconcile-suite-and-runbook.md).
+owns fixing them is in [the plan for reconciling the suite and the
+runbook](../plans/create-event-end-to-end/plans/fixing-create-event/plans/03-reconcile-suite-and-runbook.md).
 
 **There is no working pytest here.**
 
@@ -169,8 +169,8 @@ path.
 **Uploads above 50 MB are rejected by the server.**
 
 `MAX_UPLOAD_SIZE_BYTES` defaults to 50 MB (`backend/main/main/settings.py:230`). The upload screen
-tells the user a different number, which is a defect owned by
-[plans/fixing-create-event/plans/02-close-the-gaps.md](../plans/fixing-create-event/plans/02-close-the-gaps.md).
+tells the user a different number, which is a defect owned by [the plan for closing the create-event
+gaps](../plans/create-event-end-to-end/plans/fixing-create-event/plans/02-close-the-gaps.md).
 
 **`node-websocket/` is dead.**
 
@@ -186,5 +186,5 @@ Every fact in this folder carries one of three marks. `verified` means probed li
 and the result seen. `stated` means a person said it and it was not probed. `inferred` means it was
 read out of the repository and confirmed by neither a person nor a run.
 
-The row for each fact, with the date and the command or file that established it, is in
-[provenance.md](provenance.md).
+The row for each fact, with the date and the command or file that established it, is in [the
+provenance table](provenance.md).

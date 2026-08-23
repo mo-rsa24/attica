@@ -89,9 +89,9 @@ Navigation: ⬅️ [How it shows up in the data](#how-it-shows-up-in-the-data) |
 
 **`Location.search_vector` is a PostgreSQL field on a SQLite database.** ✅
 
-It is a `SearchVectorField` from `django.contrib.postgres`. This project runs on SQLite (see
-[../../environment/overview.md](../../environment/overview.md)). Full-text search built on that field cannot work as
-written on the current database.
+It is a `SearchVectorField` from `django.contrib.postgres`. This project runs on SQLite (see [the
+environment overview](../../environment/overview.md)). Full-text search built on that field cannot
+work as written on the current database.
 
 **An event records its venue twice, in two different ways.** ✅
 

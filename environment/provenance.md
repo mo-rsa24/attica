@@ -6,7 +6,7 @@ Every fact carries one of three marks. `verified` means probed live on the date 
 result seen. `stated` means a person said it and it was not probed. `inferred` means it was read out
 of the repository and confirmed by neither a person nor a run.
 
-Back to [00-INDEX.md](00-INDEX.md) | [overview.md](overview.md)
+Back to [the index](00-INDEX.md) | [the overview](overview.md)
 
 | Fact | Mark | How it was established |
 |---|---|---|

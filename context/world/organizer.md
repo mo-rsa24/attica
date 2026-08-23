@@ -98,8 +98,8 @@ nested `Role.Names` class, not on `Role`. Checked live: `hasattr(Role, "SERVICE_
 `common/permissions.py` are never reached, because nothing imports that module.
 
 This is a defect, not a meaning. It is named here because the meaning of "role" in this codebase
-cannot be described honestly without it, and it is recorded properly in
-[../../environment/overview.md](../../environment/overview.md).
+cannot be described honestly without it, and it is recorded properly in [the environment
+overview](../../environment/overview.md).
 
 **Two profile pictures per user.** ✅
 

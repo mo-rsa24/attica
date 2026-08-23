@@ -11,8 +11,8 @@ someone intended; these show what the code does today, including the parts that 
 Five scenes, each a small Vite app you run locally and operate. Each opens with a claim about the
 running system and lets you sever or vary the thing the claim depends on.
 
-Screenshots of two of them are in
-[`../../figures/how-attica-actually-works/`](../../figures/how-attica-actually-works/).
+Screenshots of two of them are in [the matching
+figures](../../figures/how-attica-actually-works/).
 
 ## The scenes
 
@@ -71,8 +71,8 @@ Anything about production. Every process here is a local development process on 
 
 **Where it came from and what judged it**
 
-The repository, and [`../../../environment/overview.md`](../../../environment/overview.md), which carries the same
-facts as prose. **Held since 2026-08-22.** No plan names it; kept because it is the picture behind
+The repository, and [the environment overview](../../../environment/overview.md), which carries
+the same facts as prose. **Held since 2026-08-22.** No plan names it; kept because it is the picture behind
 the environment file.
 
 ### attica-realtime-overlay
@@ -90,8 +90,8 @@ move.
 **What it cannot say**
 
 Whether the broadcast happens at all on a given path. It does not, on the booking-request write
-path, which never calls `group_send`; see
-[`../../../context/world/booking.md`](../../../context/world/booking.md).
+path, which never calls `group_send`; see [what a booking
+is](../../../context/world/booking.md).
 
 **Where it came from and what judged it**
 
@@ -110,9 +110,9 @@ You resume exactly where you left off.
 
 **What it cannot say**
 
-What happens to the draft at publish. That is
-[`../../../context/world/event-draft.md`](../../../context/world/event-draft.md), and it is the
-thing most often got wrong: the draft is kept, not deleted.
+What happens to the draft at publish. That is [what an event draft
+is](../../../context/world/event-draft.md), and it is the thing most often got wrong: the draft is
+kept, not deleted.
 
 **Where it came from and what judged it**
 
@@ -135,8 +135,8 @@ gives the database somewhere to refuse.
 **What it cannot say**
 
 Whether the materializer has been run. It is a management command nobody schedules; until it runs
-there are no slot rows and nothing is bookable. See
-[`../../../context/world/availability.md`](../../../context/world/availability.md).
+there are no slot rows and nothing is bookable. See [what availability
+means](../../../context/world/availability.md).
 
 **Where it came from and what judged it**
 

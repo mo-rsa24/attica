@@ -107,7 +107,8 @@ Exclusions: no database or table icons, no code, no server racks, no fourth prov
 
 Faithfulness note: exactly three kinds enter the wrapper, and the organizer's arrow touches only the
 wrapper, never the three vignettes. If the render shows the organizer booking a venue directly, it
-contradicts [marketplace-resource.md](world/marketplace-resource.md#what-people-get-wrong).
+contradicts [what people get wrong about a marketplace
+resource](world/marketplace-resource.md#what-people-get-wrong).
 
 ### Prompt 2 (Subject): Everyone is both buyer and seller
 
@@ -216,7 +217,8 @@ Exclusions: no database or table icons, no JSON braces or code, no arrow implyin
 ```
 
 Faithfulness note: the draft must still be visible on the right after publish. Drawing it consumed
-contradicts [event-draft.md](world/event-draft.md#what-people-get-wrong), where the draft survives as
+contradicts [what people get wrong about an event
+draft](world/event-draft.md#what-people-get-wrong), where the draft survives as
 its own row.
 
 ### Prompt 2 (Process): From asking to booked
@@ -242,7 +244,8 @@ Exclusions: no chat app interfaces, no currency symbols, no calendar grids, no f
 
 Faithfulness note: agreement and booking are separate steps, so vignettes three and four must not be
 merged. A handshake drawn inside the haggling vignette contradicts
-[chat-room.md](world/chat-room.md#what-people-get-wrong), where an accepted bid is not a booking.
+[what people get wrong about a chat room](world/chat-room.md#what-people-get-wrong), where an
+accepted bid is not a booking.
 
 ### Process capstone: One organizer, start to finish
 

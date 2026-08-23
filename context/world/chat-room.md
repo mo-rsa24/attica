@@ -32,7 +32,7 @@ Navigation: ⬅️ [Words this file uses](#words-this-file-uses) | 📋 [TOC](#t
 
 Messages are rows. Attachments are rows pointing at uploaded files. Bids are rows with their own
 lifecycle. The database is the record; the live updating is a layer on top of it, which is a system
-fact and lives in [../../environment/overview.md](../../environment/overview.md).
+fact and lives in [the environment overview](../../environment/overview.md).
 
 ## What a bid is
 

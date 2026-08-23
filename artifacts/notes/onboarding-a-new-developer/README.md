@@ -3,10 +3,9 @@
 The written guides that take somebody with Django and React experience, and no knowledge of Attica,
 from a machine with nothing installed to a seeded running stack in one sitting.
 
-Produced by the scope at [../../../plans/onboarding-docs/](../../../plans/onboarding-docs/). The
-slide decks that accompany them are in
-[../../decks/onboarding-a-new-developer/](../../decks/onboarding-a-new-developer/) and the procedure
-diagrams in [../../figures/onboarding-a-new-developer/](../../figures/onboarding-a-new-developer/).
+Produced by [the onboarding docs scope](../../../plans/onboarding-docs/). The slide decks that
+accompany them are in [the onboarding decks](../../decks/onboarding-a-new-developer/) and the
+procedure diagrams in [the onboarding figures](../../figures/onboarding-a-new-developer/).
 
 ## What is in here
 
@@ -23,8 +22,8 @@ and the checks that prove each one is there.
 
 **How we got this**
 
-Written from the repository's own requirements and the environment facts in
-[../../../environment/overview.md](../../../environment/overview.md), then partially walked. The
+Written from the repository's own requirements and the environment facts in [the environment
+overview](../../../environment/overview.md), then partially walked. The
 cold-start verification that would prove it end to end is
 [plan 07](../../../plans/onboarding-docs/plans/07-cold-start-verification.md), which has not been
 completed.

@@ -37,7 +37,7 @@ Run [recipe 3](#3-materialize-availability-slots) afterwards, or nothing will be
 
 One row per bookable thing, whichever of the three kinds it is. Everything in scheduling talks to
 it and never to the underlying venue, artist or vendor.
-See [../context/world/marketplace-resource.md](../../context/world/marketplace-resource.md).
+See [what a marketplace resource is](../../context/world/marketplace-resource.md).
 </details>
 
 ## 2. Seed the booking scenarios
@@ -106,7 +106,7 @@ bookable window written out as a row. You cannot enforce "this window is taken" 
 recurrence rule, because there is no row to lock. Materializing turns the rule into rows with a
 unique constraint on `(resource, start_at, end_at)`, which is what makes double-booking a database
 guarantee rather than an application hope.
-See [../context/world/availability.md](../../context/world/availability.md).
+See [what availability means](../../context/world/availability.md).
 </details>
 
 ## 4. The test accounts

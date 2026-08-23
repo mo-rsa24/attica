@@ -4,7 +4,7 @@ The documents this folder was assembled from. None of them is a recipe: nobody p
 document, and none of them is kept current. They are here so a recipe that looks wrong can be
 checked against what it was written from.
 
-The originals live in [sources/](sources/).
+The originals live in [the sources folder](sources/).
 
 ## The documents
 
@@ -19,7 +19,7 @@ removed rather than corrected, because nobody has run the command and seen the r
 **[The create-event data preparation guide](sources/create-event-data-preparation-guide-original.md)**
 
 The hand-written explanation of how to make artists bookable before walking the wizard. Its facts
-became [environment/django-admin/](../environment/django-admin/) and its click paths became
+became [the Django admin facts](../environment/django-admin/) and its click paths became
 [Preparing artist availability](preparing-the-data/preparing-artist-availability.md) and
 [Walking the event wizard](driving-the-app/walking-the-event-wizard.md). Two defects in the
 original, corrected on the way across: every command block used a `/mnt/c/users/molef/playground/`

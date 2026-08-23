@@ -4,8 +4,8 @@ The admin is the only surface in Attica that writes scheduling data directly. Ev
 does through the API, the admin can do around it, which is what makes it useful for preparing data
 and what makes it dangerous.
 
-What to click, once you know these facts, is
-[../../runbook/preparing-the-data/preparing-artist-availability.md](../../runbook/preparing-the-data/preparing-artist-availability.md).
+What to click, once you know these facts, is [preparing artist
+availability](../../runbook/preparing-the-data/preparing-artist-availability.md).
 
 ## Table of contents
 
@@ -39,8 +39,8 @@ Navigation: ⬅️ [Getting in](#getting-in) | 📋 [TOC](#table-of-contents) | 
 `AvailabilitySlot`, `BookingRequest`, `Booking`, `CalendarEvent`, `IdempotencyRecord` and
 `AuditLog`.
 
-The five that matter for making a provider bookable are covered in
-[scheduling-availability.md](scheduling-availability.md).
+The five that matter for making a provider bookable are covered in [what makes a provider
+bookable](scheduling-availability.md).
 
 **A model that is not registered is invisible here, not absent.** The row exists in the database
 and the API can see it. When something you expect to edit has no admin page, the answer is the

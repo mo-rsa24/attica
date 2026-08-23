@@ -4,8 +4,8 @@ An artist in the catalogue is not a bookable artist. Five separate rows have to 
 scheduler will return them, and when one is missing the search returns an empty list with no error,
 which reads exactly like "this artist is busy".
 
-What to click to create them is
-[../../runbook/preparing-the-data/preparing-artist-availability.md](../../runbook/preparing-the-data/preparing-artist-availability.md).
+What to click to create them is [preparing artist
+availability](../../runbook/preparing-the-data/preparing-artist-availability.md).
 
 ## Table of contents
 
@@ -31,7 +31,7 @@ All five live in `backend/main/scheduling/models.py`. Each depends on the one ab
 **Row 4 is the one that is always missing.** A rule is a recurrence ("every Saturday 10:00 to
 18:00"). A slot is one concrete window written out as a database row. The search reads slots, never
 rules, so a correct rule with no slots behind it is invisible. Why the system is built in two
-layers is in [../../context/world/availability.md](../../context/world/availability.md).
+layers is in [what availability means](../../context/world/availability.md).
 
 **Changing a rule does not update the slots already generated from it.** The old rows stay exactly
 as they were, so the screen and the search disagree until the range is rematerialized.

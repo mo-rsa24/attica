@@ -1,8 +1,8 @@
 # Onboarding a new developer: the procedure diagrams
 
 Two Mermaid flowcharts showing the shape of each setup process at a glance: where it forks, and
-where it can be skipped. They sit beside the guides in
-[../../notes/onboarding-a-new-developer/](../../notes/onboarding-a-new-developer/).
+where it can be skipped. They sit beside the guides in [the onboarding
+notes](../../notes/onboarding-a-new-developer/).
 
 ## What is in here
 

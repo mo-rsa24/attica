@@ -2,8 +2,8 @@
 
 Get a bare Windows machine ready to run Attica. This is step zero: it produces a
 machine with Python 3.12, Node, npm, Redis, and Git available, so that
-[backend-setup.md](backend-setup.md) and [frontend-setup.md](frontend-setup.md)
-can run unmodified as written.
+[the backend setup guide](backend-setup.md) and [the frontend setup
+guide](frontend-setup.md) can run unmodified as written.
 
 **Target state:** an Ubuntu WSL2 shell where `python3.12 --version`, `node --version`,
 `npm --version`, `git --version`, and `redis-cli ping` all succeed.
@@ -247,7 +247,7 @@ If you want a GUI to inspect the SQLite file (optional, not required for setup):
 - or the lighter **DB Browser for SQLite** (`sudo apt install -y sqlitebrowser`,
   run from inside WSL with an X server, or just install the Windows build)
 
-Neither is a prerequisite for [`backend-setup.md`](backend-setup.md). Skip this section
+Neither is a prerequisite for [the backend setup guide](backend-setup.md). Skip this section
 entirely if you don't need to browse the database by hand.
 
 ---
@@ -264,8 +264,8 @@ npm --version
 redis-cli ping
 ```
 
-All five should succeed (Redis returns `PONG`). If they do, continue to
-[backend-setup.md](backend-setup.md).
+All five should succeed (Redis returns `PONG`). If they do, continue to [the backend setup
+guide](backend-setup.md).
 
 ---
 

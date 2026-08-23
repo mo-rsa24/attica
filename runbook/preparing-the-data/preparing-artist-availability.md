@@ -5,16 +5,16 @@ path: it works across accounts you do not have passwords for, which is what make
 for demo and test data and the wrong tool for anything a real provider should own.
 
 **Why five separate things have to exist before an artist is bookable**, and which field silently
-blocks a request, is in
-[../../environment/django-admin/scheduling-availability.md](../../environment/django-admin/scheduling-availability.md).
-Read it once; the recipes here assume it.
+blocks a request, is in [what makes a provider
+bookable](../../environment/django-admin/scheduling-availability.md). Read it once; the recipes here
+assume it.
 
 ## Before any of these
 
 The backend is up (`../running-the-web-app/bringing-the-stack-up.md`), you are logged into
 `http://127.0.0.1:8000/admin/` as a superuser, and the artist already exists in the marketplace. If
-the admin rejects your login, see
-[../../environment/django-admin/the-admin-site.md](../../environment/django-admin/the-admin-site.md#getting-in).
+the admin rejects your login, see [getting into the
+admin](../../environment/django-admin/the-admin-site.md#getting-in).
 
 ## Contents
 

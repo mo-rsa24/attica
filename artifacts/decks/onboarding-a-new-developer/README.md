@@ -1,8 +1,8 @@
 # Onboarding a new developer: the decks
 
 Two Marp decks that carry the reasoning behind the setup guides: why each step exists, rather than
-what to type. The guides themselves are in
-[../../notes/onboarding-a-new-developer/](../../notes/onboarding-a-new-developer/).
+what to type. The guides themselves are in [the onboarding
+notes](../../notes/onboarding-a-new-developer/).
 
 ## What is in here
 

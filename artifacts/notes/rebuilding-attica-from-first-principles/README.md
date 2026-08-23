@@ -21,8 +21,8 @@ sixteen. `handbook/README.md` carries the full order and two entry points.
 
 **How many cells.** Seventeen files: sixteen chapters and the index.
 
-**One example.** [`handbook/01-system-map.md`](handbook/01-system-map.md), the chapter that lays out
-what talks to what.
+**One example.** [The system map](handbook/01-system-map.md), the chapter that lays out what talks
+to what.
 
 **How we got these**
 
@@ -41,7 +41,7 @@ code can drift without the chapter looking wrong.
 
 Two things it predates and therefore does not know: that five models are called some variant of
 `Booking` with only `scheduling.Booking` live, and that a user carries two incompatible role
-systems. Both are in [`../../../context/`](../../../context/00-INDEX.md).
+systems. Both are in [the context folder](../../../context/00-INDEX.md).
 
 **Where it came from and what judged it**
 

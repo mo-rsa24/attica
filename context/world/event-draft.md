@@ -125,4 +125,4 @@ Navigation: ⬅️ [What people get wrong](#what-people-get-wrong) | 📋 [TOC](
 | Publishing upserts an `Event` from the draft | Read `_upsert_event_from_draft` at `backend/main/events/views.py:415` and the publish action at `:496` | 2026-08-22 |
 | `Event` carries both `is_draft` and `status` | Read `backend/main/events/models.py:43-49` | 2026-08-22 |
 | Draft bookings are settled at publish | Read `finalize_draft_bookings` at `backend/main/scheduling/services.py:1814` | 2026-08-22 |
-| The asset upload path shape | Recorded in [sources.md § 1](../sources.md#1-the-event-creation-flow-map), Step 10, observed live 2026-08-16 | 2026-08-16 |
+| The asset upload path shape | Recorded in [Sources § 1](../sources.md#1-the-event-creation-flow-map), Step 10, observed live 2026-08-16 | 2026-08-16 |

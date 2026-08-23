@@ -1,8 +1,8 @@
 # 🌍 Context: Attica
 
 What Attica is about in the real world: the problem it solves, the people and things behind the
-data, where the data comes from, and what every field means. What the system *is* lives in
-[../environment/overview.md](../environment/overview.md). This folder is only the meaning.
+data, where the data comes from, and what every field means. What the system *is* lives in [the
+environment overview](../environment/overview.md). This folder is only the meaning.
 
 Attica is a South African events platform. An organizer plans an event in one place instead of
 across WhatsApp, spreadsheets, email and social media direct messages, and books the venue, the
@@ -35,9 +35,9 @@ artists and the service providers they need without leaving it.
 | [diagram-prompts.md](diagram-prompts.md) | Picture prompts, 7 written, 0 rendered | 1 |
 | [data/](data/) | Where the data comes from, and what every field means | 2 |
 
-Picture prompts are in [diagram-prompts.md](diagram-prompts.md); rendered images sit in
-`diagrams/`. Documents outside the repo that this folder draws on are listed in
-[sources.md](sources.md).
+Picture prompts are in [the illustrated map](diagram-prompts.md); rendered images sit in
+`diagrams/`. Documents outside the repo that this folder draws on are listed in [the sources
+list](sources.md).
 
 ## Still open
 
@@ -61,21 +61,21 @@ The things nobody could say yet. Each carries who or what would settle it.
 
 ## Pictures still missing
 
-- [ ] 📷 [world/event.md § What it looks like](world/event.md#what-it-looks-like): a screenshot of
+- [ ] 📷 [Event § What it looks like](world/event.md#what-it-looks-like): a screenshot of
       a published event listing as an attendee sees it. Save as `images/world/01-event-listing.png`.
-- [ ] 📷 [world/event-draft.md § What it looks like](world/event-draft.md#what-it-looks-like): the
+- [ ] 📷 [Event draft § What it looks like](world/event-draft.md#what-it-looks-like): the
       event creation wizard mid-flow, showing the step indicator. Nine step screenshots already
       exist in the learning journey at
       `/home/molef/goal-setting/learning/attica-event-creation/artifacts/figures/walking-the-event-creation-flow/` and one can be
       copied here. Save as `images/world/02-wizard-mid-flow.png`.
-- [ ] 📷 [world/chat-room.md § What a bid is](world/chat-room.md#what-a-bid-is): the chat panel
+- [ ] 📷 [Chat room § What a bid is](world/chat-room.md#what-a-bid-is): the chat panel
       with a bid card in the thread. Save as `images/world/03-bid-in-thread.png`.
-- [ ] 🖼️ [diagram-prompts.md § Prompt 1 (Subject)](diagram-prompts.md#prompt-1-subject-one-table-three-kinds):
+- [ ] 🖼️ [Illustrated map § Prompt 1 (Subject)](diagram-prompts.md#prompt-1-subject-one-table-three-kinds):
       the three provider kinds collapsing into one marketplace resource. Paste, render, save as
       `diagrams/world-01-one-table-three-kinds.png`.
-- [ ] 🖼️ [diagram-prompts.md § Prompt 1 (Process)](diagram-prompts.md#prompt-1-process-draft-to-published-event):
+- [ ] 🖼️ [Illustrated map § Prompt 1 (Process)](diagram-prompts.md#prompt-1-process-draft-to-published-event):
       draft to published event, and what the publish step promotes. Paste, render, save as
       `diagrams/data-01-draft-to-event.png`.
 - [ ] 🖼️ Five more prompts are written and unrendered: two subject, one subject capstone, one
-      process, one process capstone. All are in [diagram-prompts.md](diagram-prompts.md), which
+      process, one process capstone. All are in [the illustrated map](diagram-prompts.md), which
       carries the running count.

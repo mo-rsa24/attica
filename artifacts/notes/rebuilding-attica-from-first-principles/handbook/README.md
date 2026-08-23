@@ -117,6 +117,6 @@ The system behind this handbook is a role-based marketplace and event platform b
 - If React patterns feel weak, go directly to [03 Frontend Foundations](./03-frontend-foundations.md), then [12 JavaScript ES6 and Async Patterns](./12-javascript-es6-and-async-patterns.md).
 - If Django or DRF patterns feel weak, go directly to [04 Backend Foundations](./04-backend-foundations.md), then [14 Python Patterns and Django Specifics](./14-python-patterns-and-django-specifics.md).
 - If you want to understand the architectural reasoning behind decisions, read [13 Design Patterns and Architectural Decisions](./13-design-patterns-and-architectural-decisions.md).
-- If you're planning to deploy to production, read [15 Operations and Production Concerns](./15-operations-and-production-concerns.md) and [TECHNOLOGY-GAPS-AND-PRODUCTION-READINESS.md](../TECHNOLOGY-GAPS-AND-PRODUCTION-READINESS.md).
+- If you're planning to deploy to production, read [15 Operations and Production Concerns](./15-operations-and-production-concerns.md) and [what stands between this and production](../../what-stands-between-this-and-production/README.md).
 - If the current work is booking-related, pair [06 Event Creation and Draft Workflows](./06-event-creation-and-draft-workflows.md) with [07 Scheduling and Booking Engine](./07-scheduling-and-booking-engine.md).
 - If the current work is messaging or alerts, pair [08 Realtime and User Feedback](./08-realtime-and-user-feedback.md) with [09 Full-Stack Integration Patterns](./09-full-stack-integration-patterns.md).

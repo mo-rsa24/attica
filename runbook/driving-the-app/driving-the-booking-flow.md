@@ -51,7 +51,7 @@ absence is correct; the next move belongs to the provider.
 
 The request is the ask; the booking is what exists after the provider says yes. The request carries
 a seven-value status covering the whole negotiation, not a yes or no.
-See [../context/world/booking-request.md](../../context/world/booking-request.md).
+See [what a booking request is](../../context/world/booking-request.md).
 </details>
 
 ## 2. Answer a request as a provider

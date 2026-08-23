@@ -1,8 +1,7 @@
 # How does Attica actually work, once you have been away from it?
 
-Screenshots taken from the interactive scenes in
-[`../../scenes/how-attica-actually-works/`](../../scenes/how-attica-actually-works/), kept so the
-pictures are readable without running anything.
+Screenshots taken from [the interactive scenes](../../scenes/how-attica-actually-works/), kept so
+the pictures are readable without running anything.
 
 ## What is in here
 
@@ -41,8 +40,8 @@ in one of three tabs.
 **Where it came from and what judged it**
 
 `frontend/vite.config.js` and `backend/main/main/routing.py`, by way of the scene.
-It corroborates a fact in [`../../../environment/overview.md`](../../../environment/overview.md): the `/ws` proxy rule
-exists and works, contradicting a claim in the learning journey's flow map that said it did not.
+It corroborates a fact in [the environment overview](../../../environment/overview.md): the `/ws`
+proxy rule exists and works, contradicting a claim in the learning journey's flow map that said it did not.
 **Held since 2026-08-22.** No plan names it; kept because it is the cheapest available proof of
 that correction.
 
@@ -73,5 +72,5 @@ a trace, which was itself taken from the repository rather than from a running s
 
 **Where they came from and what judged them**
 
-The scene in [`../../scenes/how-attica-actually-works/attica-organizer-journey/`](../../scenes/how-attica-actually-works/attica-organizer-journey/).
+[The organizer journey scene](../../scenes/how-attica-actually-works/attica-organizer-journey/).
 **Held since 2026-08-22.** No plan names this set.
