@@ -167,3 +167,17 @@ their reasons. A changelog also records what changed about a plan; nothing here 
 made deliberately so this run would have something to roll back to. Branching would have separated
 the run from the checkpoint that exists for it. Rolling back is one `git revert` or one reset to that
 checkpoint.
+
+---
+
+# Decisions taken while populating this scope's plans
+
+## Populating the plans in the same unattended run
+
+**Decision.** `populate-plans` was run on this scope immediately after the decomposition, in the same
+session, rather than left as a suggestion for a later one.
+
+**Why.** The commit two before this one is `checkpoint before unattended decompose+populate run`, so
+the run this scope was written inside is a decompose-and-populate run, not a decompose-only one.
+Stopping at the master plan would have left the scope in the same state as `getting-in` was before its
+plans were authored, which is the state the checkpoint exists to move past.
