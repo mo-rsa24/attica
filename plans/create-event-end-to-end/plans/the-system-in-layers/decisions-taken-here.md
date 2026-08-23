@@ -288,3 +288,46 @@ The checkbox is the stronger form, because `sync-plan-tree` walks it and a heade
 files were checked in each sibling scope before deciding, so this is the tree's settled shape rather
 than an omission repeated three times. Adding the header to these four alone would make this scope
 the only one that differs, for no gain a reader could act on.
+
+## Decomposing this scope again writes nothing
+
+**Decision.** The scope is already decomposed, so a further decomposing pass verifies the wiring and
+records what it found rather than rewriting anything. No file in `plans/` was touched, nothing was
+renumbered, and no second scope was spawned under another name for the same work. A different scope
+was not substituted either: the eight still undecomposed are named in
+[the scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md) and each is its own
+run.
+
+**Why.** `decompose-plan` creates a scope; it does not recreate one. Run against a scope that already
+has a master plan, a map and four plan files, it can only overwrite files that are correct or
+duplicate them beside themselves. A plan file is the only copy of what it says, so overwriting one
+costs more than skipping the pass costs.
+
+**What was checked, and what it found.** All six writes the decomposition is responsible for are
+present.
+
+The scope directory holds a `MASTER_PLAN.md`, a map, and a `plans/` folder with four files in it. The
+parent's Sub-Scopes table carries row 3 linking this scope's master plan. The parent's running order
+carries steps 7 to 10, interleaved after the two blockers rather than appended as a block, with the
+reason for that placement written under the table. This master plan opens with the pointer at the
+parent's running order, above its Mission, and declares no competing table of its own. The map
+inherits from the parent map by name, declares no new glyph and no new colour meaning, and says the
+parent capstone keeps the layers glyph whole. The parent capstone already carries that glyph, in the
+"alongside, from day one" column, so this scope owes the parent no amendment.
+
+Two of the writes do not apply here. There is no parent task line to replace with a link, because the
+parent scope has no plan files of its own and its `## Plans` section says so. For the same reason no
+`▶ Next` or `◀ Needs` pointer anywhere in the parent could have named a decomposed line, so there was
+none to repair.
+
+Every relative link in the master plan, the four plans, the map and this file resolves to a file that
+exists. The three `![](...)` strings in plan 02 are literal illustrations of a broken embed, written
+inside prose about broken embeds, not links.
+
+The requirement that a scope depending on an unmade decision says so is met: the master plan's
+section on what this scope may draw while three decisions are open names D1, D2 and D3, and the four
+plans draw what the code does on the day it is drawn rather than what an answer might make it.
+
+**What this leaves untouched, deliberately.** `running-the-workers` has four plan files on disk that
+the parent's running order still describes as not authored yet, and they are not under version
+control. That is that scope's reconciliation to make and its files to commit, not this one's.
