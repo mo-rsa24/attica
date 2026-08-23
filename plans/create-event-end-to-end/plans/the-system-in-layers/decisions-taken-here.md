@@ -244,10 +244,11 @@ that matters.
 
 **Why.** Four real plan files now hold the folder open.
 
-## Populating this scope again adds nothing
+## Populating this scope again adds no plan file, and corrects what it finds
 
 **Decision.** The scope's `plans/` folder is finished at four files, and a further populating pass
-verifies them rather than adding a fifth. Nothing here was renumbered, overwritten or duplicated.
+verifies them and fixes what the verification catches, rather than adding a fifth. Nothing here was
+renumbered, overwritten or duplicated.
 
 **Why.** `populate-plans` is incremental: it adds to an existing set and never rewrites one. The four
 plans already cover every Definition-of-Done item, so a fifth file would either repeat work already
@@ -273,6 +274,36 @@ sibling. Every in-file `▶ Next` and `◀ Needs` anchor resolves to a heading i
 The parent capstone already carries the glyph this scope zooms into, labelled "the system in layers"
 in the alongside column, so no amendment to it is owed. The parent's running order carries steps 7 to
 10 and its `Do this next` names plan 01 as startable now.
+
+**The one thing the item-by-item check does not catch is a count**, and there was one. Nine is the
+number of system diagrams this scope owes, and it was being used in a second sense it does not carry:
+the number of images to render. Those differ, because
+[02](plans/02-draw-the-layers-map.md) task 1.2 writes three or four subject pieces into
+`environment/diagram-prompts.md` and task 1.4 writes a process lane, each with its own `Save as:`
+path, and only the capstone of that file is one of the nine. So
+[04](plans/04-render-check-and-write-it-down.md) was headed "Render the nine" while its own
+instruction 4.4 listed ten items, its Description said the scope's own map gets rendered too, and its
+Outputs table named no row at all for the environment map's subject pieces.
+
+**How it is resolved.** The render set is whatever
+[04's worklist](plans/04-render-check-and-write-it-down.md#1--build-the-render-worklist) finds on the
+day, which is what that task already builds by sweeping every `Save as:` line and checking each path
+against the filesystem. Every fixed count in 04's instruction lane and its framing prose now says
+that instead of saying nine, its Outputs table carries the missing row, and Goal 3 in the master plan
+says in one line that nine is what the scope owes rather than what it renders. The alternative,
+keeping a number, means five places to hold in sync and a set that quietly files short.
+
+**One happy path had no failure beside it.** The failure criterion was scoped to the nine, and the
+environment map's process lane, one request from an organizer to a provider's screen, is a happy path
+outside them. [02](plans/02-draw-the-layers-map.md) task 1.4 now states the failure choice the same
+way every brief in [03](plans/03-brief-the-other-eight.md) does, with the outbox worker not running
+as the candidate, because that is the failure the environment folder already calls silent.
+
+**The process lane is not regenerated for this.** Its four stages, its gate and its failure branches
+are the same as when it was authored, and the shared contract at `~/.claude/DIAGRAM_PROMPTS_FORMAT.md`
+regenerates a lane whole or leaves it alone, never patches one. Stage 4's nine images are the nine
+owed diagrams, which is still what the picture means. So the live lane still equals snapshot
+[01](diagrams/process-versions/01-2026-08-23.md) and no snapshot 02 was stamped.
 
 **What this leaves open.** D1, D2 and D3 are still unanswered, and the plans are written for that: no
 picture here waits on them and none guesses at them.

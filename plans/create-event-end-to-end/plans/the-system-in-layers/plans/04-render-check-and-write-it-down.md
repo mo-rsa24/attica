@@ -41,8 +41,8 @@ The one ordering that matters across the tree is the
 
 Navigation: ⬅️ [Position in the plan tree](#position-in-the-plan-tree) | 📋 [TOC](#table-of-contents) | [Next](#environment-facts-this-plan-depends-on) ➡️
 
-Nine prompts exist and nothing has been rendered. Every render status in the scope reads
-`⏳ not rendered`, and that is accurate rather than stale.
+Every prompt this scope wrote exists and nothing has been rendered. Every render status in the
+scope reads `⏳ not rendered`, and that is accurate rather than stale.
 
 This is the plan that most often does not happen, which is why it is a plan rather than a line at the
 end of another one. A prompt nobody renders is invisible: it breaks no check, and the document around
@@ -92,7 +92,7 @@ be a waste not to use it.
 
 **The recipes are the part that outlives the scope.**
 
-Nine images are worth having once. A written way to render one and a written way to prove one still
+The images are worth having once. A written way to render one and a written way to prove one still
 matches the code are worth having every time the code changes, and neither exists today. Everything
 written about diagrams in this repository stops at the prompt.
 
@@ -100,8 +100,8 @@ written about diagrams in this repository stops at the prompt.
 
 Navigation: ⬅️ [Considerations](#considerations) | 📋 [TOC](#table-of-contents) | [Next](#why-this-plan-exists) ➡️
 
-Nine images on disk, each one read back against its own note before it was filed, and two recipes so
-the tenth does not need this plan.
+Every prompt in the scope on disk as an image, each one read back against its own note before it was
+filed, and two recipes so the next one does not need this plan.
 
 ## Why this plan exists
 
@@ -123,7 +123,8 @@ was on the day it was made. The second recipe is the answer to that, and it is w
 Navigation: ⬅️ [Why this plan exists](#why-this-plan-exists) | 📋 [TOC](#table-of-contents) | [Next](#illustrations) ➡️
 
 ```
-  nine prompts
+  every prompt on
+  the worklist
        │
        ▼
   paste into ChatGPT ──► save at the Save as: path
@@ -163,7 +164,10 @@ Save as `../diagrams/process-capstone-four-stages.png`. *(image not yet generate
 
 Navigation: ⬅️ [Illustrations](#illustrations) | 📋 [TOC](#table-of-contents) | [Next](#purpose-and-goal) ➡️
 
-1. **Nine rendered images**, each at its `Save as:` path, each checked against its note.
+1. **Every prompt rendered**, each at its `Save as:` path, each checked against its note. How many
+   that is comes from task 1.1's worklist rather than from a number written here: it is the nine
+   system diagrams the scope owes plus the rest of the environment map's own pieces, and
+   [02](02-draw-the-layers-map.md) task 1.2 decides whether that lane is three pieces or four.
 2. **This scope's own map rendered too**: six subject pieces, the subject capstone, and the process
    capstone.
 3. **Two runbook recipes**: turning a prompt into a filed image, and proving a filed image still
@@ -218,7 +222,8 @@ For Claude to execute. Ask Claude to do these.
   - Done when: no status in the scope was written because a prompt looked finished. Every one was
     read off a path.
 
-▶ **Next: [instruction 4.1](#4--render-the-nine)**, which is where the images actually get made.
+▶ **Next: [instruction 4.1](#4--render-every-prompt-on-the-worklist)**, which is where the images
+actually get made.
 
 ### 2. 📖 Write the two recipes
 
@@ -239,7 +244,7 @@ written before doing the thing describes the intention rather than the job.
     confirming the claim, and what to do when it no longer holds. The answer to that last one is to
     mark the prompt stale on the slot so nobody renders it by accident, not to quietly fix the
     caption.
-  - Done when: it works for any diagram in the repository, not only this scope's nine.
+  - Done when: it works for any diagram in the repository, not only this scope's own.
 
 - [ ] **2.3 Register both in the runbook index**
   - Add both to [the runbook index](../../../../../runbook/00-INDEX.md), phrased as the question each
@@ -271,14 +276,14 @@ Navigation: ⬅️ [Tasks](#tasks) | 📋 [TOC](#table-of-contents) | [Next](#th
 For you to follow manually. Do these yourself. This is the longest manual lane in the scope, because
 rendering and judging an image is not something a command does.
 
-### 4. 🎨 Render the nine
+### 4. 🎨 Render every prompt on the worklist
 
 ◀ **Needs: [task 1](#1--build-the-render-worklist)**, the worklist.
 
 4.1 **Open ChatGPT and start one conversation for the whole set**
    - Go to `https://chatgpt.com` in a browser, signed in, and pick a model that generates images.
-   - One conversation for all nine, not one each. The set has to read as one, and a model that has
-     just drawn three images in this style draws the fourth closer to them.
+   - One conversation for the whole worklist, not one each. The set has to read as one, and a model
+     that has just drawn three images in this style draws the fourth closer to them.
    - Expected result: an empty conversation ready for the first prompt.
 
 4.2 **Paste the first prompt, whole, including the style paragraph**
@@ -303,16 +308,18 @@ rendering and judging an image is not something a command does.
    - ❌ You are not sure of the path: it is on the `Save as:` line under the prompt's title. Every
      prompt has one; a prompt without one is a defect to fix in the prompt.
 
-4.4 **Repeat 4.2 and 4.3 for the remaining eight**
-   - Order: the layers map, the process lane, then the four in `how-a-booking-happens`, then the
-     four in `onboarding-a-new-developer`.
-   - Expected result: nine files, nine `Save as:` paths.
+4.4 **Repeat 4.2 and 4.3 for the rest of the worklist**
+   - Order, by group rather than by count: the layers map, then the environment map's other subject
+     pieces, then its process lane, then the four in `how-a-booking-happens`, then the four in
+     `onboarding-a-new-developer`, then this scope's own map.
+   - Expected result: one file per row of the task 1.1 worklist, each at the `Save as:` path that
+     row names, and no row left without a file.
 
 ▶ **Next: [instruction 5.1](#5--check-the-layers-map-against-the-running-system)**.
 
 ### 5. ✅ Check the layers map against the running system
 
-◀ **Needs: [instruction 4.3](#4--render-the-nine)**, the layers map on disk.
+◀ **Needs: [instruction 4.3](#4--render-every-prompt-on-the-worklist)**, the layers map on disk.
 
 Every image gets the note check in instruction 6. This one gets an extra check that no other image
 in the scope can have, because its subject is something you can start up and count.
@@ -360,7 +367,8 @@ in the scope can have, because its subject is something you can start up and cou
 rendered.
 
 6.1 **Read each remaining image back against its own note**
-   - For each of the other eight, open the image and its faithfulness note side by side.
+   - For every worklist row except the layers map, which instruction 5 already checked, open the
+     image and its faithfulness note side by side.
    - Confirm each clause. Confirm every hedged piece is visibly hedged and every solid piece is
      solid. Then say out loud what the image taught you.
    - Expected result: what you said matches the visual thesis the prompt claimed.
@@ -375,7 +383,7 @@ rendered.
    - ❌ Broken image icon: the path in the embed and the path on disk disagree. The `Save as:` line
      is the authority.
 
-6.3 **Look at all nine together and judge them as one set**
+6.3 **Look at the whole set together and judge it as one**
    - Put every image in one folder view, or open them as tabs, and look at them side by side.
    - Expected result: they read as one family. Same background, same glyph weight, same legend
      placement, same label style.
@@ -423,6 +431,7 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | What | Where | Lane | State |
 |---|---|---|---|
 | The layers map, rendered | `environment/diagrams/attica-01-the-system-in-layers.png` | subject | ⏳ not rendered |
+| The environment map's other subject pieces | `environment/diagrams/` | subject | ⏳ not rendered |
 | One request end to end, rendered | `environment/diagrams/attica-02-one-request-end-to-end.png` | process | ⏳ not rendered |
 | Four diagrams in the booking grouping | `artifacts/figures/how-a-booking-happens/` | subject | ⏳ not rendered |
 | Four diagrams in the onboarding grouping | `artifacts/figures/onboarding-a-new-developer/` | subject | ⏳ not rendered |

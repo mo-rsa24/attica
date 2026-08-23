@@ -469,8 +469,9 @@ Navigation: ⬅️ [Orchestration](#orchestration) | 📋 [TOC](#table-of-conten
 
 Navigation: ⬅️ [References](#references) | 📋 [TOC](#table-of-contents) | [Next](#recommended-skill) ➡️
 
-[04-render-check-and-write-it-down.md](04-render-check-and-write-it-down.md), which turns all nine
-prompts into images, checks each against its note, and writes down how to do both again.
+[04-render-check-and-write-it-down.md](04-render-check-and-write-it-down.md), which turns every
+prompt in the scope into an image, checks each against its note, and writes down how to do both
+again.
 
 ## Recommended skill
 

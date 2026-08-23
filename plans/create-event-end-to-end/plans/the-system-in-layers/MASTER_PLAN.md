@@ -78,10 +78,13 @@ neither goes missing and neither gets drawn twice.
    Pictures section names the layers map instead of reading "None yet".
 2. `environment/overview.md` carries the layers map, as an image once it is rendered and as a
    diagram-wanted slot until then, never as a broken embed.
-3. Nine diagrams exist: the four written as briefs in `onboarding-docs`, and the five the reviews
-   ask for (the booking state machine, the contention sequence, the real-time delivery path, event
-   convergence, and the layers map itself).
-4. Every one of the nine carries the file-and-line references it was checked against, and the date
+3. Nine system diagrams exist. That is what this scope owes, not what it renders: the four written
+   as briefs in `onboarding-docs`, and the five the reviews ask for (the booking state machine, the
+   contention sequence, the real-time delivery path, event convergence, and the layers map itself).
+   The environment map carries further pieces of its own, so the number of images to make is
+   whatever [the render worklist](plans/04-render-check-and-write-it-down.md#1--build-the-render-worklist)
+   finds on the day.
+4. Every prompt in the set carries the file-and-line references it was checked against, and the date
    it was checked.
 5. Every happy path in the set has its failure drawn, either as branches inside the same image or as
    its own page, with the choice stated per diagram.
@@ -155,7 +158,7 @@ This folder's contents. The order that matters is the
 | [01 Read the system before drawing it](plans/01-read-the-system-before-drawing-it.md) | Establish, with a `path:line` on every claim, what a booking is, what happens under contention, what reaches a screen, and whether convergence exists | ⚠️ not started |
 | [02 Draw the layers map](plans/02-draw-the-layers-map.md) | Give `environment/` its first pictures: the folder's map, the layers prompt, and the slot in `overview.md` | ⚠️ not started |
 | [03 Brief the other eight](plans/03-brief-the-other-eight.md) | The four the reviews ask for, the four already briefed in `onboarding-docs`, and a failure beside every one | ⚠️ not started |
-| [04 Render it, check it, and write down how](plans/04-render-check-and-write-it-down.md) | Nine images made, each read back against its note before filing, and the two recipes for doing it again | ⚠️ not started |
+| [04 Render it, check it, and write down how](plans/04-render-check-and-write-it-down.md) | Every prompt in the scope rendered, each read back against its note before filing, and the two recipes for doing it again | ⚠️ not started |
 
 ---
 

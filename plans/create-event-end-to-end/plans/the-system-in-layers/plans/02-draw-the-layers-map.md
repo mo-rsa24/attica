@@ -242,8 +242,14 @@ from [01](01-read-the-system-before-drawing-it.md).
   - Draw it as far as the code actually goes, using [01](01-read-the-system-before-drawing-it.md)'s
     section 5. Where the path stops before a screen, draw it stopping. That is the finding, not a
     gap in the drawing.
+  - This is the one happy path this plan draws, so it carries the same failure choice every other
+    happy path in the scope carries: state in the prompt whether the failure is a branch inside this
+    image or its own page, and write the failure content either way. The candidate here is the
+    stage the request dies at when the outbox worker is not running, which is the silence
+    [the execution model](../../../../../environment/overview.md#execution-model) names.
   - `Save as: environment/diagrams/attica-02-one-request-end-to-end.png`, `⏳ not rendered`.
-  - Done when: the lane's last stage is whatever the code's last step is, and the note says so.
+  - Done when: the lane's last stage is whatever the code's last step is, the note says so, and the
+    failure choice is stated rather than left silent.
 
 ▶ **Next: [task 2.1](#2--wire-it-into-the-files-people-read)**.
 
