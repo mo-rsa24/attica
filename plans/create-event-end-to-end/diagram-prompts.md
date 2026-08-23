@@ -102,7 +102,7 @@ between them, and the acceptance panel carries two browsers with the refresh cro
 Three things to fix on the next render. The five domain glyphs are unlabelled apart from "booking
 truth", so a reader cannot tell contention from workers from availability from the journey; the
 label belongs on each glyph. The arrows inside the domain panel point inward toward booking truth,
-and the dependency runs the other way. And the two glyphs in the alongside column carry no labels.
+and the dependency runs the other way. And the deploy glyph in the alongside column carries no label.
 
 **Visual thesis.** Nothing above the blockers is measurable until the blockers land, the domain plane
 gates both other planes, and the two upper planes run side by side.
@@ -117,7 +117,8 @@ the same time". The top panel, acceptance, holds two browser cards facing each o
 dashed arrow between them and a refresh glyph crossed through.
 
 To the right of the whole stack, outside the panels, two smaller glyphs on their own vertical line
-labelled "alongside, from day one": a layers diagram glyph and a deploy glyph.
+labelled "alongside, from day one": a layers diagram glyph labelled "the system in layers", and a
+deploy glyph.
 
 Every piece in this map is hedged. Nothing in this scope is built.
 

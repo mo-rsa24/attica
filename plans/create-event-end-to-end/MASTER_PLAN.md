@@ -7,7 +7,7 @@ Two blockers, and they can run at the same time. Open
 browser suite tell the truth, or run `populate-plans` on
 [getting-in](plans/getting-in/MASTER_PLAN.md), which makes the other three roles reachable.
 
-The remaining ten sub-scopes are named below and not yet decomposed.
+The remaining nine sub-scopes are named below and not yet decomposed.
 
 ## Running order
 
@@ -22,9 +22,14 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 4 | [Settle what a role is](plans/getting-in/plans/01-settle-what-a-role-is.md) | Decide which of the two classifications decides what a user may see | ⚠️ not started | nothing |
 | 5 | [Grant every role](plans/getting-in/plans/02-grant-every-role.md) | Seeds grant the three ungranted roles and give the nine marketplace users theirs | ⚠️ not started | 4 |
 | 6 | [Prove it and write it down](plans/getting-in/plans/03-prove-it-and-write-it-down.md) | Five logins, five screenshots, the runbook pair, the verified credentials table | ⚠️ not started | 5 |
+| 7 | [the-system-in-layers](plans/the-system-in-layers/MASTER_PLAN.md) | Plans not authored yet. The layers map for `environment/`, the four diagrams the reviews ask for, and the four already written as briefs in `onboarding-docs` | ⚠️ not started | nothing |
 
-Steps 1 and 4 both wait on nothing and can run at the same time. Everything in the domain plane
+Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
+
+Step 7 is one row for a whole sub-scope because its plan files do not exist yet. It sits last in
+the table only for that reason, not because anything gates it. `populate-plans` replaces the row
+with the real plans and interleaves them where they belong.
 
 ---
 
@@ -106,7 +111,7 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 |---|---|---|---|
 | 1 | [fixing-create-event](plans/fixing-create-event/MASTER_PLAN.md) | blocker | nothing |
 | 2 | [getting-in](plans/getting-in/MASTER_PLAN.md) | blocker | nothing |
-| 3 | `the-system-in-layers` | cross | nothing |
+| 3 | [the-system-in-layers](plans/the-system-in-layers/MASTER_PLAN.md) | cross | nothing |
 | 4 | `one-booking-truth` | domain | 1, 2 |
 | 5 | `contention-and-holds` | domain | 4 |
 | 6 | `running-the-workers` | domain | 4 |
@@ -121,8 +126,9 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 Scopes 1, 2, 3 and 12 start immediately. After 8 lands, the performance and experience planes run in
 parallel.
 
-`fixing-create-event` is the only sub-scope with plan files. `getting-in` has a master plan and an
-empty `plans/`. The other ten are named here and not yet decomposed.
+`fixing-create-event` is the only sub-scope with plan files. `getting-in` and
+`the-system-in-layers` each have a master plan and an empty `plans/`. The other nine are named here
+and not yet decomposed.
 
 ---
 
