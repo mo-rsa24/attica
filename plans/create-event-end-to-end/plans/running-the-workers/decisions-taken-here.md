@@ -16,19 +16,34 @@ first, because they change what the scope is, not only how it is written.
 
 ## The count is ten commands, not eleven
 
-**Decision.** The master plan says ten scheduling management commands and names the arithmetic, and
-does not repeat the parent's "eleven".
+**Decision.** The count everywhere is ten, and both planning sources that said eleven are corrected
+to match rather than being left to disagree with the scope that reads them.
 
 **Why.** `ls backend/main/scheduling/management/commands/*.py` on 2026-08-23 returns ten files
 excluding `__init__.py`. The parent arrives at eleven as "one materialiser, five expiry commands,
 two outbox workers, three seeds", and there are four expiry commands, not five. Carrying a wrong
 count forward would have made the scope's first plan spend its time looking for a command that does
-not exist. The alternative, silently writing "ten" without saying the parent says otherwise, would
-have left the next reader to rediscover the same discrepancy.
+not exist.
 
-**What to do about the parent.** [The scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md)
-is a planning-walk document in `ideas/`, not a plan file, and this pass did not edit it. Correcting
-it is a one-line edit somebody should make; it is named here so it is not lost.
+**What was done about the parent.** Both documents that carry the wrong count are corrected, so
+nobody plans against it a second time.
+[The scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#6-running-the-workers)
+now says ten and names the seeds-versus-runner split.
+[Where we landed](../../../../ideas/enhancing-create-event-end-to-end/WHERE-WE-LANDED.md#2-the-state-of-the-world)
+now says ten, four expiry, two outbox, and names the two commands that are broken as well as inert.
+
+**Why correct them rather than leave the correction here.** Both are present-tense sources somebody
+reads before planning, and a count that is wrong in the source gets copied into the next scope that
+reads it. Recording the correction only in this folder would have protected this scope and nothing
+else. The one cost, that a reader of the corrected source no longer sees the discrepancy, is paid
+for by this entry, which is where a disagreement should be argued.
+
+**What was deliberately not corrected.**
+[The plan walk](../../../../ideas/enhancing-create-event-end-to-end/PLAN_WALK.md) also says eleven,
+and stays as it is. It is the record of the session that produced the first scope cut, and that cut
+is superseded anyway: it describes seven scopes and twenty plan files where the programme now has
+thirteen. Editing a record of what was said on a day would falsify the record to fix a number nobody
+acts on from there.
 
 ## Three of the ten must never be on a runner
 
@@ -36,16 +51,17 @@ it is a one-line edit somebody should make; it is named here so it is not lost.
 excluded from the runner by name, and the Definition of Done says "by name" rather than "by
 omission".
 
-**Why.** "Wire up eleven scheduling management commands" reads as though all of them want a
+**Why.** A bare "wire up the scheduling management commands" reads as though all of them want a
 schedule. Three of them write test data. A seed on a clock would rewrite the development database on
 an interval, which is the kind of thing that gets discovered at the end of a long debugging session.
 Naming them in the criterion costs one line and makes the exclusion checkable.
 
-## The runbook already answers one of the three questions the Owes line says it does not
+## The runbook already answers one of the three questions it was said to be missing
 
 **Decision.** The Runbook section says which of the three questions is already answered and which two
-are not, rather than repeating the parent's "everything written about Redis stops at
-`redis-cli ping`".
+are not. The Owes line in [the scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#6-running-the-workers)
+said all three were missing, on the grounds that "everything written about Redis stops at
+`redis-cli ping`", and it is corrected to name the one that exists.
 
 **Why.** [Stack § 4](../../../../runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox)
 carries a real run from 2026-08-22 with the pending count query and its output pasted in, so "how

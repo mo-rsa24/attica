@@ -44,15 +44,16 @@ in one transaction, and delivery may then fail without losing the event. Ninetee
 
 ## What is true today, with a line number on every claim
 
-Read before planning anything here. Each of these was read out of the repository on 2026-08-23 and
-several of them contradict what the programme's own planning notes say.
+Read before planning anything here. Each of these was established by reading the repository on
+2026-08-23, not by running it, and each carries the file and line to check it against. Three of them
+corrected the programme's planning notes, which is recorded in
+[the decisions taken here](decisions-taken-here.md).
 
-**There are ten scheduling commands, not eleven.** One materialiser, four expiry commands, two
-outbox commands, three seeds. [The scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#6-running-the-workers)
-says eleven, arriving at it as "one materialiser, five expiry commands, two outbox workers, three
-seeds". The fifth expiry command does not exist. The count that matters is smaller still: **three
-seeds must never be on a schedule**, so the number of commands wanting a runner is seven, and two
-of those seven are daemons that already wrap the other five.
+**There are ten scheduling commands.** One materialiser, four expiry commands, two outbox commands,
+three seeds. The count that matters is smaller: **three seeds must never be on a schedule**, so the
+number wanting a runner is seven, and two of those seven are daemons that already wrap the other
+five. An earlier count of eleven, reached by counting five expiry commands where there are four, is
+corrected in both planning sources and recorded in [the decisions taken here](decisions-taken-here.md#the-count-is-ten-commands-not-eleven).
 
 **`expire_draft_holds` is a byte-for-byte copy of `expire_checkout_holds`.** Both call
 `expire_checkout_sessions` (`backend/main/scheduling/services.py:1744`). Nothing anywhere expires

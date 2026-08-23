@@ -161,9 +161,9 @@ same way every time, and that both parties are told.
 **decide** One infrastructure decision, not three: expiry, availability materialisation and outbox
 dispatch all need the same thing.
 
-**Owes.** `environment/` a new execution-model fact: "running Attica" stops meaning four hand-started processes. `runbook/` a pair, and this is the one nothing covers today: everything written about Redis stops at `redis-cli ping`, so "is the queue moving", "how many events are pending" and "what dead-lettered and why" have no written answer.
+**Owes.** `environment/` a new execution-model fact: "running Attica" stops meaning four hand-started processes. `runbook/` a pair: how to start and stop the recurring work, and how to find out what is stuck. Only part of the second exists. The drain-the-outbox recipe answers "how many events are pending" with a real run pasted in, and answers neither "what dead-lettered and why" nor "what is stranded in `processing`", so the recipe gets finished rather than duplicated.
 
-**wire up** Eleven scheduling management commands exist and nothing runs any of them.
+**wire up** Ten scheduling management commands exist and nothing runs any of them. Three of the ten are seeds and must stay off any schedule, so seven want a runner, and two of those seven are daemons already wrapping the other five.
 
 **wire up** The outbox worker, with retries and dead-lettering, both of which already have tables.
 

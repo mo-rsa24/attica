@@ -50,11 +50,17 @@ carrying `instant`, `approval_required` and `hybrid`.
 
 ### Built and inert
 
-**All eleven scheduling management commands.** One materialiser, five expiry commands, two outbox
-workers, three seeds. Nothing runs any of them.
+**All ten scheduling management commands.** One materialiser, four expiry commands, two outbox
+commands, three seeds. Nothing runs any of them. Two of the ten are broken as well as inert:
+`expire_draft_holds` is a byte-for-byte copy of `expire_checkout_holds`, and
+`expire_and_materialize` never materialises and writes an inline update that skips the outbox.
 
-**The notification channel.** Clients subscribe to a per-user group. Nothing ever publishes to it.
-The socket is wired at one end only.
+**The notification channel, for everything except chat.** Clients subscribe to a per-user group and
+two different functions write notification rows into it. `create_notification`
+(`backend/main/notifications/utils.py:24`), which chat uses, writes the row and pushes.
+`_create_in_app_notification` (`backend/main/scheduling/services.py:2658`), which every outbox
+dispatch uses, writes the row and stops. So the socket is wired at both ends for chat and at one end
+for the whole booking journey, and the fix is to copy the writer that already works.
 
 Most of the booking journey described in the third review is in this category: implemented, correct
 looking, and doing nothing because no worker runs and no event is pushed.
@@ -77,7 +83,8 @@ times on mount. A screen claims 100MB against a 50MB limit. One route never rend
 counter disagrees with the routes. The idempotency key is generated per click. `select_for_update`
 does not lock on SQLite. Resume works from one entrance only. No loading indicator exists in any of
 the eight step files. Four live representations of a booking, of which the chat one is the most
-referenced.
+referenced. An outbox event claimed into `processing` is stranded for good, because the dispatcher
+only ever selects `pending` and `failed` and no reaper returns it.
 
 ## 3. Open decisions
 
