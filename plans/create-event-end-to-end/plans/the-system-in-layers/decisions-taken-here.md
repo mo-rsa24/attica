@@ -276,3 +276,15 @@ in the alongside column, so no amendment to it is owed. The parent's running ord
 
 **What this leaves open.** D1, D2 and D3 are still unanswered, and the plans are written for that: no
 picture here waits on them and none guesses at them.
+
+## The boilerplate prompt header stays out
+
+**Decision.** No plan here carries a `## Recommended prompt (after this plan completes)` header, even
+though the template lists one, and none was added.
+
+**Why.** All ten plan files across the three populated scopes in this tree agree: none has that
+header, and every one instead carries `/ingest-error-pattern` as a real checkbox in its close out.
+The checkbox is the stronger form, because `sync-plan-tree` walks it and a header it cannot see. Two
+files were checked in each sibling scope before deciding, so this is the tree's settled shape rather
+than an omission repeated three times. Adding the header to these four alone would make this scope
+the only one that differs, for no gain a reader could act on.
