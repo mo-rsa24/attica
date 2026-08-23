@@ -126,5 +126,14 @@ Every piece in this map is hedged. Nothing in this scope is built.
 
 ## Process lane
 
-Not authored yet. `populate-plans` writes it once this scope has plan files, and each changed
-regeneration is stamped into `diagrams/process-versions/`.
+Not authored yet, and what it waits on is not this scope's own plan files. Its stages are the
+[running order](MASTER_PLAN.md#running-order), whose steps live in the sub-scopes rather than here,
+so the lane draws the thirteen scopes with those steps laid over them. Four of the thirteen have plan
+files and nine do not, so the table is going to grow by most of its eventual length, and this lane is
+regenerated whole rather than patched. Authoring it now means drawing it again.
+
+Nothing is waiting on it. Each sub-scope's map carries its own process lane over its own plans, and
+[running the workers](plans/running-the-workers/diagram-prompts.md#process-lane) and
+[fixing create event](plans/fixing-create-event/diagram-prompts.md#process-lane) already have one.
+
+Each changed regeneration is stamped into `diagrams/process-versions/`.

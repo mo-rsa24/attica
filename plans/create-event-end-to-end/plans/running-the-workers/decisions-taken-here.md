@@ -331,12 +331,29 @@ commands are made honest would claim the scope finished two steps early, and tha
 misreading this scope exists to correct: the machinery looking finished while nothing reaches a
 person.
 
-## The parent's process lane was left alone
+## The parent's process lane was left alone, and its stub was corrected
 
-**Decision.** The parent scope's own process lane still reads "Not authored yet" and was not written
-in this run.
+**Decision.** The parent scope's process lane was not authored. Its stub was rewritten, because the
+reason it gave for its own gap was wrong.
 
-**Why.** It draws from the parent's plan files across thirteen sub-scopes, four of which have plans
-and nine of which do not. Authoring it now would fix a picture of a tree that is a third built, and
-the lane is regenerated whole rather than patched, so the work would be redone rather than extended.
-The request named one scope, and the parent's lane is not that scope's to write.
+**Why not author it.** The lane's stages are the parent's running order, and nine of its thirteen
+scopes have no plan files yet, so the table will grow by most of its eventual length. The lane is
+regenerated whole rather than patched, so drawing it now means drawing it again. Nothing is waiting
+on it either: a child's lane draws that child's own plans and does not read the parent's.
+
+**Why the stub had to change anyway.** It said `populate-plans` writes the lane "once this scope has
+plan files". The parent has no plan files of its own and may never have any, since its steps live in
+the sub-scopes, so that sentence made the lane wait on a thing that is not coming. The stub now names
+the real gap, which is the nine undecomposed scopes. This is the same failure that was corrected in
+this scope's own map: a document explaining its gap with a false reason is worse than one that simply
+names the gap.
+
+## What was checked before this run finished
+
+**Decision.** The verification sweep `decompose-plan` closes with was run across this scope, not
+assumed from the fact that nothing had been renumbered.
+
+**What it covered and what it found.** Every in-file anchor and every relative path across the five
+plans resolves to something that exists, checked by script rather than by eye. All five plans carry
+their `▶ Next` and `◀ Needs` pointers on every task and instruction group, and every section number
+they cite resolves. Nothing was broken, so nothing was repaired.
