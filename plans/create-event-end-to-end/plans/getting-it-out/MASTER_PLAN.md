@@ -203,6 +203,23 @@ learns nothing about which variables exist.
 (`*.sqlite3` at `:4`, `media/` at `:66`). 79 migration files across ten apps describe
 the schema; nothing describes the data.
 
+### The users are in South Africa, which is the one fact that fixes a region
+
+**48 sites, 17 sites, and two of three defaults.** `ZAR` appears at 48 sites in `frontend/src`. The
+`en-ZA` locale is passed at 17 sites across 10 files, among them
+`EventOrganizerDashboard.jsx`, `ProviderDashboard.jsx` and `ArtistPostSidebar.jsx`. In the backend,
+`backend/main/events/models.py:54` and `backend/main/chat/models.py:187` both default `currency` to
+`ZAR`.
+
+This is the evidence the target-host choice in the Environment Context section rests on, and it is
+the only claim in this scope that decides something expensive to reverse, because changing a region
+later means moving the data.
+
+**One of the three defaults disagrees, and it is not this scope's.**
+`backend/main/chat/models.py:76` defaults `currency` to `USD`. That is one of the four live booking
+representations contradicting the other two, so it is evidence for `one-booking-truth` rather than
+for deployment, and nothing here is changed on account of it.
+
 ---
 
 ## The decision this scope owns, and the ones it does not
@@ -323,9 +340,16 @@ the runbook, and none of them required knowing anything that is not written down
 
 ## Definition of Done
 
-- [ ] The deployment decision taken, written down, signed and dated: what runs Attica, where, how a
-      change gets there, and how it is put back. Every losing candidate carries its own paragraph and
-      the reason it lost
+- [ ] The deployment decision taken, written down, signed and dated: what runs Attica, how a change
+      gets there, and how it is put back. Every losing candidate carries its own paragraph and the
+      reason it lost. Where it runs is already settled as a class of host, in
+      [the decisions taken here](decisions-taken-here.md#the-target-host-one-small-linux-machine-in-johannesburg-at-a-fixed-price),
+      and the decision either adopts that class or says in one paragraph why it is wrong
+- [ ] ⚠️ The account created and the machine provisioned by hand: a small Linux virtual machine in a
+      Johannesburg region at a fixed monthly price, on an account Molefe owns. The class is chosen;
+      the provider, the size and the price are not, so record all three plus the region in the
+      decision. Nothing in this scope can be checked against a real machine until this exists
+      `[owner: human]`
 - [ ] That decision carries one line per execution-tier candidate from
       [the execution decision](../running-the-workers/plans/01-take-the-execution-decision.md) saying
       what this answer does to it, or, if D7 is already taken, one line saying what this answer does
@@ -455,15 +479,26 @@ a deliverable here rather than a detail.
 tests fail. Any claim here about continuous integration passing has to account for that, and fixing
 it is another scope's.
 
-One fact this scope needs is not written in `environment/` and must not be inferred: **where a
-deployed Attica would run.** There is no hosting account, no domain, no target host and no budget
-recorded anywhere in this repository, and the deployment decision cannot be taken without one. That
-is a question for a person, and it is the first thing this scope's first plan has to establish rather
-than assume. Recorded in
-[the decisions taken here](decisions-taken-here.md#the-environment-question-this-scope-cannot-answer-is-named-rather-than-guessed).
+One fact this scope needs is not written in `environment/`: **where a deployed Attica would run.**
+There is no hosting account, no domain, no target host and no budget recorded anywhere in this
+repository, and no candidate mechanism can be compared without one.
 
-Where a fact this scope needs is not written in `environment/`, stop and ask rather than inferring
-it.
+**The answer taken here is one small Linux virtual machine in a Johannesburg region, at a fixed
+monthly price, on an account Molefe owns.** It was chosen rather than left open, in a pass with
+nobody to ask, and it is reversible by anyone who disagrees. The reasoning, including the three
+classes of host it was chosen over and what it deliberately leaves undecided, is in
+[the decisions taken here](decisions-taken-here.md#the-target-host-one-small-linux-machine-in-johannesburg-at-a-fixed-price).
+
+**It settles a place, not a mechanism.** The provider's name, the machine's size, whether anything
+runs in a container, what supervises the processes, how a change gets there, and whether the database
+sits on that box or beside it are all still D9's, and this scope's first plan takes them.
+
+**Nothing of it goes into `environment/` yet.** That folder records what is true about the system the
+work runs on, and no such machine exists. It becomes an environment fact when someone has created it,
+which is why creating the account is an `[owner: human]` criterion below rather than a task.
+
+Where another fact this scope needs is not written in `environment/`, stop and ask rather than
+inferring it.
 
 ---
 

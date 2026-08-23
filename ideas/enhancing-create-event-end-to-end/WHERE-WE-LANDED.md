@@ -106,7 +106,10 @@ through the Vite dev proxy, and two more hardcode `127.0.0.1:8000`.
 ## 3. Open decisions
 
 **D1. Which booking representation survives.** Four are live. The scheduling one is the most
-complete; the chat one is the most used by reference count. Everything else is downstream of this.
+complete; the chat one is the most used by reference count. They disagree about money as well as
+about state: `chat/models.py:187` and `events/models.py:54` default `currency` to `ZAR` and
+`chat/models.py:76` defaults it to `USD`, in an application whose interface writes `ZAR` at 48 sites.
+Everything else is downstream of this.
 Recommendation: scheduling survives, and the chat migration is costed honestly rather than assumed
 away.
 

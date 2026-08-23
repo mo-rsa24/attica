@@ -240,7 +240,8 @@ artifact the gate keeps rather than discards, drawn with the same silhouette as 
 subject piece 2 and without the red cross.
 
 **Third level.** One titled rounded panel labelled to show it is one machine today and need not stay
-one, holding four sub-panels side by side at the same height, each carrying its own title. The first
+one, carrying a small location chip on its edge naming the city it sits in, holding four sub-panels
+side by side at the same height, each carrying its own title. The first
 holds a handler glyph. The second holds a worker gear, turning, on a small clock platform. The third
 holds a cylinder. The fourth holds a folder of images. Each of the four carries a small door glyph on
 its outer edge with a configuration chip beside it, and each door has a short plain arrow leaving it
@@ -264,7 +265,9 @@ labelled for the environment section this scope writes.
 
 **Faithfulness note.** Four levels, bottom to top, with exactly one downward line, which is the
 rollback on the left edge. The globe's arrow arrives, which is the single difference from subject
-piece 1 and the whole point of the scope. All four sub-panels have a door and a configuration chip,
+piece 1 and the whole point of the scope. The machine panel carries a city on it and is not in the
+decide colour, because where it sits is settled; the empty slot beside it is, because a second
+machine is not. All four sub-panels have a door and a configuration chip,
 and their outward arrows end in the decide-colour slot, because a second machine is a possibility this
 scope leaves open rather than a thing it builds. Nothing else is in the decide colour and nothing is
 in the defect colour, because this is the end state. Nothing leaves the top edge.

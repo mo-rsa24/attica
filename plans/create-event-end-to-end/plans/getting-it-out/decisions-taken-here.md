@@ -201,17 +201,73 @@ bookings. But D9 is unmade, and an unmade decision cannot be guaranteed not to i
 user-visible word. `the-design-system` handled the mirror image of this the same way, keeping
 `/env-pulse` as a conditional because one possible answer to D10 would make its "nothing owed" false.
 
-## The environment question this scope cannot answer is named rather than guessed
+## The target host: one small Linux machine in Johannesburg, at a fixed price
 
-**Decision.** "Where a deployed Attica would run" is written into the Environment Context section as
-a fact that is not in `environment/` and must not be inferred, and as the first thing this scope's
-first plan has to establish from a person.
+**Decision.** A deployed Attica runs on **one small Linux virtual machine, in a Johannesburg region,
+at a fixed monthly price, on an account Molefe owns.** This repository records no hosting account, no
+domain, no target host and no budget, so the fact was chosen rather than left open, in a pass with
+nobody to ask.
 
-**Why.** This repository records no hosting account, no domain, no target host and no budget. The
-project's own rule is to stop and ask rather than infer an environment fact, and the pass's
-instruction to decide rather than ask governs choices about how to write the scope, not facts about
-the world that no amount of reading the repository can produce. A guessed host would make every
-candidate comparison in the D9 plan a comparison against a fiction.
+**Why a place had to be chosen at all.** Every candidate in the D9 plan is compared on cost, on what
+it can hold open, and on what it makes a person operate by hand. All three of those are properties of
+a candidate *on a particular host*. Leaving the host open would make the D9 plan a comparison against
+a fiction, which is the same failure as guessing the answer, arrived at more slowly.
+
+**Why Johannesburg.** The users are in South Africa and the repository says so in three independent
+places. `ZAR` appears at 48 sites in `frontend/src`, the `en-ZA` locale is used at 17 sites across 10
+files, and two of the three currency defaults in the backend are `ZAR`
+(`backend/main/events/models.py:54` and `backend/main/chat/models.py:187`). The interface this
+programme is being built toward is real-time: the whole of `one-client-truth` is about a socket
+delivering state changes without a refresh, so round-trip latency is felt continuously rather than
+once per page. Region is also the choice that gets expensive to reverse, because reversing it means
+moving the data, which is the argument for taking it early rather than by default.
+
+**Why one machine.** [The scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#13-getting-it-out)
+says the topology must be logically separable while running on one machine, so one machine is what
+the constraint was written for. The whole of Attica's state today is a 2.2 MB database file and 51 MB
+of media.
+
+**Why a fixed monthly price.** No budget is recorded, and the account holder is a student. When the
+ceiling is unknown, a bill that cannot surprise is worth more than a bill that could be smaller. A
+metered platform is the right answer once somebody has stated a number, and nobody has.
+
+**The three classes it was chosen over.**
+
+A serverless or function platform loses on what it can hold open. Daphne holds long-lived WebSocket
+connections, three client components already open sockets, and the notification channel is the
+delivery path for the entire booking journey. Per-request billing and connection timeouts are the
+wrong shape for a process whose job is to stay connected.
+
+A free platform tier loses on Redis and on sleeping. The channel layer and the cache both require it
+(`settings.py:96` and `:116`), and free tiers that sleep make a real-time programme untestable: an
+undelivered notification and a sleeping dyno look identical from outside, which is exactly the class
+of confusion this programme exists to remove.
+
+A managed application platform, the kind where pushing a branch deploys it, loses on timing rather
+than on merit. It is a plausible answer to D9, and adopting it as the *host* would pre-decide the
+mechanism D9 exists to choose. A plain virtual machine is the substrate that keeps every mechanism
+candidate available, including running a managed platform on top of it later.
+
+**What this deliberately does not settle.** The provider's name, the machine's size, whether anything
+runs in a container, what supervises the processes, how a change gets from a commit to that machine,
+and whether the database and Redis sit on the box or beside it. All of those are D9 and belong to
+this scope's first plan. This entry removes the blocker; it does not take the decision.
+
+**What it constrains elsewhere, in one line.** D6 and D8 stay open, and whatever they choose should
+be in the same region as this machine, because a database or an object store in another region turns
+one network hop into two on the path this programme measures.
+
+**How to reverse it.** Change this entry and the Environment Context section it is linked from, both
+in one edit, before the D9 plan runs. After that plan runs it is written into a signed decision and
+reversing it costs a rewrite of that plan's candidate table.
+
+**What is still a person's job.** Creating the account, choosing the provider and the size, and
+paying for it. Those are `[owner: human]` criteria in the Definition of Done, not tasks, and none of
+them is done by this entry.
+
+**It is not an `environment/` fact yet.** That folder records what is true about the system the work
+runs on, and no such machine exists. It is written there once one does, as part of the whole new
+section this scope owes.
 
 ---
 
@@ -274,3 +330,11 @@ scope's plan file during a decomposition.
 
 **The live Sentry token.** Already owned, as above. Rotating it is a browser step in someone's Sentry
 account and is not this scope's, and nothing was deleted or moved.
+
+**The currency default that disagrees with the other two.** Establishing that Attica's users are in
+South Africa, which is what fixes the region, turned up `backend/main/chat/models.py:76` defaulting
+`currency` to `USD` where `chat/models.py:187` and `events/models.py:54` both default it to `ZAR`.
+That is one of the four live booking representations disagreeing with the other two, so it is
+evidence for D1 and belongs to `one-booking-truth`. It was added to
+[the open decisions](../../../../ideas/enhancing-create-event-end-to-end/WHERE-WE-LANDED.md#3-open-decisions)
+under D1, where that scope will read it, and no code was touched.
