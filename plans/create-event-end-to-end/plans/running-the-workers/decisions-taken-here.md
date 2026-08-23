@@ -193,14 +193,15 @@ own render note already records that the five domain glyphs need labels on the n
 editing the prompt to name them would have re-recorded a fix that is already recorded, on a prompt
 whose image already exists.
 
-## Where the placeholder row went in the parent's running order
+## Where this scope's rows sit in the parent's running order
 
-**Decision.** One placeholder row at position 11, with its "Waits on" cell naming
-`one-booking-truth` in words rather than by a step number.
+**Decision.** Steps 11 to 15, appended after the layers scope's four, with the two cells that depend
+on `one-booking-truth` naming it in words rather than by a step number.
 
 **Why.** Scopes 4 and 5 sit between the layers scope and this one and neither is decomposed, so
-there is no step number to point at. A number would have promised an ordering the table cannot yet
+there is no step number to point at. A number would promise an ordering the table cannot yet
 express. Naming the scope keeps the dependency readable and stays true when those rows arrive.
+Appending rather than inserting also renumbers nothing that already exists.
 
 ---
 
@@ -220,3 +221,83 @@ scope. The outbox dispatcher's claim uses a conditional `UPDATE` rather than `se
 it is safe on SQLite for one worker and unproven for two. Stating the assumption is honest; designing
 for a second worker process on a database that cannot arbitrate would be a concurrency bug written
 deliberately.
+
+---
+
+## The fifth plan was written rather than the other four trimmed to fit
+
+**Decision.** `plans/05-prove-it-and-write-it-down.md` now exists. The scope is five plans, which is
+what plans 01 to 04 always said it was.
+
+**Why.** The four plan files on disk were authored as a set of five: each opens with "of five", and
+fourteen references across three of them point at `05-prove-it-and-write-it-down.md` by name. The
+population run that wrote them stopped before the last file. That left two possible repairs, and
+only one of them is honest.
+
+Editing the four to say "of four" and stripping the fourteen references would have deleted real
+work rather than finishing it, and the work is not optional: the scope's Definition of Done carries
+six items no other plan owns. Nothing else finishes the runbook pair's second half, rewrites the two
+environment statements this scope makes false, or walks the dead-letter path. Writing the fifth file
+was the smaller change and the only one that leaves the Definition of Done reachable.
+
+**What the fifth plan owns, and where each item came from.** Nothing in it was invented. The four
+existing plans hand it work by name, and the master plan lists the rest.
+
+The second half of the runbook pair, "what is stuck" and "what died and why", is handed over
+explicitly by [03](plans/03-build-the-runner.md), which says it owns the first of the three questions
+and that 05 owns the other two, and that the second recipe finishes
+[Stack § 4](../../../../runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox)
+rather than opening a file beside it. The environment rewrites are handed over by
+[03](plans/03-build-the-runner.md), whose runner makes the four-hand-started-processes sentence
+wrong, and by [04](plans/04-close-the-two-silent-losses.md), which says of the never-pushes gap that
+"it stops being true in this plan, and 05 rewrites it". The three environment facts from
+[01](plans/01-take-the-execution-decision.md) task 4.4 are handed to `/env-pulse` here by that plan's
+own wording. The dead-letter walk is [04](plans/04-close-the-two-silent-losses.md)'s stated next
+step: 05 "gives the dead-letter table a way to be read and replayed". The cold-terminal test and the
+two pulses are Definition-of-Done items with no other owner.
+
+**What it deliberately does not do.** It changes no code, and says so in its own Description. A code
+change surfacing at this point belongs in one of the four plans before it, and putting it here would
+hide a gap in them behind a document.
+
+## The dead-letter walk is instruction 4 of plan 05, not of plan 04
+
+**Decision.** The by-hand dead-letter walk lives in the fifth plan even though the dead-lettering it
+exercises is built in the fourth.
+
+**Why.** [04](plans/04-close-the-two-silent-losses.md)'s own Next step says 05 is what "gives the
+dead-letter table a way to be read and replayed", and its engagement gate lists four pass conditions,
+none of which is the dead-letter walk. So the fourth plan was written expecting the walk to sit here.
+It also reads better here: the walk produces the real `error_message` and the real replay output that
+the recipe has to quote, so doing it one task before writing it down means the evidence is still on
+screen. A walk done a plan earlier would be written up from memory.
+
+## Committing the four plan files that were already on disk
+
+**Decision.** All five plan files are committed together, along with the three documents that said
+this scope had none.
+
+**Why.** The four were untracked, so nothing recorded that they existed and any `git clean` would
+have taken them. Committing four alone was the one option to reject outright: fourteen links pointing
+at a file that is not there is worse in the tree than the same four files sitting outside it, because
+a tracked broken link reads as a mistake somebody made rather than as work in progress.
+
+The three documents were each stating something false once the files existed: this scope's own Plans
+section said "(none yet)", the parent's running order carried a placeholder row reading "plans not
+authored yet", and this scope's map said the process lane could not be written "because this scope
+has no plan files". All three now say what is true.
+
+**What was checked before committing.** Every relative link and every in-file anchor across the five
+plans, the master plan, the map and this file resolves to something that exists. The fifth plan
+carries the same twenty sections as its four siblings. No existing plan file was renumbered or
+overwritten, and no row in the parent's running order above step 11 changed.
+
+## The map's process lane is left unwritten
+
+**Decision.** The map now says the process lane is outstanding and authorable. It was not authored.
+
+**Why.** The process lane is `populate-plans`' resolution pass over a scope's plan files, and writing
+it is that skill's job on a scope this run was reconciling rather than populating. What could not be
+left alone was the sentence explaining why it did not exist, which gave "this scope has no plan
+files" as the reason. That reason stopped being true, and a document explaining its own gap with a
+false reason is worse than one that simply names the gap.

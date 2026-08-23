@@ -164,12 +164,15 @@ Every piece in this map is hedged. Nothing in this scope is built.
 
 ## Process lane
 
-Not authored yet. `populate-plans` writes it once this scope has plan files, and each changed
-regeneration is stamped into `diagrams/process-versions/`.
+Outstanding. The five plan files it draws from now exist, so it is authorable: `populate-plans`
+writes it from them in running order, taking its gates and failure branches from each plan's
+engagement gate and its ❌ branches. Each changed regeneration is stamped into
+`diagrams/process-versions/`.
 
 ---
 
 ## What is outstanding
 
 Six prompts, none rendered: five subject pieces and the subject capstone. The process lane and its
-capstone do not exist yet, because this scope has no plan files. Nothing in `diagrams/` yet.
+capstone are not written yet, and nothing blocks them: the five plan files they draw from are in
+place. Nothing in `diagrams/` yet.

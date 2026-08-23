@@ -238,9 +238,16 @@ of a dispatch and, a cycle later, the notification arrives anyway.
 
 ## Plans
 
-(none yet. `populate-plans` authors this folder's plan files. The order they run in is the
-[parent's running order](../../MASTER_PLAN.md#running-order), which carries a placeholder row for
-this scope until then.)
+This folder's contents. The order that matters is the
+[parent's running order](../../MASTER_PLAN.md#running-order).
+
+| Plan | What it does | Status |
+|---|---|---|
+| [01 Take the execution decision](plans/01-take-the-execution-decision.md) | Settle D7: what runs the recurring work, with the candidates that lost and why each lost | ⚠️ not started |
+| [02 Make the commands honest](plans/02-make-the-commands-honest.md) | Resolve the two commands that lie about what they do, so nothing goes on a clock while it is still wrong | ⚠️ not started |
+| [03 Build the runner](plans/03-build-the-runner.md) | Put every non-seed scheduling command on the runner, with a log that answers "is it moving" | ⚠️ not started |
+| [04 Close the two silent losses](plans/04-close-the-two-silent-losses.md) | The reaper for stranded `processing` rows, and one notification path that pushes as well as persists | ⚠️ not started |
+| [05 Prove it and write it down](plans/05-prove-it-and-write-it-down.md) | The two runbook questions nothing answers, and the two environment facts this scope made false | ⚠️ not started |
 
 ---
 

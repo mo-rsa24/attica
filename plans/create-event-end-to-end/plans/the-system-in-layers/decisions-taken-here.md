@@ -328,6 +328,7 @@ The requirement that a scope depending on an unmade decision says so is met: the
 section on what this scope may draw while three decisions are open names D1, D2 and D3, and the four
 plans draw what the code does on the day it is drawn rather than what an answer might make it.
 
-**What this leaves untouched, deliberately.** `running-the-workers` has four plan files on disk that
-the parent's running order still describes as not authored yet, and they are not under version
-control. That is that scope's reconciliation to make and its files to commit, not this one's.
+**What this run found next door.** `running-the-workers` had four plan files on disk, untracked, out
+of a set of five, with the fifth never written and fourteen links across three of them pointing at
+it by name. The repair belongs to that scope and is recorded in
+[its own decisions](../running-the-workers/decisions-taken-here.md), not here.
