@@ -663,6 +663,7 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | The eight pinned commands and their before-numbers | inside the decision record | — | not started |
 | The contract plans 02, 03 and 04 build against | inside the decision record | — | not started |
 | The three neighbour lines | inside the decision record | — | not started |
+| What the two screens showed: the dead class, and the two elements carrying two different greys | inside the decision record | — | not started |
 | A dead class shown in DevTools with no matching rule | `artifacts/figures/the-design-system/dead-class-in-devtools.png` | — | not started |
 | Three empty rooms | [piece 1](../diagram-prompts.md#piece-1-three-empty-rooms-planned--not-rendered) → `../diagrams/subject-01-three-empty-rooms.png` | subject | ⏳ not rendered |
 | The inventory nobody chose | [piece 2](../diagram-prompts.md#piece-2-the-inventory-nobody-chose-planned--not-rendered) → `../diagrams/subject-02-the-inventory-nobody-chose.png` | subject | ⏳ not rendered |

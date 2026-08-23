@@ -516,6 +516,7 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | The fifteen narrow spaces, each with its decision | inside the layout rules | — | not started |
 | The two mobile layouts, named as layouts | inside the layout rules | — | not started |
 | The after-numbers, with the same commands | inside the layout rules | — | not started |
+| The mobile walk's verdicts: works, tight but usable, or unusable per wizard step, and what happened to the filter sidebar | inside the layout rules | — | not started |
 | One card at two container widths, and unchanged at two window widths | `artifacts/figures/the-design-system/one-card-two-container-widths.png` | — | not started |
 | Every wizard step at iPhone SE width | `artifacts/figures/the-design-system/mobile-wizard-step-NN.png` | — | not started |
 | Every card is told the window's width | [piece 6](../diagram-prompts.md#piece-6-every-card-is-told-the-windows-width-planned--not-rendered) → `../diagrams/subject-06-every-card-is-told-the-windows-width.png` | subject | ⏳ not rendered |

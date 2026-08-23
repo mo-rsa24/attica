@@ -482,6 +482,7 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | One reduced-motion rule replacing three | `frontend/src/index.css`, `frontend/src/App.css` | — | not started |
 | The seven ambient animations, each decided | inside the motion rules | — | not started |
 | The intended behaviour of the two dead class names | inside the motion rules | — | not started |
+| What the reduced-motion check showed: which movements were visible, which stopped under each method, and any hover pair still settling at two speeds | inside the motion rules | — | not started |
 | The home page with reduced motion on | `artifacts/figures/the-design-system/reduced-motion-on.png` | — | not started |
 | Three empty rooms | [piece 1](../diagram-prompts.md#piece-1-three-empty-rooms-planned--not-rendered) → `../diagrams/subject-01-three-empty-rooms.png` | subject | ⏳ not rendered |
 | Seven plans, seven gates | [process prompt 2](../diagram-prompts.md#prompt-2-process-seven-plans-seven-gates-planned--not-rendered) → `../diagrams/process-02-seven-plans-seven-gates.png` | process | ⏳ not rendered |

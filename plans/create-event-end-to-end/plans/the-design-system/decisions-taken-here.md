@@ -190,6 +190,27 @@ This scope has eight such numbers rather than one, so the risk is eight times la
 commands are a deliverable of plan 01 for that reason, and every later plan's after-number is
 specified as "the command from plan 01, run again".
 
+## The scope was checked against its own preflight before being called done
+
+**Decision.** `/verify-plan` was run over all seven plan files as the last act of authoring them,
+rather than left for whoever opens plan 01 first.
+
+**Why.** Every plan in this scope opens with a task 0 telling its reader to run that check before
+working from the plan. A scope that ships seven plans none of which has been checked is asking the
+first reader to do the author's proofreading, and it is the cheapest possible check to run.
+
+**What it found, and what changed.** Structure, section order, breadcrumbs, hierarchical task
+numbering, the Error Matrix subsections, the Orchestration columns, the three maintenance tasks with
+their paths written in, and every `▶ Next` and `◀ Needs` pointer with a resolving anchor all passed
+on all seven. One finding stood: four plans asked a person to write something down during a by-hand
+check with no Outputs / Deliverables row to hold it, so the observation would have landed in a chat
+message and been lost. Each of those four gained one row naming where it goes, and
+[plan 05](plans/05-the-components-that-own-the-styles.md)'s task 3.2 gained the filename it had left
+implicit.
+
+**What was deliberately not repaired.** Nothing. The check surfaced one class of gap and it was
+closed in the same pass.
+
 ## The master plan carries the counts rather than deferring them all to plan 01
 
 **Decision.** The numbers appear in full in the master plan's "What is true today" section, not only

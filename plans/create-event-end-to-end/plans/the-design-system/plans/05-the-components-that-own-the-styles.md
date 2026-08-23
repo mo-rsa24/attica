@@ -376,9 +376,12 @@ was found to work rather than what was intended.
     [07](07-prove-it-and-write-it-down.md)'s runbook recipe is written from this section.
 
 - [ ] **3.2 Record what instruction 4 found**
-  - The time the ten-minute test took, and every question the builder had to ask or guess.
-  - Done when: each question is either answered in the placement note or listed as a known gap. The
-    questions are the actual output of that test; the time is only the headline.
+  - Into `artifacts/notes/the-design-system/where-the-components-live.md`, in its own section: the
+    time the ten-minute test took, every question the builder had to ask or guess, and any property
+    where the new card differed from the existing one.
+  - Done when: each question is either answered elsewhere in the placement note or listed there as a
+    known gap. The questions are the actual output of that test; the time is only the headline, and
+    [07](07-prove-it-and-write-it-down.md) writes the first runbook recipe from them.
 
 - [ ] **3.3 Write the grouping's card entry**
   - Add the placement note to `artifacts/notes/the-design-system/README.md` per
@@ -503,6 +506,7 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | The states the interface displays, read with their sources | inside the placement note | — | not started |
 | What was migrated and what was left | inside the placement note | — | not started |
 | The after-numbers, with the same commands | inside the placement note | — | not started |
+| What the ten-minute test showed: the time, every question the builder had to guess, and any property that differed from an existing card | inside the placement note | — | not started |
 | One card built from the layer, beside an existing card | `artifacts/figures/the-design-system/one-card-built-from-the-layer.png` | — | not started |
 | The skeleton holding the card's geometry | `artifacts/figures/the-design-system/skeleton-preserves-geometry.png` | — | not started |
 | One button, sixty-four times | [piece 3](../diagram-prompts.md#piece-3-one-button-sixty-four-times-planned--not-rendered) → `../diagrams/subject-03-one-button-sixty-four-times.png` | subject | ⏳ not rendered |
