@@ -168,8 +168,12 @@ Navigation: ⬅️ [Illustrations](#illustrations) | 📋 [TOC](#table-of-conten
    that is comes from task 1.1's worklist rather than from a number written here: it is the nine
    system diagrams the scope owes plus the rest of the environment map's own pieces, and
    [02](02-draw-the-layers-map.md) task 1.2 decides whether that lane is three pieces or four.
-2. **This scope's own map rendered too**: six subject pieces, the subject capstone, and the process
-   capstone.
+2. **This scope's own map rendered too**: six subject pieces, the subject capstone, the process lane
+   and the process capstone. Nine, which is the count [the map](../diagram-prompts.md#what-is-outstanding)
+   itself gives. The lane version is rendered like any other prompt, the way the sibling scope renders
+   both of its lane versions beside its capstone. The copy of the lane under
+   `../diagrams/process-versions/` is a dated record, not a tenth prompt, and task 1.1 does not sweep
+   that folder.
 3. **Two runbook recipes**: turning a prompt into a filed image, and proving a filed image still
    matches the code.
 4. **The scope's close out**: `env-pulse`, the recall gallery, and the sync that flips this scope to
@@ -311,7 +315,8 @@ rendering and judging an image is not something a command does.
 4.4 **Repeat 4.2 and 4.3 for the rest of the worklist**
    - Order, by group rather than by count: the layers map, then the environment map's other subject
      pieces, then its process lane, then the four in `how-a-booking-happens`, then the four in
-     `onboarding-a-new-developer`, then this scope's own map.
+     `onboarding-a-new-developer`, then this scope's own map, whose lane version is rendered as well
+     as its capstone.
    - Expected result: one file per row of the task 1.1 worklist, each at the `Save as:` path that
      row names, and no row left without a file.
 
@@ -437,6 +442,7 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | Four diagrams in the onboarding grouping | `artifacts/figures/onboarding-a-new-developer/` | subject | ⏳ not rendered |
 | This scope's six subject pieces | `../diagrams/subject-0*.png` | subject | ⏳ not rendered |
 | This scope's subject capstone | `../diagrams/subject-capstone-the-layers-glyph-opened-up.png` | subject | ⏳ not rendered |
+| This scope's process lane, version 01 | `../diagrams/process-01-four-stages.png` | process | ⏳ not rendered |
 | This scope's process capstone | `../diagrams/process-capstone-four-stages.png` | process | ⏳ not rendered |
 | The rendering recipe | `runbook/` | — | not started |
 | The checking recipe | `runbook/` | — | not started |

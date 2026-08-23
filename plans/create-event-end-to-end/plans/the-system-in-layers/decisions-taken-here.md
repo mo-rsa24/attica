@@ -293,6 +293,18 @@ that instead of saying nine, its Outputs table carries the missing row, and Goal
 says in one line that nine is what the scope owes rather than what it renders. The alternative,
 keeping a number, means five places to hold in sync and a set that quietly files short.
 
+**The scope's own map is rendered at nine prompts, not eight.**
+[04](plans/04-render-check-and-write-it-down.md) listed six subject pieces, the subject capstone and
+the process capstone, and left out the process lane version itself, which carries a `Save as:` path
+and a not-rendered mark like every other prompt in
+[the map](diagram-prompts.md#what-is-outstanding). The lane version is a render target: the map's own
+outstanding count says nine, and `fixing-create-event` has both of its lane versions rendered to
+`process-01-unblock-then-reclassify.png` and `process-02-three-plans-three-gates.png` beside its
+capstone, so that is the tree's practice rather than a reading of the contract. 04 now names the lane
+in its Description, its render order and its Outputs table. The dated copy of the lane under
+`diagrams/process-versions/` is a record rather than a tenth prompt, and task 1.1's sweep does not
+reach that folder, so nothing is counted twice.
+
 **One happy path had no failure beside it.** The failure criterion was scoped to the nine, and the
 environment map's process lane, one request from an organizer to a provider's screen, is a happy path
 outside them. [02](plans/02-draw-the-layers-map.md) task 1.4 now states the failure choice the same
