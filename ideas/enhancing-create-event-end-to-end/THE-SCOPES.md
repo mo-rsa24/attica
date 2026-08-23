@@ -25,10 +25,11 @@ writes it as one of its commit writes, so the ten scopes not yet decomposed get 
 The two that exist already have one.
 
 **The catch is the parent capstone.** A child map is the zoom-in on one glyph in the parent's picture,
-and the parent has five subject pieces for thirteen scopes. `performance-architecture`,
-`the-event-workspace`, `the-design-system` and `getting-it-out` have no glyph there to zoom into yet,
-so decomposing each of those amends the parent capstone in the same commit. That is four amendments
-coming, and they are cheap individually and expensive to discover all at once at the end.
+so a scope with no glyph there amends the capstone in the same commit as its decomposition. The
+capstone now names the five domain scopes, the three experience scopes, and the two that run
+alongside, which leaves `performance-architecture` as the only scope without its own glyph: it is one
+scope drawn as a whole panel, so the panel is its glyph and decomposing it amends nothing. Every
+amendment this prediction was written for has been made.
 
 ## Running order
 
@@ -247,7 +248,9 @@ ignore from gap-detected-and-refetch. Delivery is at-least-once, never exactly-o
 
 **build** Reconnect and snapshot recovery, so a dropped socket degrades to slow rather than to wrong.
 
-**fix** Two realtime models coexist in chat: a WebSocket and an eight-second poll. Pick one.
+**fix** The eight-second poll is a fallback that runs only after the socket errors, and in
+`ChatRoom` it is permanent, because that component never reconnects. One shared transport with one
+reconnect policy, rather than three components each answering the question their own way.
 
 ### 11. the-event-workspace
 

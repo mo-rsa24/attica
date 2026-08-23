@@ -16,7 +16,10 @@ A fourth is planned and waiting rather than startable:
 [running-the-workers](plans/running-the-workers/MASTER_PLAN.md) has its master plan and its five
 plan files, but the work itself waits on `one-booking-truth`.
 
-The remaining eight sub-scopes are named below and not yet decomposed.
+A fifth, [one-client-truth](plans/one-client-truth/MASTER_PLAN.md), has its master plan and no plan
+files yet. It waits on `running-the-workers`, and its plan files are authored by `populate-plans`.
+
+The remaining seven sub-scopes are named below and not yet decomposed.
 
 ## Running order
 
@@ -40,6 +43,7 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 13 | [Build the runner](plans/running-the-workers/plans/03-build-the-runner.md) | Every non-seed scheduling command on the runner, with a log that answers "is it moving" | ⚠️ not started | 11, 12 |
 | 14 | [Close the two silent losses](plans/running-the-workers/plans/04-close-the-two-silent-losses.md) | The reaper for stranded `processing` rows, and one notification path that pushes as well as persists | ⚠️ not started | 13 |
 | 15 | [Prove it and write it down](plans/running-the-workers/plans/05-prove-it-and-write-it-down.md) | The two runbook questions nothing answers, and the two environment facts this scope made false | ⚠️ not started | 14 |
+| 16 | [one-client-truth](plans/one-client-truth/MASTER_PLAN.md) | One cache the client reads, an envelope carrying an entity version, and a reconnect that recovers. Plans not authored yet | ⚠️ not started | 15 |
 
 Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
@@ -49,6 +53,12 @@ rather than by step number do so because that scope is not decomposed yet, so th
 point at. Steps 11 and 12 wait on it and on each other for nothing, so they run at the same time.
 Two undecomposed domain scopes, `one-booking-truth` and `contention-and-holds`, sit between step 10
 and step 11 in the sub-scope order below and contribute no rows here yet.
+
+Step 16 is a scope rather than a plan. `one-client-truth` has a master plan and no plan files, so it
+holds one placeholder row until `populate-plans` runs there and replaces it with a row per plan. It
+sits directly after step 15 because it waits on `running-the-workers` and on nothing else; the three
+undecomposed domain scopes between them in the sub-scope order will push it down when they are
+decomposed.
 
 Steps 7 to 10 are grouped after the two blockers in this table rather than interleaved through them,
 because nothing in either direction gates the other: the layers scope needs no login and no green
@@ -142,7 +152,7 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 | 7 | `availability-that-is-true` | domain | 5, 6 |
 | 8 | `the-booking-journey` | domain | 5, 6 |
 | 9 | `performance-architecture` | performance | 7, 8 |
-| 10 | `one-client-truth` | experience | 6 |
+| 10 | [one-client-truth](plans/one-client-truth/MASTER_PLAN.md) | experience | 6 |
 | 11 | `the-event-workspace` | experience | 8, 10 |
 | 12 | `the-design-system` | experience | 2 |
 | 13 | `getting-it-out` | cross | 4 |
@@ -151,7 +161,8 @@ Scopes 1, 2, 3 and 12 start immediately. After 8 lands, the performance and expe
 parallel.
 
 `fixing-create-event`, `getting-in`, `the-system-in-layers` and `running-the-workers` have plan
-files. The other eight are named here and not yet decomposed.
+files. `one-client-truth` has a master plan and no plan files yet. The other seven are named here and
+not yet decomposed.
 
 ---
 

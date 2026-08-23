@@ -99,12 +99,14 @@ Rendered to [diagrams/whole-scope-in-one-picture.png](diagrams/whole-scope-in-on
 out of blockers, the two upper planes are drawn side by side at the same height with the band
 between them, and the acceptance panel carries two browsers with the refresh crossed through.
 
-Three things the rendered image gets wrong, all fixed in the prompt below and waiting on the next
+Four things the rendered image gets wrong, all fixed in the prompt below and waiting on the next
 render. The five domain glyphs came out unlabelled apart from "booking truth", so a reader cannot
 tell contention from workers from availability from the journey; the prompt now names all five. The
 arrows inside the domain panel point inward toward booking truth where the dependency runs outward
-from it, which the prompt has always said. And the deploy glyph in the alongside column came out
-unlabelled; the prompt now labels it.
+from it, which the prompt has always said. The deploy glyph in the alongside column came out
+unlabelled; the prompt now labels it. And the experience panel is drawn as one undivided panel where
+it holds three scopes; the prompt now names its three component glyphs, the way the domain panel
+names its five.
 
 **Visual thesis.** Nothing above the blockers is measurable until the blockers land, the domain plane
 gates both other planes, and the two upper planes run side by side.
@@ -116,8 +118,11 @@ five component glyphs, each carrying its own label under it: "booking truth", "c
 "the workers", "availability" and "the booking journey". The booking-truth glyph feeds the other
 four. Above that, two panels drawn side by side at the same height, performance on the left and
 experience on the right, both receiving an upward arrow from domain, with a horizontal band between
-them labelled "these two run at the same time". The top panel, acceptance, holds two browser cards
-facing each other with a purple dashed arrow between them and a refresh glyph crossed through.
+them labelled "these two run at the same time". The performance panel holds one scope, so the panel
+is its glyph and carries no components inside it. The experience panel holds three, each drawn as its
+own component glyph carrying its own label under it: "one client truth", "the event workspace" and
+"the design system". The top panel, acceptance, holds two browser cards facing each other with a
+purple dashed arrow between them and a refresh glyph crossed through.
 
 To the right of the whole stack, outside the panels, two smaller glyphs on their own vertical line
 labelled "alongside, from day one": a layers diagram glyph labelled "the system in layers", and a

@@ -62,14 +62,23 @@ two different functions write notification rows into it. `create_notification`
 dispatch uses, writes the row and stops. So the socket is wired at both ends for chat and at one end
 for the whole booking journey, and the fix is to copy the writer that already works.
 
+**Half of the real-time envelope.** Four scheduling models carry a `version` field
+(`ResourcePolicy`, `AvailabilityRule`, `AvailabilitySlot` and `Booking`) and five serializer field
+lists expose it, and `OutboxEvent` carries `aggregate_type` and `aggregate_id` as real columns. None
+of it travels over a socket: every push carries a notification row with a title and a message string
+and no version at all. `BookingRequest`, the entity the journey turns on, has no version field, and
+the two sites that bump a version use `F("version") + 1`, so the code that just saved the row cannot
+read the new number back without a second query.
+
 Most of the booking journey described in the third review is in this category: implemented, correct
 looking, and doing nothing because no worker runs and no event is pushed.
 
 ### Missing
 
 A payment provider interface, so the mock is a field rather than an adapter. Cancellation policy and
-refund tiers. Screen-shaped read endpoints. An event-convergence projection. A real-time event
-envelope with a monotonic version and gap detection. One server-state layer on the client. Design
+refund tiers. Screen-shaped read endpoints. An event-convergence projection. One server-state layer
+on the client, where today there is no data layer at all and 132 fetch call sites across 38 of the
+110 client files. Design
 tokens, a typography scale and a motion language. Client-side draft persistence. Direct-to-storage
 upload and image variants. Connection pooling. Any deployment mechanism at all. An activity or inbox
 surface.
@@ -82,8 +91,10 @@ five dashboards are unreachable. The browser suite runs logged out. Capacity 250
 times on mount. A screen claims 100MB against a 50MB limit. One route never renders and the step
 counter disagrees with the routes. The idempotency key is generated per click. `select_for_update`
 does not lock on SQLite. Resume works from one entrance only. No loading indicator exists in any of
-the eight step files. Four live representations of a booking, of which the chat one is the most
-referenced. An outbox event claimed into `processing` is stranded for good, because the dispatcher
+the eight step files. Three components open their own WebSocket with three different reconnect
+policies, one of which is no reconnect at all, and none of the three refetches after a reconnect, so
+whatever changed during a gap is simply absent. Four live representations of a booking, of which the
+chat one is the most referenced. An outbox event claimed into `processing` is stranded for good, because the dispatcher
 only ever selects `pending` and `failed` and no reaper returns it.
 
 ## 3. Open decisions
@@ -155,7 +166,7 @@ everything else after the transaction. Connection pooling. Image variants and di
 upload.
 
 **Experience.** One server-state layer that WebSocket events patch rather than a parallel state
-tree. A real-time envelope with versions and gap recovery. A persistent application shell so the
+tree, replacing 132 fetch call sites across 38 of the 110 client files with no cache between them. A real-time envelope with versions and gap recovery. A persistent application shell so the
 wizard reads as one object. Wizard step as navigation state, separate from completion state, so
 resume works from any entrance. Autosave with a visible save state. Optimistic everywhere except
 scarce inventory. Design tokens, typography roles, a motion language with duration bands, container

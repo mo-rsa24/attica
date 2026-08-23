@@ -121,8 +121,8 @@ than picking a round number: the webhook timeout is 5 seconds
 A reaper that returns an event to `pending` may cause a second delivery of something that was
 actually sent just before the worker died. That is correct behaviour for this design and it must be
 said out loud, because the alternative is losing events. Where a duplicate notification would be
-visibly wrong to a user, that is a finding for `one-client-truth`, scope 10, which owns the event
-envelope and its version.
+visibly wrong to a user, that is a finding for [one-client-truth](../../one-client-truth/MASTER_PLAN.md),
+scope 10, which owns the event envelope and its version.
 
 **Watch the frames, not the interface.**
 
@@ -305,8 +305,8 @@ For Claude to execute. Ask Claude to do these.
 - [ ] **2.2 State at-least-once where somebody would assume otherwise**
   - One comment beside the reclaim: a reclaimed event may be delivered twice if the worker died
     after sending and before recording, and that is the intended trade against losing it. Name
-    `one-client-truth`, scope 10, as the scope that makes duplicates harmless with an entity version
-    on the event envelope.
+    [one-client-truth](../../one-client-truth/MASTER_PLAN.md), scope 10, as the scope that makes
+    duplicates harmless with an entity version on the event envelope.
   - Done when: a reader who arrives at this function expecting exactly-once is told otherwise in the
     file rather than in a plan.
 
