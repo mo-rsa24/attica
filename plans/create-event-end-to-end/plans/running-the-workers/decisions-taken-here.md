@@ -189,19 +189,31 @@ one, which the existing vocabulary states exactly. The sibling scope `the-system
 justify a document glyph; this one had nothing to justify, and saying so is worth a sentence so a
 later reader does not go looking for the addition.
 
-## The parent capstone was not amended
+## The parent capstone gets labels, not a new glyph
 
-**Decision.** [The parent's subject capstone](../../diagram-prompts.md)
-was left untouched.
+**Decision.** No glyph was added to [the parent's subject capstone](../../diagram-prompts.md). Its
+five domain glyphs are now named in the prompt, one of those names being this scope's, and the
+deploy glyph in the alongside column is named too.
 
-**Why.** The rule is that a scope with no glyph in the parent capstone gets one added in the same
-commit. This scope has one: it is among the five component glyphs in the capstone's domain panel,
-and [the scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md) names the four
-scopes that lack a glyph, which are `performance-architecture`, `the-event-workspace`,
-`the-design-system` and `getting-it-out`. This is not one of them. The capstone is `[built]` and its
-own render note already records that the five domain glyphs need labels on the next render, so
-editing the prompt to name them would have re-recorded a fix that is already recorded, on a prompt
-whose image already exists.
+**Why no new glyph.** The rule is that a scope with no glyph in the parent capstone gets one added in
+the same commit. This scope has one: it is among the five component glyphs in the capstone's domain
+panel, and [the scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md) names the
+four scopes that lack a glyph, which are `performance-architecture`, `the-event-workspace`,
+`the-design-system` and `getting-it-out`. This is not one of them.
+
+**Why the labels anyway.** A glyph nobody can identify does not carry the scope into the parent
+picture, which is the thing the rule exists to guarantee. The capstone's own render note said the
+five domain glyphs came out unlabelled and that the label belongs on each; it recorded the fault
+without saying what the labels are, so the next render would have had to re-derive five names.
+Naming them costs a line and settles it. The five are the parent's own sub-scope names, already in
+[its Sub-Scopes table](../../MASTER_PLAN.md#sub-scopes), so nothing is invented and no vocabulary is
+added: the pinned art direction already calls for a clean label under every icon.
+
+**What was deliberately left alone.** The arrow structure inside the domain panel. The prompt says
+booking truth feeds the other four, and the running order is finer than that (scopes 7 and 8 wait on
+5 and 6, not directly on 4). The capstone is the coarse view and it is `[built]`, so re-cutting its
+dependency structure is a bigger claim than labelling and belongs to whoever redraws it, not to a
+scope correcting its own glyph. The render note keeps the arrow fault on the list.
 
 ## Where this scope's rows sit in the parent's running order
 

@@ -99,10 +99,12 @@ Rendered to [diagrams/whole-scope-in-one-picture.png](diagrams/whole-scope-in-on
 out of blockers, the two upper planes are drawn side by side at the same height with the band
 between them, and the acceptance panel carries two browsers with the refresh crossed through.
 
-Three things to fix on the next render. The five domain glyphs are unlabelled apart from "booking
-truth", so a reader cannot tell contention from workers from availability from the journey; the
-label belongs on each glyph. The arrows inside the domain panel point inward toward booking truth,
-and the dependency runs the other way. And the deploy glyph in the alongside column carries no label.
+Three things the rendered image gets wrong, all fixed in the prompt below and waiting on the next
+render. The five domain glyphs came out unlabelled apart from "booking truth", so a reader cannot
+tell contention from workers from availability from the journey; the prompt now names all five. The
+arrows inside the domain panel point inward toward booking truth where the dependency runs outward
+from it, which the prompt has always said. And the deploy glyph in the alongside column came out
+unlabelled; the prompt now labels it.
 
 **Visual thesis.** Nothing above the blockers is measurable until the blockers land, the domain plane
 gates both other planes, and the two upper planes run side by side.
@@ -110,15 +112,16 @@ gates both other planes, and the two upper planes run side by side.
 Four stacked rounded panels, bottom to top. The bottom panel, blockers, holds two glyphs: a test
 suite card with a red cross and a login card with three closed gates. An upward arrow leaves it
 carrying the label "nothing above is measurable until this is green". The panel above, domain, holds
-five component glyphs with the booking-truth glyph feeding the other four. Above that, two panels
-drawn side by side at the same height, performance on the left and experience on the right, both
-receiving an upward arrow from domain, with a horizontal band between them labelled "these two run at
-the same time". The top panel, acceptance, holds two browser cards facing each other with a purple
-dashed arrow between them and a refresh glyph crossed through.
+five component glyphs, each carrying its own label under it: "booking truth", "contention and holds",
+"the workers", "availability" and "the booking journey". The booking-truth glyph feeds the other
+four. Above that, two panels drawn side by side at the same height, performance on the left and
+experience on the right, both receiving an upward arrow from domain, with a horizontal band between
+them labelled "these two run at the same time". The top panel, acceptance, holds two browser cards
+facing each other with a purple dashed arrow between them and a refresh glyph crossed through.
 
 To the right of the whole stack, outside the panels, two smaller glyphs on their own vertical line
 labelled "alongside, from day one": a layers diagram glyph labelled "the system in layers", and a
-deploy glyph.
+deploy glyph labelled "getting it out".
 
 Every piece in this map is hedged. Nothing in this scope is built.
 
