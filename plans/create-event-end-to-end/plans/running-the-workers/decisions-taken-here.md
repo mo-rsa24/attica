@@ -292,12 +292,51 @@ plans, the master plan, the map and this file resolves to something that exists.
 carries the same twenty sections as its four siblings. No existing plan file was renumbered or
 overwritten, and no row in the parent's running order above step 11 changed.
 
-## The map's process lane is left unwritten
+## The map's process lane, and the run that asked for a decomposition already done
 
-**Decision.** The map now says the process lane is outstanding and authorable. It was not authored.
+**Decision.** The request was `decompose-plan` for this scope. This scope was already decomposed, so
+the decomposition was not re-run. The one thing that skill owes a child scope and that was still
+missing here, the map's process lane, was written instead, in three prompts, with its version 01
+stamped in `diagrams/process-versions/`.
 
-**Why.** The process lane is `populate-plans`' resolution pass over a scope's plan files, and writing
-it is that skill's job on a scope this run was reconciling rather than populating. What could not be
-left alone was the sentence explaining why it did not exist, which gave "this scope has no plan
-files" as the reason. That reason stopped being true, and a document explaining its own gap with a
-false reason is worse than one that simply names the gap.
+**Why.** Every write `decompose-plan` makes was already on disk: this folder, its master plan, its
+five plans, its map, the parent's Sub-Scopes entry, and the parent's running-order rows 11 to 15.
+Re-running it would have rewritten the master plan and re-created a `plans/` folder that already
+holds five files, which is the one outcome that cannot be undone by reading the diff. The process
+lane was the only genuine gap, and its own stub already said it was authorable because the five plan
+files it draws from exist.
+
+**Why three prompts and not five.** One prompt per plan would have drawn the same five stages five
+times. The three each do a different job: why steps 11 and 12 come before anything is scheduled,
+what each of the five gates actually checks, and the before-and-after of the whole scope. Prompt 1
+and prompt 2 overlap on the same two stages on purpose, at different zoom.
+
+**How the pinned reading axes survived a lane about time.** The parent pins vertical to upward
+dependency and horizontal to "these two can run at the same time", and a process lane is usually
+drawn left to right as time. Here they did not have to be traded: steps 11 and 12 both wait on
+`one-booking-truth` and on nothing else, and 13 waits on both, so time and dependency point the same
+way and the two side-by-side panels mean exactly what the parent says side by side means. Sequence is
+carried by the running-order step badges, and the lane says so in its opening paragraph rather than
+leaving a reader to assume a new axis meaning.
+
+**What the lane was allowed to use.** Only the five pinned colours (blue dashed a request, green
+solid a write, orange dashed a queued or outbox event, purple dashed a WebSocket push, red a
+confirmed defect), the four glyphs this scope's art direction already names, and the sequencing
+devices the format contract grants every process lane: numbered step badges, phase containers and
+gate bars. No new colour meaning, no new glyph, no sixth tier.
+
+**One faithfulness rule runs through all three notes.** Purple dashed appears only where step 14 has
+already happened. Prompt 1 forbids it outright, because drawing delivery at the point where the two
+commands are made honest would claim the scope finished two steps early, and that is the exact
+misreading this scope exists to correct: the machinery looking finished while nothing reaches a
+person.
+
+## The parent's process lane was left alone
+
+**Decision.** The parent scope's own process lane still reads "Not authored yet" and was not written
+in this run.
+
+**Why.** It draws from the parent's plan files across thirteen sub-scopes, four of which have plans
+and nine of which do not. Authoring it now would fix a picture of a tree that is a third built, and
+the lane is regenerated whole rather than patched, so the work would be redone rather than extended.
+The request named one scope, and the parent's lane is not that scope's to write.

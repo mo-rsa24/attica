@@ -334,3 +334,8 @@ art direction, palette, glyph vocabulary and tiers, and reading axes exactly, an
 of its own. It is the zoom-in on the workers glyph in
 [the parent's subject capstone](../../diagram-prompts.md), which keeps it as one glyph in the domain
 panel.
+
+The map carries both lanes. The subject lane and its capstone draw the machinery this scope touches;
+the process lane draws the five plans over that same cast, with each plan's engagement gate as the
+thing it checks. The process lane is regenerated whole rather than patched, and every version of it
+is kept in [the process history](diagrams/process-versions/).

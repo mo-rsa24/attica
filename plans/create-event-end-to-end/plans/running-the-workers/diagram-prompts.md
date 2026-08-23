@@ -164,15 +164,128 @@ Every piece in this map is hedged. Nothing in this scope is built.
 
 ## Process lane
 
-Outstanding. The five plan files it draws from now exist, so it is authorable: `populate-plans`
-writes it from them in running order, taking its gates and failure branches from each plan's
-engagement gate and its ❌ branches. Each changed regeneration is stamped into
-`diagrams/process-versions/`.
+The same cast as the subject lane with the five plan files drawn over it: what runs when, and what
+each gate actually checks. Sequence is carried by the numbered step badges, which are the parent's
+running-order numbers 11 to 15, so the pinned reading axes hold unchanged. Upward is still
+dependency, and two things side by side still means they can run at the same time.
+
+History: `diagrams/process-versions/`. This lane is regenerated whole, never patched.
+
+### Prompt 1 (Process): nothing goes on a clock while it is still wrong `[planned]` ⏳ not rendered
+
+**Save as:** `diagrams/process-01-nothing-goes-on-a-clock-yet.png`
+
+**Visual thesis.** Two things have to be true before a single job is scheduled: somebody has chosen
+what runs it, and no command is still named for a job it does not do. Putting a lie on a clock runs
+the lie every minute instead of when somebody remembers.
+
+Two panels side by side at the same height at the bottom, because both wait on the same earlier
+scope and on nothing else.
+
+The left panel carries step badge 11. Inside it, a worker gear drawn as an empty outline with a
+question-mark glyph on it, a candidate row beneath it in muted grey with nothing chosen, and a
+person figure at a terminal card to one side with blue dashed arrows running into the candidate row,
+because every exists-here answer in that row comes from a command run on this machine rather than
+from memory.
+
+The right panel carries step badge 12. Inside it, two command glyphs with different labels both
+arrowed into one service glyph with a red chip across the pair, and, to the side, a cylinder with one
+highlighted field row. One orange dashed arrow now leaves that cylinder into a queue tray, where the
+subject lane's drawing of the same pair had only a stub that stopped short.
+
+Above both panels, spanning their full width, one horizontal gate bar carrying step 13's platform
+above it. The bar holds two small icons, a signed sheet and a counter, and is captioned with what
+must be true to cross it. The only two arrows entering the bar come upward, one from each panel, and
+nothing crosses it from the sides.
+
+**Faithfulness note.** The two panels are the same height and neither feeds the other. The gear in
+the left panel is still an outline with nothing chosen beside it; step 11 produces a signature, not a
+running process. The right panel's change is exactly one orange dashed arrow reaching the queue tray,
+and no purple dashed arrow appears anywhere in this image, because delivery is step 14 and drawing it
+here claims the scope is finished two steps early. The gate spans both panels rather than sitting
+over one.
+
+### Prompt 2 (Process): five steps, five gates `[planned]` ⏳ not rendered
+
+**Save as:** `diagrams/process-02-five-steps-five-gates.png`
+
+**Visual thesis.** Every step here is closed by somebody checking something a test cannot, and four
+of the five gates are a person at a screen rather than a suite going green.
+
+Five stages on the dominant vertical axis, read bottom to top, each carrying its running-order step
+badge and each closed on its upper edge by a gate bar holding one icon that names what it checks.
+Steps 11 and 12 are the two lowest and sit side by side at the same height; 13, 14 and 15 stack
+singly above them.
+
+Step 11, the decision: the outlined gear and the candidate row, gate holding a signed sheet,
+captioned that somebody else can build from it without asking.
+
+Step 12, the honest commands: two command glyphs into one service glyph with a red chip, gate
+holding a counter, captioned as a count taken before and a count taken after.
+
+Step 13, the runner: the same gear now filled and turning on a platform with a clock on it, a short
+stack of log lines beside it with one line per job, and three seed command glyphs held outside the
+platform behind a small barrier. Gate holds a cartoon figure at a cold terminal, captioned that a
+stranger started it from the recipe.
+
+Step 14, the two silent losses: a queue tray with a reaper gear returning one row from a holding pen
+back into the tray, and two browser cards with a single purple dashed arrow between them passing
+through one group glyph. Gate holds a browser card with its socket-frame panel open, captioned that
+the frame was read rather than the bell watched.
+
+Step 15, the writing down: an open book with green solid arrows entering it, and beside it a document
+card for the environment fact this scope rewrites. Gate holds the same open book with two answered
+question marks on its facing page, captioned that both questions were answered from the recipe alone.
+
+One thick route line runs upward through all five gates. Two thin arrows leave step 13 sideways into
+step 15's book and two more leave step 14, because the recipe is written from what those two steps
+produced rather than from the plan.
+
+**Faithfulness note.** All five gates are drawn at equal weight. Four of them carry a person or a
+person's screen and only step 12's is a number, which is the actual balance of this scope and the
+thing a smaller final gate would misrepresent. The three seed glyphs at step 13 sit outside the
+runner's platform behind a barrier rather than merely unconnected, because excluding them is a
+deliverable. Step 14 has exactly one purple dashed arrow. Nothing leaves the top edge.
+
+### Process capstone: ten commands nobody runs, to a screen that changes by itself `[planned]` ⏳ not rendered
+
+**Save as:** `diagrams/process-capstone-nobody-runs-them-to-a-screen.png`
+
+**Visual thesis.** The machinery was all there and none of it moved. What changes here is not new
+code on a screen: it is that nobody has to remember anything, and nothing that was safely persisted
+is lost on the way to a person.
+
+One journey read bottom to top.
+
+At the bottom, outside any panel, ten command glyphs sit loose with a person figure at a terminal
+card beneath them and ten short blue dashed arrows leaving that figure, one to each command,
+captioned that today the person is the scheduler.
+
+Above them, the five step stages drawn small and compressed, 11 and 12 side by side and 13, 14 and 15
+stacked, because they are the middle of the journey rather than its point.
+
+At the top, one wide panel holding three things left to right. The worker gear, filled and turning on
+a clock platform, with the three seed glyphs held outside that platform behind a barrier. A queue
+tray with an orange dashed arrow into the gear and a reaper gear returning one row from a holding pen
+back into the tray. Two browser cards facing each other with a single purple dashed arrow between
+them through one group glyph, and no person figure touching either card.
+
+Beside the top panel, outside it, an open book receiving two green solid arrows, with two answered
+question marks on its facing page, and a document card labelled for the environment fact this scope
+rewrites.
+
+**Faithfulness note.** The ten command glyphs start loose with every arrow originating at the person
+figure, and end with every arrow originating at the gear; the person figure must not appear again
+anywhere above the bottom, because its disappearance is the whole argument. The three seeds stay
+outside the platform at the top, since excluding them is a deliverable and not an omission. Exactly
+one purple dashed arrow at the top, and nothing touching the browser cards, because the claim is that
+nobody pressed anything. The book sits outside the panel and only receives arrows.
 
 ---
 
 ## What is outstanding
 
-Six prompts, none rendered: five subject pieces and the subject capstone. The process lane and its
-capstone are not written yet, and nothing blocks them: the five plan files they draw from are in
-place. Nothing in `diagrams/` yet.
+Nine prompts, none rendered: five subject pieces, the subject capstone, two process prompts and the
+process capstone. Nothing in `diagrams/` yet. The process lane's version 01 is stamped at
+[the first process snapshot](diagrams/process-versions/01-2026-08-23.md), and the live lane above
+always equals the newest snapshot there.
