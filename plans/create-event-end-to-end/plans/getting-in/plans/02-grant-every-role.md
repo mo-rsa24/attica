@@ -1,6 +1,6 @@
 # 🔑 Grant Every Role
 
-Step 2 of 3 in this scope. Waits on [01](01-settle-what-a-role-is.md).
+Step 2 of 4 in this scope. Waits on [01](01-settle-what-a-role-is.md).
 Next: [03-prove-it-and-write-it-down.md](03-prove-it-and-write-it-down.md).
 
 ## Table of contents

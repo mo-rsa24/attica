@@ -360,6 +360,22 @@ their union.
   - Done when: the two already known are in it, plus anything else found. This section is what
     [03](03-brief-the-other-eight.md) reads before writing a single brief.
 
+- [ ] **5.4 Record what Attica's scale is, or that nobody knows it**
+  - A section at the end of the findings file answering four questions: how many users are expected,
+    how many bookings a day, how many reads per write, and what counts as too slow.
+  - Nothing in this repository states any of them, so the expected answer to all four is "unknown",
+    and this task's output is a recorded gap with a named owner rather than an invented figure. Say
+    who would settle each: the product owner for the first two, a decision for the fourth.
+  - Where a number *can* be derived from what exists, derive it and show the command. Row counts in
+    the seeded database, and the 478 media files across 51 MB, are real and are the only figures
+    available today.
+  - Why it sits in this plan: every caching, indexing and capacity argument downstream is a
+    preference until these exist, and this is the plan that establishes facts. The two throttle rates
+    picked in
+    [close the open door](../../getting-in/plans/04-close-the-open-door.md) are explicitly guesses
+    waiting on this section.
+  - Done when: four questions, four answers, and no answer is a guess presented as a figure.
+
 ▶ **Next: [instruction 6.1](#6--check-the-two-suspect-claims-in-a-browser)**.
 
 ### Close out. 🔄 Record what this plan taught
@@ -459,6 +475,7 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | The six-section findings file | `artifacts/notes/how-a-booking-happens/what-the-code-does-today.md` | — | not started |
 | The grouping's card | `artifacts/notes/how-a-booking-happens/README.md` | — | not started |
 | The disagreements section | inside the findings file | — | not started |
+| The scale section: four questions, answered or recorded unknown with an owner | inside the findings file | — | not started |
 | The observed websocket status code | recorded in instruction 6.2, written into the findings file | — | not started |
 | One concept, four state machines | [piece 2](../diagram-prompts.md#piece-2-one-concept-four-state-machines-planned--not-rendered) → `../diagrams/subject-02-one-concept-four-machines.png` | subject | ⏳ not rendered |
 | Two answers to when a hold starts | [piece 3](../diagram-prompts.md#piece-3-two-answers-to-when-a-hold-starts-planned--not-rendered) → `../diagrams/subject-03-two-answers-one-hold.png` | subject | ⏳ not rendered |

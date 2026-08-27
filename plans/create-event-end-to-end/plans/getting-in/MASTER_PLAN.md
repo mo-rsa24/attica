@@ -58,6 +58,13 @@ somewhere different each time. Nothing has to be assigned by hand first.
 - [ ] The credentials table at
       [seeding and resetting data](../../../../runbook/preparing-the-data/seeding-and-resetting-data.md)
       verified, with `seed_vendor_petal`, `seed_venue_atrium` and `seed_venue_horizon` added
+- [ ] `DEFAULT_PERMISSION_CLASSES` is `IsAuthenticated`, every deliberately public endpoint declares
+      `AllowAny` in its own file, and the audit table backing that has no row marked unknown. The
+      default is `AllowAny` today, so a view is public unless it says otherwise, and `scheduling`
+      declares permissions on 14 of its 35 view classes
+- [ ] ⚠️ Three private endpoints return 401 to an anonymous `curl`, and repeated failed logins return
+      429. Both tried by hand against a running server, because a permission table nobody tested is
+      the claim this scope exists to stop making `[owner: human]`
 - [ ] Close out: `/ingest-error-pattern` for anything that bit, then
       `/sync-plan-tree @plans/create-event-end-to-end/plans/getting-in`
 
@@ -79,6 +86,7 @@ This folder's contents. The order that matters is the
 | [01 Settle what a role is](plans/01-settle-what-a-role-is.md) | Decide which of the two classifications decides what a user may see, and write it into `context/` | ⚠️ not started |
 | [02 Grant every role](plans/02-grant-every-role.md) | Create a staff account, make the seeds grant the three ungranted roles and give the nine marketplace users theirs | ⚠️ not started |
 | [03 Prove it and write it down](plans/03-prove-it-and-write-it-down.md) | Log in as all five, screenshot each, then write the runbook pair and verify the credentials table | ⚠️ not started |
+| [04 Close the open door](plans/04-close-the-open-door.md) | Audit what each view actually protects, flip the API default from open to closed, and throttle login and availability search | ⚠️ not started |
 
 ---
 

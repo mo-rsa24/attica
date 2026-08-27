@@ -423,6 +423,17 @@ the runbook, and none of them required knowing anything that is not written down
       owed. [The scopes](../../../../ideas/enhancing-create-event-end-to-end/THE-SCOPES.md#13-getting-it-out)
       names only `environment/` and `runbook/`, and the judgement is in
       [the decisions taken here](decisions-taken-here.md#context-is-checked-rather-than-assumed-to-be-owed-nothing)
+- [ ] A health route exists that answers whether the database and the channel layer are reachable, so
+      "is it up" can be asked from outside without opening a browser. `backend/main/main/urls.py`
+      carries no such route today, and the commit-reporting item above answers a different question:
+      which version is serving, not whether it can serve
+- [ ] The data has a way back, separately from the code: what a backup covers (the database, the
+      51 MB of uploaded media across 478 files, or both), where it is kept, and how often. Every
+      rollback item above puts a commit back and leaves the data exactly as the bad deploy left it,
+      which is the failure this covers
+- [ ] ⚠️ The restore performed by hand, once, onto an empty machine, with the time it took and
+      anything lost written down. A restore recipe nobody has run is a claim, not a recipe
+      `[owner: human]`
 - [ ] Close out: `/ingest-error-pattern` for anything that bit, then
       `/sync-plan-tree @plans/create-event-end-to-end/plans/getting-it-out`
 
@@ -436,9 +447,22 @@ the runbook, and none of them required knowing anything that is not written down
 
 ## Plans
 
-(none yet. This folder's plan files are authored by `populate-plans`. When they exist they are
-interleaved into the [parent's running order](../../MASTER_PLAN.md#running-order), which replaces
-the single placeholder row standing for this scope today.)
+Six, of which four are written. The order that matters is the
+[parent's running order](../../MASTER_PLAN.md#running-order), which still carries one placeholder row
+for this whole scope until `sync-plan-tree` interleaves these.
+
+| Plan | What it does | Status |
+|---|---|---|
+| [01 Take the deployment decision](plans/01-take-the-deployment-decision.md) | Settle what runs Attica, how a change gets there, and how it is put back, with every losing candidate and why it lost | ⚠️ not started |
+| [02 Make two clones the same](plans/02-make-two-clones-the-same.md) | Commit the lockfile and the environment template, so a fresh clone installs without archaeology | ⚠️ not started |
+| [03 Make the workflow a gate](plans/03-make-the-workflow-a-gate.md) | Get continuous integration passing on `main` and keep the build it produces | ⚠️ not started |
+| [04 Let the environment say where things live](plans/04-let-the-environment-say-where-things-live.md) | Database, channel layer and cache read the environment; no literal host, port or engine in `settings.py` | ⚠️ not started |
+| 05 Give the client an address | The built bundle learns where its backend is, and something serves the bundle and the media with debug off | ⚠️ not authored |
+| 06 Ship it, put it back and write it down | The two recipes, the health route, the data backup and its restore, and the `env-pulse` that records what changed | ⚠️ not authored |
+
+Plans 05 and 06 are referenced by name from all four written plans, so their filenames are already
+fixed: `plans/05-give-the-client-an-address.md` and
+`plans/06-ship-it-put-it-back-and-write-it-down.md`. `populate-plans` authors them.
 
 ---
 

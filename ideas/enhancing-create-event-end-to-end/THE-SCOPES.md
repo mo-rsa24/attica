@@ -161,6 +161,18 @@ not against a double click. Derive it from the request.
 **build** A concurrency test that proves two simultaneous requests on the same window resolve the
 same way every time, and that both parties are told.
 
+**fix** The `version` columns guard nothing. `AvailabilitySlot`, `AvailabilityRule`, `ResourcePolicy`
+and `Booking` each carry one and each increments it with `F("version") + 1`, and no update anywhere
+filters on the version it expected to find. Optimistic locking is declared in the schema and absent
+from the writes.
+
+**decide** Which of the four mechanisms enforces the invariant, said out loud with the three that
+lost. They are the idempotency key (built and used), the pessimistic lock (built, inert on SQLite),
+the version compare-and-swap (half built, above) and the check constraint on
+`capacity_reserved <= capacity_total` (built, and the only one working today). Three of the four need
+no row-level locking, so PostgreSQL is one route to the invariant rather than the only one, and that
+changes what this scope is allowed to assume about its own dependency.
+
 ### 6. running-the-workers
 
 **decide** One infrastructure decision, not three: expiry, availability materialisation and outbox
@@ -234,6 +246,16 @@ whether a resource is bookable.
 **build** Direct-to-storage upload with derived image variants. An eight megabyte image is currently
 served into a card that displays it at a fraction of that size, and a large upload occupies an
 application worker for its duration.
+
+**build** Pagination. No `DEFAULT_PAGINATION_CLASS` is set and one mention of pagination exists in
+the whole backend, so every list endpoint returns its full table. This one gets worse with success:
+the artist list is fine at fifty artists and is an outage at fifty thousand.
+
+**decide** Whether the request path stays synchronous. Every view is a `def` under an ASGI server,
+while the chat consumers are `async def` in the same process, so a slow query holds a worker for its
+whole duration and the websocket connections share that process with it. Either the slow paths become
+async, or the decision is that they stay sync and the process count absorbs it, but it is currently
+neither: it is what the code happened to be.
 
 ---
 

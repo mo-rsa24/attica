@@ -1,8 +1,8 @@
 # 📋 Prove It and Write It Down
 
-Step 3 of 3 in this scope. Waits on [01](01-settle-what-a-role-is.md) and
+Step 3 of 4 in this scope. Waits on [01](01-settle-what-a-role-is.md) and
 [02](02-grant-every-role.md).
-Next: this scope closes.
+Next: this scope closes, once [04](04-close-the-open-door.md) has also landed.
 
 ## Table of contents
 
@@ -29,8 +29,10 @@ Next: this scope closes.
 
 Navigation: 📋 [TOC](#table-of-contents) | [Next](#quick-context-where-you-are) ➡️
 
-Scope: [getting-in](../MASTER_PLAN.md). Last of three. It is the plan that closes the scope, because
-this scope's definition of done is a person logging in five times, not a diff.
+Scope: [getting-in](../MASTER_PLAN.md). It is the plan that closes the scope, because this scope's
+definition of done is a person logging in five times, not a diff.
+[04](04-close-the-open-door.md) runs beside it and changes what the API allows, so if 04 lands after
+this plan, instruction 3 gets run again.
 
 The one ordering that matters across the tree is the
 [parent's running order](../../../MASTER_PLAN.md#running-order).
@@ -212,7 +214,7 @@ actually happened, not from what the plan expected.
 - [ ] **Run the following prompt:** `/runbook-pulse @runbook` — this plan owes `runbook/` its pair
       and the pulse is what confirms both landed and are reachable from the index.
 - [ ] **Run the following prompt:** `/sync-plan-tree @plans/create-event-end-to-end/plans/getting-in`
-  - This is the sync that closes the scope, so its report should show all three plans ✅ and the
+  - This is the sync that closes the scope, so its report should show all four plans ✅ and the
     scope ready to aggregate up to the parent.
 
 ▶ **Next: the engagement gate.**
@@ -315,7 +317,7 @@ Navigation: ⬅️ [Outputs / Deliverables](#outputs--deliverables) | 📋 [TOC]
 | Write the recipes | `/drip-runbook <the recipe>` | tasks 1.1 and 1.2 | Two recipes to `RUNBOOK_FORMAT.md` |
 | Capture patterns | `/ingest-error-pattern` | the close out, after any red run | Errors added to catalogs |
 | Land the recipes | `/runbook-pulse @runbook` | the close out | Both are reachable from the index |
-| Close the scope | `/sync-plan-tree @plans/create-event-end-to-end/plans/getting-in` | the close out | All three plans ✅, ready to aggregate to the parent |
+| Close the scope | `/sync-plan-tree @plans/create-event-end-to-end/plans/getting-in` | the close out | All four plans ✅, ready to aggregate to the parent |
 
 ## References
 

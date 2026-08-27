@@ -1,6 +1,6 @@
 # 🧭 Settle What a Role Is
 
-Step 1 of 3 in this scope. Waits on nothing.
+Step 1 of 4 in this scope. Waits on nothing.
 Next: [02-grant-every-role.md](02-grant-every-role.md).
 
 ## Table of contents

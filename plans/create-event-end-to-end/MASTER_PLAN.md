@@ -67,7 +67,8 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 26 | [The components that own the styles](plans/the-design-system/plans/05-the-components-that-own-the-styles.md) | The button, the one card skeleton replacing four, and explicit status text for actions in flight | ⚠️ not started | 23, 24, 25 |
 | 27 | [Cards that answer to their container](plans/the-design-system/plans/06-cards-that-answer-to-their-container.md) | Container queries where the space decides, breakpoints where the viewport does, and mobile as its own layout | ⚠️ not started | 26 |
 | 28 | [Prove it and write it down](plans/the-design-system/plans/07-prove-it-and-write-it-down.md) | The check that catches an invented style, the five dead class names, and the runbook pair that does not exist | ⚠️ not started | 27 |
-| 29 | [getting-it-out](plans/getting-it-out/MASTER_PLAN.md) | Take the deployment decision, build what it chooses, and make one machine reproducible enough that a second one is a copy rather than an archaeology exercise | ⚠️ plans not authored yet | `one-booking-truth` |
+| 29 | [getting-it-out](plans/getting-it-out/MASTER_PLAN.md) | Take the deployment decision, build what it chooses, and make one machine reproducible enough that a second one is a copy rather than an archaeology exercise | ⚠️ 4 of 6 plans authored | `one-booking-truth` |
+| 30 | [Close the open door](plans/getting-in/plans/04-close-the-open-door.md) | Audit what each view actually protects, flip the API default from open to closed, and throttle login and availability search | ⚠️ not started | 4 |
 
 Steps 1, 4 and 7 all wait on nothing and can run at the same time. Everything in the domain plane
 waits on step 3 and step 6, the two blockers finishing.
@@ -91,6 +92,12 @@ step 22 and not on each other. They sit at the bottom because inserting them at 
 renumber every row from 7 to 21, and those numbers are written into eleven existing plan files and
 one diagram map. The `Waits on` column carries the dependency; the reasoning is in
 [that scope's decisions](plans/the-design-system/decisions-taken-here.md#the-rows-are-appended-to-the-parents-running-order-as-22-to-28-not-inserted-at-7).
+
+Step 30 belongs at step 7, directly after the rest of `getting-in`, and sits at the bottom for the
+same reason steps 22 to 28 do: inserting it would renumber every row above it. Its `Waits on` cell
+carries what actually gates it, which is step 4 and nothing else. It came out of
+[the scouted concepts](../../ideas/what-a-world-class-attica-needs/SCOUTED-CONCEPTS.md), which read
+twelve system design sources against this tree and found the API's default permission is `AllowAny`.
 
 Step 29 is a placeholder for a whole sub-scope rather than a plan. It is one row because
 `getting-it-out` has a master plan and no plan files yet; `populate-plans` replaces this row with its
