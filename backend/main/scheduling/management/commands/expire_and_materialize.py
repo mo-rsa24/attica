@@ -17,7 +17,6 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from scheduling.models import BookingRequest
-from scheduling.services import materialize_slots_for_resource
 
 
 class Command(BaseCommand):
