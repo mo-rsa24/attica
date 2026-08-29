@@ -50,9 +50,9 @@ what publish does to a draft, and [what an organizer is](../../../../context/wor
 
 ## Mission
 
-Fix the six confirmed bugs in Attica's event-creation flow, resolve the two that cannot currently be
-classified, and leave the runbook carrying each bug beside its fix, so the next person who hits one
-of these recognises it instead of rediscovering it.
+Fix the eight confirmed bugs in Attica's event-creation flow, resolve the two that cannot currently
+be classified, and leave the runbook carrying each bug beside its fix, so the next person who hits
+one of these recognises it instead of rediscovering it.
 
 ---
 
@@ -76,18 +76,23 @@ of these recognises it instead of rediscovering it.
    `test` because the invariant now holds, or still expected-failing for a reason written down.
 3. The organizer dashboard at `/dashboard/organizer` loads and shows the seven seeded scenarios.
 4. Every bug in this scope appears in a runbook recipe with its symptom, its cause and its fix.
+   Six of the eight already have their symptom written up: the two wizard-state bugs are in
+   [Wizard § 5](../../../../runbook/driving-the-app/walking-the-event-wizard.md#5-set-the-location-on-route-step4)
+   and [Wizard § 8](../../../../runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got),
+   which need their cause and fix adding once fixed.
 5. `environment/overview.md`'s Known gaps section no longer lists any gap this scope closed.
 
 ---
 
 ## Expected Outcome
 
-An organizer can create an event without hitting any of these six defects, the two suites agree with
-reality, and `runbook/` answers "I have seen this before, what was it" for each one.
+An organizer can create an event without hitting any of these eight defects, the two suites agree
+with reality, and `runbook/` answers "I have seen this before, what was it" for each one.
 
 The fixes are small: two are one-line path corrections, two are validation guards, one is a
-persistence bug, one is a status code. The value is not in their size, it is that nothing currently
-records them and each one costs an afternoon to rediscover.
+persistence bug, one is a status code, and two are frontend state bugs of a few lines each. The
+value is not in their size, it is that nothing currently records them and each one costs an
+afternoon to rediscover.
 
 ---
 
@@ -103,6 +108,9 @@ records them and each one costs an afternoon to rediscover.
 7. ⚠️ Reading another organizer's draft returns the same status code as trying to publish it, and
    the choice between 403 and 404 is written down somewhere.
 8. ⚠️ The idempotent-publish test is marked `test`, not `test.fail`.
+8a. ⚠️ An address picked on route step4 is the address that saves, with a test proving it.
+8b. ⚠️ The review screen shows the title, date, category and capacity that `steps.step1` holds.
+8c. ⚠️ The step4 location either reaches the published event or is recorded as a known gap.
 9. ⚠️ Both suites green, per goals 1 and 2.
 10. ⚠️ Manual checkpoint: the runbook has a recipe covering each bug, and a person who has never
     seen the bug can recognise it from the symptom written there.
@@ -132,16 +140,18 @@ None. This scope is small enough to hold three plans directly.
 ## Plans
 
 - ⚠️ [Unblock the truth](plans/01-unblock-the-truth.md)
-- ⚠️ [Close the gaps](plans/02-close-the-gaps.md)
+- ⚠️ [Close the gaps](plans/02-close-the-gaps.md) (now six defects, not four)
 - ⚠️ [Make the suites honest](plans/03-reconcile-suite-and-runbook.md)
 
 ---
 
 ## Where these bugs came from
 
-Every one was found on 2026-08-22 and 2026-08-23 by running things rather than reading them: the
-Django suite, the Playwright suite, and a browser driven through the organizer flow. None was
-recorded anywhere in the repository beforehand.
+Six were found on 2026-08-22 and 2026-08-23 by running things rather than reading them: the
+Django suite, the Playwright suite, and a browser driven through the organizer flow. Two more were
+found on 2026-08-28, driving the wizard end to end and reading the database after every screen,
+while writing the runbook's wizard recipes. None was recorded anywhere in the repository
+beforehand.
 
 The full evidence, with commands and output, is in [the retrofit ledger](../../../../RETROFIT.md) under the
 verification passes.

@@ -29,18 +29,24 @@ Next: [Make the suites honest](03-reconcile-suite-and-runbook.md).
 
 Navigation: 📋 [TOC](#table-of-contents) | [Next](#quick-context-where-you-are) ➡️
 
-Scope: [fixing-create-event](../MASTER_PLAN.md). Second of three. Four defects, each with a test
-already written that will tell you when it is fixed.
+Scope: [fixing-create-event](../MASTER_PLAN.md). Second of three. Six defects. Four have a test
+already written that will tell you when it is fixed; the two wizard-state ones need their test
+writing as part of the fix.
 
 ## Quick context: where you are
 
 Navigation: ⬅️ [Position in the plan tree](#position-in-the-plan-tree) | 📋 [TOC](#table-of-contents) | [Next](#environment-facts-this-plan-depends-on) ➡️
 
-Four confirmed defects, all in the event-creation path, all with existing failing tests:
+Six confirmed defects, all in the event-creation path.
 
-Two are missing validation (a past date, a negative price both go through). One is a persistence bug
-(an uploaded asset does not attach to its draft). One is an inconsistency (two paths disagree about
-whether reading another organizer's draft is 403 or 404).
+Four are backend and each already has a failing test: two missing validations (a past date, a
+negative price both go through), one persistence bug (an uploaded asset does not attach to its
+draft), and one inconsistency (two paths disagree about whether reading another organizer's draft is
+403 or 404).
+
+Two are frontend and were found later, by driving the wizard and reading the database after every
+screen. Route step4 saves a different location from the one picked, and the review screen cannot
+display the event basics it already holds. Neither has a test yet.
 
 **Step 1 may have added to this list.** If either of the two previously-unclassifiable bugs turned
 out to be a real, unfixed defect, it belongs here.
@@ -86,7 +92,8 @@ changing anything, or you will fix the wrong end.
 Navigation: ⬅️ [Considerations](#considerations) | 📋 [TOC](#table-of-contents) | [Next](#why-this-plan-exists) ➡️
 
 An organizer cannot publish an event dated in the past or priced below zero, an uploaded asset stays
-attached to its draft, and the two paths that guard another organizer's draft agree with each other.
+attached to its draft, the two paths that guard another organizer's draft agree with each other, and
+the two wizard screens that currently misreport their own state tell the truth.
 
 ## Why this plan exists
 
@@ -110,6 +117,8 @@ Navigation: ⬅️ [Why this plan exists](#why-this-plan-exists) | 📋 [TOC](#t
   create, base_price = -10    ✅ 200, event created        ❌ 400, rejected
   upload a poster             ✅ 200, assets list empty    ✅ 200, poster in assets
   read someone else's draft   404 here, 403 at publish     one status, both paths
+  pick an address on step4    sometimes saves another one  saves the one picked
+  open the review screen      basics blank, data is fine   basics show what step1 holds
 ```
 
 ## Illustrations
@@ -134,8 +143,9 @@ Save as `../diagrams/process-02-three-plans-three-gates.png`. *(image not yet ge
 Navigation: ⬅️ [What happens (visual)](#what-happens-visual) | 📋 [TOC](#table-of-contents) | [Next](#purpose-and-goal) ➡️
 
 Add server-side validation for past dates and negative prices, make uploaded assets persist and come
-back on the draft, and make the retrieve and publish paths agree on one status code for a draft that
-belongs to someone else.
+back on the draft, make the retrieve and publish paths agree on one status code for a draft that
+belongs to someone else, and stop the two wizard screens that misreport their own state: route step4
+overwriting a chosen address, and the review screen showing blanks for values it already has.
 
 ## Purpose and goal
 
@@ -144,7 +154,8 @@ Navigation: ⬅️ [Description: what to fix](#description-what-to-fix) | 📋 [
 **Purpose.** Stop the flow accepting states nothing downstream can handle.
 
 **Goal.** Four tests change state: two Playwright `test.fail` markers flip to `test`, and the two
-erroring Django tests pass. `python manage.py test` reports 0 failures and 0 errors.
+erroring Django tests pass. `python manage.py test` reports 0 failures and 0 errors. Two new tests
+exist and pass, one per wizard-state defect, because neither had any coverage before.
 
 ## Tasks
 
@@ -215,15 +226,66 @@ For Claude to execute. Ask Claude to do these.
   - Rotate the token in Sentry first, then replace both values in `.env.example` with obvious
     placeholders (`SENTRY_DSN=https://<key>@<org>.ingest.sentry.io/<project>`), and put the real
     ones in `.env`, which is where the app reads them from anyway.
-  - Rotating is a browser step in the Sentry account, so it is instruction 3.4, not a task here.
+  - Rotating is a browser step in the Sentry account, so it is instruction 4.4, not a task here.
 
-▶ **Next: [instruction 3.1](#3--try-each-fix-as-an-organizer)**.
+▶ **Next: [task 3.1](#3--fix-the-two-wizard-screens-that-lie-about-their-own-state)**.
+
+### 3. 🖥️ Fix the two wizard screens that lie about their own state
+
+◀ **Needs: [task 2](#2--fix-asset-persistence-and-the-status-disagreement)**.
+
+Both were found on 2026-08-28 by driving the wizard end to end and reading the database after every
+screen. Neither has a test yet, so each task writes one. Both are frontend-only; the backend stores
+and publishes the right values in both cases.
+
+- [ ] **3.1 Stop route step4 overwriting a location the organizer already chose**
+  - The symptom: the organizer picks an address from the dropdown, the box and the map pin both show
+    it, and the address that saves is somewhere else. Observed saving an Emfuleni address
+    (lat `-26.719`, lon `27.836`) while the pin still showed Sandton, about 90 km away.
+  - The cause: on mount, `frontend/src/ListingStep4.jsx:43` asks the browser for the user's
+    location. Its success callback at `:51` calls `setSelectedLocation` and `setSearchQuery`
+    unconditionally, with no check for a choice already made. The callback does a reverse-geocode
+    round trip first, so it commonly lands *after* the organizer has picked.
+  - It is a race, so it does not reproduce every time. Waiting for the box to settle before picking
+    makes it save correctly, which is the confirmation that this is the mechanism.
+  - Decide between guarding the callback (only seed the field when the organizer has not chosen) and
+    dropping the auto-detect. Guarding keeps the convenience; write down which you chose.
+  - Add a test that picks an address, resolves geolocation afterwards, and asserts the picked one
+    survives.
+
+- [ ] **3.2 Make the review screen show the event basics it already has**
+  - The symptom: `/listing/<id>/review` shows Title "Pending details from Step 1", Date & time
+    "Add schedule in earlier steps", and Category and Capacity "Not provided", while the panel
+    beside it says "Review complete". The values are in the draft the whole time and publish uses
+    them correctly.
+  - The cause is two things meeting. `reviewDetails` is initialised to `{}` at
+    `frontend/src/ListingReview.jsx:138`, and the guard at `:184` returns it whenever it is a
+    non-array object. An empty object satisfies that, so the `steps.step1` fallback at `:185` is
+    unreachable code. Separately, step1 persists `eventDetails` as `{}`, so after any reload there
+    is nothing in the object the screen does read.
+  - Fix the guard to test for the keys it needs rather than for object-ness, so the fallback can
+    fire. Consider also persisting `eventDetails` on step1's save, but the guard is the smaller and
+    more certain change.
+  - Add a test that loads a review screen from a draft with `eventDetails: {}` and a populated
+    `steps.step1`, and asserts the title renders.
+
+- [ ] **3.3 Decide whether the step4 location is meant to reach the published event**
+  - Not classified as a defect yet, and that is the point of this task. On event 48, published from
+    a draft carrying a full address, `location_id` and `venue` are both empty while
+    `steps.step4.location` still holds the address, latitude and longitude.
+  - `events_event` has no latitude or longitude column, so there may be nowhere for it to go. This
+    may be unimplemented rather than broken.
+  - Produce a verdict, the same way step 1 produced verdicts for autosave and the unsaved-changes
+    guard: a defect with a fix, or a gap recorded in
+    [the environment overview](../../../../../environment/overview.md)'s known gaps.
+
+▶ **Next: [instruction 4.1](#4--try-each-fix-as-an-organizer)**.
 
 ### Close out. 🔄 Record what this plan taught
 
-◀ **Needs: [instruction 3.2](#3--try-each-fix-as-an-organizer)**.
+◀ **Needs: [instruction 4.2](#4--try-each-fix-as-an-organizer)**.
 
-- [ ] **Run the following prompt:** `/ingest-error-pattern` for each of the four defects
+- [ ] **Run the following prompt:** `/ingest-error-pattern` for each of the six defects
 - [ ] **Run the following prompt:** `/sync-plan-tree @plans/create-event-end-to-end/plans/fixing-create-event`
 
 ▶ **Next: the engagement gate.**
@@ -234,30 +296,30 @@ Navigation: ⬅️ [Tasks](#tasks) | 📋 [TOC](#table-of-contents) | [Next](#th
 
 For you to follow manually. Do these yourself. A passing test is not the same as a usable screen.
 
-### 3. 🖱️ Try each fix as an organizer
+### 4. 🖱️ Try each fix as an organizer
 
-◀ **Needs: [task 2](#2--fix-asset-persistence-and-the-status-disagreement)**.
+◀ **Needs: [task 3](#3--fix-the-two-wizard-screens-that-lie-about-their-own-state)**.
 
-3.1 **Try to create a past-dated event through the wizard**
+4.1 **Try to create a past-dated event through the wizard**
    - Stack up per [Stack § 1](../../../../../runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up),
      logged in as `test_organizer`. Start an event and set the date to yesterday.
    - Expected result: you are stopped, **and told why, in the form**.
    - ✅ a readable message naming the field. ❌ a raw 400 in the console with nothing on screen: the
      server is right and the form is silent, which is a worse experience than before. Note it.
 
-3.2 **Upload a poster and confirm it is really there**
+4.2 **Upload a poster and confirm it is really there**
    - Reach the media step, upload an image, then reload the page.
    - Expected result: the poster is still shown after the reload, not just after the upload.
    - ✅ it survives a reload. ❌ it vanishes: the fix addressed the response, not the storage.
 
-3.3 **Check the upload limit message**
+4.3 **Check the upload limit message**
    - The screen says "Max 100MB each"; the server rejects above 50 MB.
    - Expected result: they agree. This is a one-word copy fix and it is in scope because a user who
      is told 100 and rejected at 60 has no way to work out what happened.
 
 ▶ **Next: [the close out](#close-out--record-what-this-plan-taught)**.
 
-3.4 **Rotate the Sentry token in the browser**
+4.4 **Rotate the Sentry token in the browser**
 
 - Open `sentry.io`, the Attica project, then Settings, then Auth Tokens.
 - Revoke the token beginning `sntryu_` that appears in `.env.example`, and create a replacement.
@@ -272,7 +334,7 @@ Navigation: ⬅️ [Instructions](#instructions) | 📋 [TOC](#table-of-contents
 Done is: `python manage.py test` reports 0 failures and 0 errors, the two Playwright markers are
 flipped, **and** you have seen each fix behave correctly in a browser as an organizer.
 
-A green suite with a form that rejects silently is not done. Instruction 3.1 is the check that
+A green suite with a form that rejects silently is not done. Instruction 4.1 is the check that
 catches it.
 
 ## Outputs / Deliverables
@@ -287,6 +349,10 @@ Navigation: ⬅️ [The engagement gate](#the-engagement-gate) | 📋 [TOC](#tab
 | One agreed status code, both paths | `backend/main/events/views.py` | not started |
 | Two Playwright markers flipped to `test` | `frontend/tests/e2e/create-event.spec.ts` | not started |
 | The upload-limit copy corrected | the media step's on-screen text | not started |
+| Route step4 keeps the chosen address | `frontend/src/ListingStep4.jsx:43-56` | not started |
+| Review screen renders the event basics | `frontend/src/ListingReview.jsx:138` and `:183-186` | not started |
+| A test per wizard-state defect | wherever the frontend tests live | not started |
+| A verdict on the step4 location never reaching the event | this plan, or the environment overview's known gaps | not started |
 
 ## Orchestration
 
@@ -329,3 +395,11 @@ Navigation: ⬅️ [Next step](#next-step) | 📋 [TOC](#table-of-contents)
 | A negative `base_price` is accepted | `POST /api/events/` | No range check at `events/serializers.py:99`. |
 | An uploaded asset returns 200 and the draft's `assets` list stays empty | `events/tests.py:91` | Either `upload_asset` does not save or the serializer does not return it. Diagnose before fixing. |
 | Reading another organizer's draft gives 404, publishing it gives 403 | `events/tests.py:248` against `events/views.py:499` | The two paths disagree. Pick one status, apply to both, record the reason. |
+
+### From driving the wizard on 2026-08-28
+
+| Error | Where it bit | Fix |
+|---|---|---|
+| The address that saves is not the one the organizer picked | Route step4, `ListingStep4.jsx:51` | The geolocation success callback overwrites the chosen location with no guard, and lands late because it reverse-geocodes first. |
+| Review shows "Pending details from Step 1" for a draft that has them | `/listing/<id>/review`, `ListingReview.jsx:138` and `:184` | `reviewDetails` starts as `{}`, which is truthy, so the guard always returns it and the `steps.step1` fallback at `:185` is unreachable. |
+| The step4 address is absent from the published event | `events_event.location_id` and `.venue`, both empty | Unclassified. `events_event` has no latitude or longitude column, so this may be unimplemented rather than broken. Task 3.3 decides. |
