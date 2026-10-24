@@ -172,15 +172,25 @@ Install commands and required API keys are listed in `.env.example`.
 
 ## Learning journeys about this repo
 
-Two learning journeys tour this codebase from outside it, under
-`/home/molef/goal-setting/learning/`. They read this repo and never write to it.
+Five learning journeys name this repo as their project, under `/home/molef/goal-setting/learning/`.
+They read this repo and never write to it. `JOURNEYS.md` at that root is the register of all of them.
 
-**`attica-event-creation/`** holds `flow-map.md`, a step-by-step recording of the event-creation
-wizard driven live in a browser on 2026-08-16: the click path, every background request with its
-method, endpoint, payload and status, and the backend handler as `file:line`. Before tracing that
-flow through the app yourself, read it. One caveat: its Step 0 claim that the Vite proxy has no
-`/ws` rule is wrong, and the rest checks out.
+**`projects/attica/event-creation/`** builds an isolated create-event flow from an empty folder and
+defends every design choice in it. Its `flow-map.md` is a step-by-step recording of the
+event-creation wizard driven live in a browser on 2026-08-16: the click path, every background
+request with its method, endpoint, payload and status, and the backend handler as `file:line`.
+Before tracing that flow through the app yourself, read it. One caveat: its Step 0 claim that the
+Vite proxy has no `/ws` rule is wrong, and the rest checks out.
 
-**`attica-architecture-decisions/`** holds the reasoning about how a database stops two people
-booking the same provider on the same day. Before changing anything in `scheduling/`, read it
+**`projects/attica/architecture-decisions/`** holds the reasoning about how a database stops two
+people booking the same provider on the same day. Before changing anything in `scheduling/`, read it
 rather than re-deriving why the slot table has a unique constraint on its window.
+
+**`projects/attica/interface-craft/`** makes a working multi-step flow feel immediate and
+considered: tokens, motion, one cache, perceived speed.
+
+**`ai-engineering/agent-harness/`** builds a coding-agent harness one layer at a time and uses it to
+redesign this repo's create-event wizard.
+
+**`ai-engineering/calendar-view-by-harness-corridor/`** replaces the create-event wizard with one
+calendar view, merged through that harness.
