@@ -49,6 +49,13 @@ per-folder and is **not** the running order. `sync-plan-tree` recomputes this ta
 | 8 | [Draw the layers map](plans/the-system-in-layers/plans/02-draw-the-layers-map.md) | Give `environment/` its first pictures: the folder's map, the layers prompt, and the slot in `overview.md` | ⚠️ not started | 7 |
 | 9 | [Brief the other eight](plans/the-system-in-layers/plans/03-brief-the-other-eight.md) | The four the reviews ask for, the four already briefed in `onboarding-docs`, and a failure beside every one | ⚠️ not started | 7, 8 |
 | 10 | [Render it, check it, and write down how](plans/the-system-in-layers/plans/04-render-check-and-write-it-down.md) | Every prompt in the scope rendered, each read back against its note before filing, and the two recipes for doing it again | ⚠️ not started | 8, 9 |
+| 10a | [Settle what a hold is](plans/contention-and-holds/plans/01-settle-what-a-hold-is.md) | Take D2 and D2a: when a hold starts, and whether one that reserves nothing may exist. Write the `hold` and `claim` context entries | ⚠️ not started | `one-booking-truth` |
+| 10b | [Settle what capacity counts](plans/contention-and-holds/plans/02-settle-what-capacity-counts.md) | Decide what `capacity_total` counts, since the code adds attendee numbers into a column holding 1 | ⚠️ not started | nothing |
+| 10c | [Prove the hole](plans/contention-and-holds/plans/03-prove-the-hole.md) | Race two organizers for one slot and watch it fail, after naming the two tests that already fail | ⚠️ not started | 10a, 10b |
+| 10d | [Move to PostgreSQL](plans/contention-and-holds/plans/04-move-to-postgres.md) | Take D6: the engine, and a range exclusion constraint that refuses overlapping confirmed bookings | ⚠️ not started | 10b, 10c |
+| 10e | [Remove what does not defend](plans/contention-and-holds/plans/05-remove-what-does-not-defend.md) | Judge twenty lock sites and four version columns now they can work: keep, fix or gone, each with a reason | ⚠️ not started | 10d |
+| 10f | [Make a repeat harmless](plans/contention-and-holds/plans/06-make-a-repeat-harmless.md) | Derive the idempotency key from user intent instead of minting a new one per call | ⚠️ not started | 10a |
+| 10g | [Break it on purpose](plans/contention-and-holds/plans/07-break-it-on-purpose.md) | The four failure injections, and which defence catches what. Closes the scope | ⚠️ not started | 10d, 10e, 10f |
 | 11 | [Take the execution decision](plans/running-the-workers/plans/01-take-the-execution-decision.md) | Settle D7: what runs the recurring work, with the candidates that lost and the reason each lost | ⚠️ not started | `one-booking-truth` |
 | 12 | [Make the commands honest](plans/running-the-workers/plans/02-make-the-commands-honest.md) | Resolve the two scheduling commands that lie about what they do, before anything goes on a clock | ⚠️ not started | `one-booking-truth` |
 | 13 | [Build the runner](plans/running-the-workers/plans/03-build-the-runner.md) | Every non-seed scheduling command on the runner, with a log that answers "is it moving" | ⚠️ not started | 11, 12 |
@@ -195,7 +202,7 @@ between symptoms. The structure, with every item marked decide, build, wire up o
 | 2 | [getting-in](plans/getting-in/MASTER_PLAN.md) | blocker | nothing |
 | 3 | [the-system-in-layers](plans/the-system-in-layers/MASTER_PLAN.md) | cross | nothing |
 | 4 | `one-booking-truth` | domain | 1, 2 |
-| 5 | `contention-and-holds` | domain | 4 |
+| 5 | [contention-and-holds](plans/contention-and-holds/MASTER_PLAN.md) | domain | 4 |
 | 6 | [running-the-workers](plans/running-the-workers/MASTER_PLAN.md) | domain | 4 |
 | 7 | `availability-that-is-true` | domain | 5, 6 |
 | 8 | `the-booking-journey` | domain | 5, 6 |

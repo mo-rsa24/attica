@@ -46,3 +46,5 @@ Treat duplicate keys as success to keep delivery at-least-once safe.
 - Per-endpoint circuit breaker:
   - opens after `SCHEDULING_WEBHOOK_CIRCUIT_FAILURE_THRESHOLD` consecutive failures,
   - remains open for `SCHEDULING_WEBHOOK_CIRCUIT_OPEN_SECONDS`.
+
+📊 Drawn in [Every event is written and none is sent](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-5-every-event-is-written-and-none-is-sent).

@@ -1498,3 +1498,199 @@ class SchedulingAdminOpsApiTests(TestCase):
         self.assertIn("webhooks", summary.data)
         self.assertIn("recent_conflict_incidents", summary.data)
         self.assertGreaterEqual(summary.data.get("dead_letter_count", 0), 1)
+
+
+class InstantModeHoldCapacityTests(TestCase):
+    """Walk finding 1: does an instant-mode approval reserve the capacity it holds?
+
+    `approve_request` creates a CheckoutSession inside `if is_instant_mode:` (services.py:791)
+    without calling `_reserve_capacity`, whose only callers are `create_booking`,
+    `start_checkout_session` and `reschedule_booking`. These tests establish what that costs.
+    """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.organizer = self._make_user("instant_organizer", "organizer")
+        self.organizer_two = self._make_user("instant_organizer_two", "organizer")
+        self.provider = self._make_user("instant_provider", "vendor")
+
+        self.event_draft = EventDraft.objects.create(
+            organizer=self.organizer,
+            current_step="step3",
+            data={"steps": {"step1": {"name": "Instant Draft"}}},
+        )
+        self.event_draft_two = EventDraft.objects.create(
+            organizer=self.organizer_two,
+            current_step="step3",
+            data={"steps": {"step1": {"name": "Approval Draft"}}},
+        )
+
+        self.resource = MarketplaceResource.objects.create(
+            owner=self.provider,
+            resource_type=MarketplaceResource.ResourceType.VENDOR,
+            display_name="Instant Vendor",
+            timezone="UTC",
+            city="Johannesburg",
+            is_active=True,
+        )
+
+        self.start_at = timezone.now() + timedelta(days=14)
+        self.end_at = self.start_at + timedelta(hours=4)
+
+    @staticmethod
+    def _make_user(username, user_type):
+        from users.models import CustomUser
+
+        return CustomUser.objects.create_user(
+            username=username,
+            password="test-pass-123",
+            user_type=user_type,
+            email=f"{username}@example.com",
+        )
+
+    def _set_policy(self, booking_mode, hold_minutes=30):
+        ResourcePolicy.objects.update_or_create(
+            resource=self.resource,
+            defaults={
+                "booking_mode": booking_mode,
+                "min_notice_hours": 0,
+                "max_horizon_days": 365,
+                "requires_deposit": False,
+                "checkout_hold_minutes": hold_minutes,
+            },
+        )
+
+    def _make_slot(self, capacity_total):
+        slot, _ = AvailabilitySlot.objects.update_or_create(
+            resource=self.resource,
+            start_at=self.start_at,
+            end_at=self.end_at,
+            defaults={
+                "capacity_total": capacity_total,
+                "capacity_reserved": 0,
+                "is_bookable": True,
+            },
+        )
+        return slot
+
+    def _request_and_approve(self, organizer, event_draft):
+        self.client.force_authenticate(organizer)
+        create_response = self.client.post(
+            "/api/scheduling/requests/create/",
+            {
+                "event_draft_id": event_draft.id,
+                "resource_id": self.resource.id,
+                "start_at": self.start_at.isoformat(),
+                "end_at": self.end_at.isoformat(),
+                "attendee_count": 1,
+                "message": "Please confirm",
+            },
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, 201)
+        request_id = create_response.data["id"]
+
+        self.client.force_authenticate(self.provider)
+        approve_response = self.client.post(
+            f"/api/scheduling/requests/{request_id}/approve/",
+            {"provider_message": "Accepted"},
+            format="json",
+        )
+        self.assertEqual(approve_response.status_code, 200)
+        return BookingRequest.objects.get(id=request_id)
+
+    def test_instant_mode_approval_reserves_the_capacity_it_holds(self):
+        """The hold exists and the counter moves with it."""
+        self._set_policy(ResourcePolicy.BookingMode.INSTANT)
+        slot = self._make_slot(capacity_total=1)
+
+        booking_request = self._request_and_approve(self.organizer, self.event_draft)
+
+        # The hold is real: a session exists, is active, and has a running clock.
+        self.assertIsNotNone(booking_request.checkout_session_id)
+        session = CheckoutSession.objects.get(id=booking_request.checkout_session_id)
+        self.assertEqual(session.status, CheckoutSession.Status.ACTIVE)
+        self.assertIsNotNone(booking_request.draft_hold_expires_at)
+
+        # The capacity it is supposedly holding was never taken.
+        slot.refresh_from_db()
+        self.assertEqual(
+            slot.capacity_reserved,
+            1,
+            "an instant-mode hold must reserve the capacity it holds, like any other checkout",
+        )
+
+    def test_approval_required_mode_does_reserve_when_checkout_starts(self):
+        """The contrast case: the same slot, reserved properly through start_checkout."""
+        self._set_policy(ResourcePolicy.BookingMode.APPROVAL_REQUIRED)
+        slot = self._make_slot(capacity_total=1)
+
+        booking_request = self._request_and_approve(self.organizer, self.event_draft)
+        self.assertIsNone(booking_request.checkout_session_id)
+
+        self.client.force_authenticate(self.organizer)
+        response = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft.id, "request_ids": [booking_request.id]},
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="instant-contrast-1",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        slot.refresh_from_db()
+        self.assertEqual(slot.capacity_reserved, 1)
+
+    def test_expiring_an_instant_hold_releases_capacity_it_never_took(self):
+        """Expiring an instant hold leaves another organizer's live reservation alone.
+
+        The instant-mode branch of `approve_request` reserves the capacity it holds, so expiry
+        releases exactly what that hold took and nothing else. This is the invariant that decides
+        whether `expire_checkout_holds` is safe to schedule.
+        """
+        slot = self._make_slot(capacity_total=2)
+
+        # A genuine reservation, taken the normal way, by a different organizer.
+        self._set_policy(ResourcePolicy.BookingMode.APPROVAL_REQUIRED)
+        genuine_request = self._request_and_approve(self.organizer_two, self.event_draft_two)
+        self.client.force_authenticate(self.organizer_two)
+        start_response = self.client.post(
+            "/api/scheduling/checkout-sessions/start/",
+            {"event_draft_id": self.event_draft_two.id, "request_ids": [genuine_request.id]},
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="instant-genuine-1",
+        )
+        self.assertEqual(start_response.status_code, 201)
+        slot.refresh_from_db()
+        self.assertEqual(slot.capacity_reserved, 1, "the genuine checkout should hold one seat")
+        genuine_session_id = genuine_request.__class__.objects.get(
+            id=genuine_request.id
+        ).checkout_session_id
+
+        # An instant-mode hold on the same slot, which reserves nothing.
+        self._set_policy(ResourcePolicy.BookingMode.INSTANT)
+        instant_request = self._request_and_approve(self.organizer, self.event_draft)
+        slot.refresh_from_db()
+        self.assertEqual(
+            slot.capacity_reserved, 2, "the instant hold takes the second seat"
+        )
+
+        # Let only the instant hold's clock run out, then run the command that has no runner.
+        instant_session = CheckoutSession.objects.get(id=instant_request.checkout_session_id)
+        CheckoutSession.objects.filter(id=instant_session.id).update(
+            hold_expires_at=timezone.now() - timedelta(minutes=1)
+        )
+        expired = expire_checkout_sessions()
+        self.assertEqual(expired, 1)
+
+        # The genuine reservation is untouched and still active.
+        genuine_session = CheckoutSession.objects.get(id=genuine_session_id)
+        self.assertEqual(genuine_session.status, CheckoutSession.Status.ACTIVE)
+
+        slot.refresh_from_db()
+        self.assertEqual(
+            slot.capacity_reserved,
+            1,
+            "expiry released only the instant hold's own seat: "
+            f"capacity_reserved is {slot.capacity_reserved}, and the other organizer's active "
+            "checkout must still hold one",
+        )

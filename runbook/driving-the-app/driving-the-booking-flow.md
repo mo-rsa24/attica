@@ -54,6 +54,8 @@ a seven-value status covering the whole negotiation, not a yes or no.
 See [what a booking request is](../../context/world/booking-request.md).
 </details>
 
+📊 Drawn in [Seven states, and the provider owns five of them](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-2-seven-states-and-the-provider-owns-five-of-them).
+
 ## 2. Answer a request as a provider
 
 Navigation: ⬅️ [1. Submit a booking request as an organizer](#1-submit-a-booking-request-as-an-organizer) | 📋 [Contents](#contents) | [Next](#3-inspect-the-seven-pre-built-scenarios) ➡️

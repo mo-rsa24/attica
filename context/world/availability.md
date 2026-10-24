@@ -52,6 +52,8 @@ two slots on one resource share the same window, and that reserved never exceeds
 `materialize_availability_slots` and `expire_and_materialize` are Django management commands. Slots
 do not appear on their own.
 
+📊 Drawn in [A slot's spare capacity is the whole hold](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-1-a-slots-spare-capacity-is-the-whole-hold).
+
 ## Why the project cares
 
 Navigation: ⬅️ [What availability is](#what-availability-is) | 📋 [TOC](#table-of-contents) | [Next](#how-it-shows-up-in-the-data) ➡️

@@ -133,6 +133,8 @@ A separate process turns those rows into notifications. If it is not running, ev
 succeeds, every API response still looks correct, and no notification is ever delivered. There is
 no error anywhere.
 
+📊 Drawn in [Every event is written and none is sent](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-5-every-event-is-written-and-none-is-sent).
+
 ## Known gaps / non-obvious constraints
 
 Navigation: ⬅️ [Execution model](#execution-model) | 📋 [TOC](#table-of-contents) | [Next](#provenance) ➡️
@@ -177,6 +179,7 @@ gaps](../plans/create-event-end-to-end/plans/fixing-create-event/plans/02-close-
 It contains only `node_modules` and a lockfile. The root `package.json` describing it names build
 paths (`backend/chat`, `frontend`) that do not match this repository's layout.
 
+📊 Drawn in [Three exits, and one state nothing can reach](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-4-three-exits-and-one-state-nothing-can-reach).
 
 ## Provenance
 

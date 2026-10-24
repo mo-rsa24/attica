@@ -109,6 +109,8 @@ guarantee rather than an application hope.
 See [what availability means](../../context/world/availability.md).
 </details>
 
+📊 Drawn in [Steps 1 to 3, the search that reserves](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-7-steps-1-to-3-the-search-that-reserves).
+
 ## 4. The test accounts
 
 Navigation: ⬅️ [3. Materialize availability slots](#3-materialize-availability-slots) | 📋 [Contents](#contents) | [Next](#5-reset-the-database-completely) ➡️

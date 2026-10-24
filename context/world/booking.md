@@ -48,6 +48,8 @@ the two, holding the window while payment resolves.
 was published into, and the organizer, and settles the draft's bookings against the real event.
 Before publish, what the organizer has accumulated is provisional.
 
+📊 Drawn in [Two doors in, one line through](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-3-two-doors-in-one-line-through).
+
 ## Why the project cares
 
 Navigation: ⬅️ [What a booking is](#what-a-booking-is) | 📋 [TOC](#table-of-contents) | [Next](#how-it-shows-up-in-the-data) ➡️

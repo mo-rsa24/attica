@@ -53,6 +53,8 @@ set, so a request belonging to neither is legal.
 `expires_at` is a nullable datetime, and `expire_pending_booking_requests` is a management command.
 An unanswered request is not left pending forever, provided someone runs the command.
 
+📊 Drawn in [Seven states, and the provider owns five of them](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-2-seven-states-and-the-provider-owns-five-of-them).
+
 ## Why the project cares
 
 Navigation: ⬅️ [What a booking request is](#what-a-booking-request-is) | 📋 [TOC](#table-of-contents) | [Next](#how-it-shows-up-in-the-data) ➡️

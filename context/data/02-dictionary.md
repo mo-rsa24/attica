@@ -712,3 +712,7 @@ How many times a post was shared.
 
 **Watch out** a plain integer someone increments, with no share records behind it. Unlike `likes`,
 it cannot be audited or undone ✅
+
+📊 Drawn in [A slot's spare capacity is the whole hold](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-1-a-slots-spare-capacity-is-the-whole-hold).
+
+📊 Drawn in [One booking, two reviews, one each way](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-6-one-booking-two-reviews-one-each-way).

@@ -369,6 +369,42 @@ def _reserve_capacity(slots, attendee_count: int):
         AvailabilitySlot.objects.filter(id__in=slot_ids).update(capacity_reserved=F("capacity_reserved") + attendee_count)
 
 
+def _reserve_slots_for_request(locked_request, *, organizer, phase: str):
+    """Lock the slots a request overlaps, check capacity, and reserve them.
+
+    Returns the locked slots, or an empty list when the resource has no materialized slots for
+    the window, which is the caller's cue to fall back to conflict checks. A shortfall records a
+    conflict incident against `phase` and raises ConflictError without reserving anything.
+    """
+    MarketplaceResource.objects.select_for_update().get(id=locked_request.resource_id)
+    slots = list(
+        _lock_overlapping_slots(
+            locked_request.resource,
+            locked_request.requested_start_at,
+            locked_request.requested_end_at,
+        )
+    )
+    if not slots:
+        return slots
+    try:
+        _assert_slot_capacity(slots, locked_request.attendee_count)
+    except ConflictError as capacity_exc:
+        _record_conflict_incident(
+            operation=BookingConflictIncident.Operation.CREATE,
+            conflict_source=BookingConflictIncident.ConflictSource.APPLICATION_CHECK,
+            resource=locked_request.resource,
+            event=locked_request.event,
+            organizer=organizer,
+            requested_start_at=locked_request.requested_start_at,
+            requested_end_at=locked_request.requested_end_at,
+            message=str(capacity_exc),
+            details={"request_id": locked_request.id, "phase": phase},
+        )
+        raise
+    _reserve_capacity(slots, locked_request.attendee_count)
+    return slots
+
+
 def _release_capacity(resource: MarketplaceResource, start_at: datetime, end_at: datetime, attendee_count: int):
     if attendee_count <= 0:
         return
@@ -791,6 +827,16 @@ def approve_request(*, reviewer, booking_request: BookingRequest, provider_messa
             if is_instant_mode:
                 hold_minutes = policy.checkout_hold_minutes or 30
                 hold_expires_at = timezone.now() + timedelta(minutes=hold_minutes)
+
+                # An instant hold takes the same capacity a manually started checkout takes.
+                # Without this the hold expires against capacity it never reserved, and
+                # _release_capacity subtracts a seat belonging to a different organizer.
+                _reserve_slots_for_request(
+                    locked_request,
+                    organizer=locked_request.organizer,
+                    phase="instant_approval",
+                )
+
                 checkout_session = CheckoutSession.objects.create(
                     organizer=locked_request.organizer,
                     event_draft=locked_request.event_draft,
@@ -1322,31 +1368,10 @@ def start_checkout_session(
         )
 
         for locked_request in locked_requests:
-            MarketplaceResource.objects.select_for_update().get(id=locked_request.resource_id)
-            slot_qs = _lock_overlapping_slots(
-                locked_request.resource,
-                locked_request.requested_start_at,
-                locked_request.requested_end_at,
+            slots = _reserve_slots_for_request(
+                locked_request, organizer=organizer, phase="checkout_start"
             )
-            slots = list(slot_qs)
-            if slots:
-                try:
-                    _assert_slot_capacity(slots, locked_request.attendee_count)
-                except ConflictError as capacity_exc:
-                    _record_conflict_incident(
-                        operation=BookingConflictIncident.Operation.CREATE,
-                        conflict_source=BookingConflictIncident.ConflictSource.APPLICATION_CHECK,
-                        resource=locked_request.resource,
-                        event=locked_request.event,
-                        organizer=organizer,
-                        requested_start_at=locked_request.requested_start_at,
-                        requested_end_at=locked_request.requested_end_at,
-                        message=str(capacity_exc),
-                        details={"request_id": locked_request.id, "phase": "checkout_start"},
-                    )
-                    raise
-                _reserve_capacity(slots, locked_request.attendee_count)
-            else:
+            if not slots:
                 booking_conflict = _find_booking_conflict(
                     locked_request.resource,
                     locked_request.requested_start_at,

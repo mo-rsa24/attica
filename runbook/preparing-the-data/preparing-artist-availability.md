@@ -79,6 +79,8 @@ narrowed to one date range instead of a horizon. `--resource-id` narrows it to o
 ❌ No rows at all: the rule's `effective_*` dates do not overlap the range you materialized, or
 `is_active` is unchecked.
 
+📊 Drawn in [A slot's spare capacity is the whole hold](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-1-a-slots-spare-capacity-is-the-whole-hold).
+
 ## 2. Change an artist's recurring availability
 
 Navigation: ⬅️ [1. Make an artist bookable](#1-make-an-artist-bookable-from-scratch) | 📋 [Contents](#contents) | [Next](#3-block-out-a-date-range) ➡️

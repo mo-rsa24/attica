@@ -211,3 +211,5 @@ notification can never be sent for a booking that rolled back. A separate proces
 into notifications afterwards. The cost of that safety is that the second process is a thing
 someone has to remember to start.
 </details>
+
+📊 Drawn in [Every event is written and none is sent](artifacts/scenes/scheduling-process-flows/figure-explainer.md#figure-5-every-event-is-written-and-none-is-sent).

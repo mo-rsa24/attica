@@ -83,7 +83,7 @@ source /home/molef/lobola/bin/activate
 python manage.py runserver                    # HTTP only (port 8000)
 daphne -b 0.0.0.0 -p 8000 main.asgi:application  # With WebSocket support
 python manage.py migrate                      # Run migrations
-python manage.py test                         # Run the test suite (43 tests; 2 currently red)
+python manage.py test                         # Run the test suite (46 tests; 2 currently red, both in events.EventDraftAPITests)
 ```
 
 ### Frontend (React/Vite)
