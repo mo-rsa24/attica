@@ -51,7 +51,7 @@ registration, not the data.
 Navigation: ⬅️ [What is registered](#what-is-registered) | 📋 [TOC](#table-of-contents)
 
 **Writing a row here does not run the code the API runs.** The scheduling service layer does the
-validating, the outbox append and the notification. An admin save writes the row and stops. So a
+validating, the [outbox](../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> append and the notification. An admin save writes the row and stops. So a
 booking created in the admin never notifies anybody, and a rule changed in the admin does not
 regenerate the slots that were built from it.
 

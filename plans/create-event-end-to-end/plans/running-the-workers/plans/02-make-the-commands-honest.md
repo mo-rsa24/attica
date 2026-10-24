@@ -57,7 +57,7 @@ the codebase that breaks the rule this scope exists to make universal.
 `expire_checkout_sessions` (`backend/main/scheduling/services.py:1744`). Nothing anywhere sweeps
 `draft_hold_expires_at`. The command is named for a job it does not do.
 
-**`expire_and_materialize` does not materialise, and its expiry skips the outbox.** It imports
+**`expire_and_materialize` does not materialise, and its expiry skips the [outbox](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub>.** It imports
 `materialize_slots_for_resource`
 (`backend/main/scheduling/management/commands/expire_and_materialize.py:20`) and never calls it. Its
 loop body is a single inline `BookingRequest.objects.filter(...).update(status=EXPIRED)`, which
@@ -84,7 +84,7 @@ From [the environment overview](../../../../../environment/overview.md), which i
   `python manage.py test` does not mean this plan broke something. Know the two by name before
   reading a run, per
   [the known gaps](../../../../../environment/overview.md#known-gaps--non-obvious-constraints).
-- The outbox worker is not running unless somebody started it. This plan checks outbox rows in the
+- The outbox worker is not running unless somebody started it. This plan checks [outbox rows](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> in the
   `pending` state, which is what an emitted-and-undispatched event looks like, so it does not need
   the worker running and should not have it running while counting.
 
@@ -136,7 +136,7 @@ Navigation: ⬅️ [The claim](#the-claim) | 📋 [TOC](#table-of-contents) | [N
 
 A rule with one exception is not a rule, it is a convention plus a bug that nobody has hit yet.
 
-Nineteen call sites in `scheduling/services.py` already write the business change and the outbox
+Nineteen call sites in `scheduling/services.py` already write the business change and the [outbox](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub>
 event in one transaction. One daemon writes its own update inline and emits nothing. Left alone,
 that daemon becomes the thing somebody copies the next time a background job is needed, because it
 is the shortest example in the file.
@@ -191,7 +191,7 @@ Three changes to `backend/main/scheduling/`, and one section appended to the sco
    `backend/main/scheduling/management/commands/expire_and_materialize.py` is replaced by a call to
    `expire_pending_requests`, which is what `expire_pending_booking_requests` already calls. The
    daemon keeps its loop, its interval argument and its signal handling.
-2. **A lapsed draft hold emits an event.** One new outbox event type for the moment
+2. **A lapsed draft hold emits an event.** One new [outbox](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> event type for the moment
    `draft_hold_expires_at` passes, emitted from wherever the lapse is recognised, so the organizer
    is told rather than discovering it. Required under both D2 answers.
 3. **`expire_draft_holds` is resolved, or handed over with the criterion written.** Three outcomes
@@ -212,7 +212,7 @@ path, and close the half of [objective 3](../MASTER_PLAN.md#objectives) that is 
 rather than a silent delivery.
 
 **Goal.** No expiry path in `backend/main/scheduling/` changes a booking's status without emitting
-the outbox event for it, proved by a row count taken before and after each command is run; and a
+the [outbox](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> event for it, proved by a row count taken before and after each command is run; and a
 lapsed draft hold produces an outbox row where today it produces nothing.
 
 ## Tasks
@@ -314,7 +314,7 @@ For Claude to execute. Ask Claude to do these.
 
 This is the part both D2 answers need, which is why it is built now rather than waited on.
 
-- [ ] **3.1 Emit an outbox event at the moment the lapse is recognised**
+- [ ] **3.1 Emit an [outbox](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> event at the moment the lapse is recognised**
   - The lapse is recognised at `backend/main/scheduling/services.py:319`, where the status
     projection reports `checkout_hold_expired`. A projection is a read and must not write, so the
     emit goes wherever the lapse is *acted on* rather than merely observed. Establish that site
@@ -405,9 +405,9 @@ the plan that closes it and it is much easier to build a fix for something you h
    - Do **not** start `run_outbox_worker`. This instruction is about what happens without it.
    - ✅ The Vite banner reads `http://localhost:5173/`: continue.
    - ❌ It reads 5174: stop and free 5173. `CORS_ALLOWED_ORIGINS` does not name 5174, so every
-     request fails on CORS and looks exactly like a wrong password.
+     request fails on [CORS](../../../../../../../Obsidian/Information%20Technology/Networking/CORS.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=Ka8vG5miErk&t=240s "Hussein Nasser, Cross Origin Resource Sharing (Explained by Example), No 'Access-Control-Allow-Origin' header is present, 4:00 to 8:10, The first CORS error ..."), [▶2](https://www.youtube.com/watch?v=Ka8vG5miErk&t=610s "Hussein Nasser, Cross Origin Resource Sharing (Explained by Example), OPTIONS 405 Method not Allowed (Preflight failed), 10:10 to 17:00, A preflight request ..."), [◆](../../../../../../../goal-setting/learning/projects/attica/event-creation/plans/02-rebuild-from-scratch/plans/13-vite-proxy-and-cors.md "The Vite proxy and CORS, projects/attica/event-creation/plans/02-rebuild-from-scratch, plan 13. The wizard wired to the backend three ways in turn: broken cr...")</sub> and looks exactly like a wrong password.
 
-5.2 **Run the expiry and read the outbox in the admin**
+5.2 **Run the expiry and read the [outbox](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> in the admin**
    - In a terminal: `python manage.py expire_pending_booking_requests`.
    - Open `http://localhost:8000/admin/` and go to Scheduling → Outbox events. You need a staff
      account; how to get one is in
@@ -440,7 +440,7 @@ the plan that closes it and it is much easier to build a fix for something you h
 Navigation: ⬅️ [Instructions](#instructions) | 📋 [TOC](#table-of-contents) | [Next](#outputs--deliverables) ➡️
 
 > This plan is done when no expiry path in `scheduling/` can change a booking without leaving an
-> outbox row behind it, and that is shown by a count rather than asserted.
+> [outbox row](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> behind it, and that is shown by a count rather than asserted.
 
 Pass:
 
@@ -506,7 +506,7 @@ expired = expire_pending_requests(limit=<the limit this daemon should carry>)
 ```
 
 **`scheduling/services.py::expire_pending_requests`** (line 2633) is what the replacement calls, and
-it is where the `request.expired` outbox event is recorded. Read it before changing the daemon, so
+it is where the `request.expired` [outbox](../../../../../../../Obsidian/Information%20Technology/System%20Design/Messaging/Outbox%20Pattern.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=23s "Confluent, What is the Transactional Outbox Pattern? ∣ Designing Event-Driven Microservices, What is the dual-write problem?, 0:23 to 0:51, The problem the p..."), [▶2](https://www.youtube.com/watch?v=5YLpjPmsPCA&t=51s "Confluent, What is the Transactional Outbox Pattern?, What is the transactional outbox pattern?, 0:51 to 1:33, The pattern itself, before how its events reac..."), [◆](../../../../../../../goal-setting/learning/system-design/foundations/plans/19-outbox-queue-and-worker.md "The outbox, the queue and the worker, system-design/foundations, plan 19. The corner shop's order and an 'order placed' event written in one transaction, a r...")</sub> event is recorded. Read it before changing the daemon, so
 the daemon's printed count means the same thing it meant before.
 
 **`scheduling/services.py::_dispatch_notification_for_event`** (line 2683) is the type-to-notification
@@ -546,4 +546,4 @@ Navigation: ⬅️ [Recommended skill](#recommended-skill) | 📋 [TOC](#table-o
 |---|---|---|
 | A command reports success for work it never did | `expire_draft_holds`, which sweeps checkout sessions and is named for draft holds | Read the file, not the name. `diff` against its neighbour settles it in one command. |
 | A background job changes state and no notification follows | `expire_and_materialize`'s inline update, which bypasses the service that emits | Route every state change through the service layer. The rule is nineteen call sites strong and had exactly one exception. |
-| A login attempt fails with a CORS error that reads like bad credentials | The browser, when Vite bound 5174 because 5173 was taken | `CORS_ALLOWED_ORIGINS` names 5173 and 3000 only. Free 5173 and restart Vite. |
+| A login attempt fails with a [CORS](../../../../../../../Obsidian/Information%20Technology/Networking/CORS.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=Ka8vG5miErk&t=240s "Hussein Nasser, Cross Origin Resource Sharing (Explained by Example), No 'Access-Control-Allow-Origin' header is present, 4:00 to 8:10, The first CORS error ..."), [▶2](https://www.youtube.com/watch?v=Ka8vG5miErk&t=610s "Hussein Nasser, Cross Origin Resource Sharing (Explained by Example), OPTIONS 405 Method not Allowed (Preflight failed), 10:10 to 17:00, A preflight request ..."), [◆](../../../../../../../goal-setting/learning/projects/attica/event-creation/plans/02-rebuild-from-scratch/plans/13-vite-proxy-and-cors.md "The Vite proxy and CORS, projects/attica/event-creation/plans/02-rebuild-from-scratch, plan 13. The wizard wired to the backend three ways in turn: broken cr...")</sub> error that reads like bad credentials | The browser, when Vite bound 5174 because 5173 was taken | `CORS_ALLOWED_ORIGINS` names 5173 and 3000 only. Free 5173 and restart Vite. |

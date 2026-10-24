@@ -33,7 +33,7 @@ Track implementation progress by checking off items as they ship.
 - [ ] Payment provider integration (Stripe / Peach Payments / Yoco)
 - [ ] `Payment` model linked to `Booking`
 - [ ] `POST /api/checkout/booking/<id>/pay/` — initiate payment
-- [ ] Webhook handler for payment confirmation / failure
+- [ ] [Webhook](../../Obsidian/Information%20Technology/System%20Design/Messaging/Webhook.md#where-to-learn-this)<sub>[▶1](https://www.youtube.com/watch?v=-4Lid7tBr6Y&t=320s "Hussein Nasser, Webhooks Tutorial with Discord and Vanilla Javascript (fetch api), Example, 5:20 to 15:06, Sends messages to a Discord channel through its we..."), [▶2](https://www.youtube.com/watch?v=x_jjhcDrISk&t=90s "ByteByteGo, Top 3 Things You Should Know About Webhooks!, How webhooks work, 1:30 to 2:00, The mechanism, straight after the chapter on polling and long poll..."), [◆](../../goal-setting/learning/system-design/foundations/plans/20-providers-webhook-and-one-key.md "The providers, the webhook, and one key, system-design/foundations, plan 20. The fake payment provider calls back to the corner shop's payment service by web...")</sub> handler for payment confirmation / failure
 - [ ] Booking status auto-advances on payment success
 - [ ] Invoices / receipts (PDF or email)
 
