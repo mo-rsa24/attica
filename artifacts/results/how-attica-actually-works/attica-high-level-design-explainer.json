@@ -1,0 +1,202 @@
+{
+ "title": "Attica: high-level design",
+ "page_title": "Attica High-Level Design",
+ "subtitle": "Local development stack as the repository runs it today, read from the code and environment/overview.md on 2026-10-24",
+ "lede": "What runs when Attica runs, from the browser on the left to the data on the right. Four of these boxes are processes started by hand: Redis, the Django backend under Daphne, the Vite dev server and the outbox worker.",
+ "version_line": "Version 1, 2026-10-24: 10 boxes, 10 arrows. Read from /home/molef/Work/attica at commit a85cc0c plus its uncommitted working tree.",
+ "col_w": 0,
+ "row_h": 130,
+ "nodes": [
+  {
+   "id": "app",
+   "kind": "client",
+   "label": "Attica web app",
+   "sub": "React 19 + MUI, in the browser",
+   "logo": "react",
+   "col": 0,
+   "row": 1
+  },
+  {
+   "id": "osm",
+   "kind": "external",
+   "label": "OpenStreetMap",
+   "sub": "Nominatim geocoding, map tiles",
+   "logo": "openstreetmap",
+   "col": 0,
+   "row": 2.25
+  },
+  {
+   "id": "vite",
+   "kind": "edge",
+   "eyebrow": "dev proxy",
+   "label": "Vite dev server",
+   "sub": "localhost:5173",
+   "logo": "vite",
+   "col": 1,
+   "row": 0
+  },
+  {
+   "id": "sentry",
+   "kind": "external",
+   "label": "Sentry",
+   "sub": "only when SENTRY_DSN is set",
+   "logo": "sentry",
+   "col": 1,
+   "row": 2.25
+  },
+  {
+   "id": "backend",
+   "kind": "service",
+   "eyebrow": "backend, one ASGI process",
+   "label": "Django backend",
+   "sub": "Daphne :8000, REST + WebSockets",
+   "logo": "django",
+   "col": 2,
+   "row": 1
+  },
+  {
+   "id": "media",
+   "kind": "files",
+   "label": "Uploaded media",
+   "sub": "backend/main/media on disk",
+   "col": 2,
+   "row": 2.25
+  },
+  {
+   "id": "redis",
+   "kind": "cache",
+   "eyebrow": "cache and channel layer",
+   "label": "Redis",
+   "sub": "127.0.0.1:6379",
+   "logo": "redis",
+   "col": 3,
+   "row": 0
+  },
+  {
+   "id": "sqlite",
+   "kind": "store",
+   "label": "SQLite",
+   "sub": "backend/main/db.sqlite3",
+   "logo": "sqlite",
+   "col": 3,
+   "row": 1
+  },
+  {
+   "id": "worker",
+   "kind": "worker",
+   "eyebrow": "worker, started by hand",
+   "label": "Outbox worker",
+   "sub": "manage.py run_outbox_worker",
+   "col": 3,
+   "row": 2.25
+  },
+  {
+   "id": "hooks",
+   "kind": "external",
+   "label": "Webhook targets",
+   "sub": "none configured by default",
+   "col": 4,
+   "row": 2.25
+  }
+ ],
+ "groups": [],
+ "edges": [
+  {
+   "from": "app",
+   "to": "vite",
+   "label": "/api /cart /checkout\n/vendors /ws",
+   "label_seg": 1
+  },
+  {
+   "from": "vite",
+   "to": "backend",
+   "label": "HTTP, and /ws\nwith ?token=JWT",
+   "label_seg": 1
+  },
+  {
+   "from": "app",
+   "to": "backend",
+   "label": "useAxios goes direct to\n127.0.0.1:8000, needs CORS",
+   "label_dy": 0
+  },
+  {
+   "from": "app",
+   "to": "osm",
+   "label": "straight from the browser",
+   "sides": "bt"
+  },
+  {
+   "from": "backend",
+   "to": "redis",
+   "label": "channel layer, db 0\npage cache, db 1",
+   "style": "async",
+   "both": true,
+   "label_seg": 1
+  },
+  {
+   "from": "backend",
+   "to": "sqlite",
+   "label": "Django ORM"
+  },
+  {
+   "from": "backend",
+   "to": "media",
+   "label": "uploads up to 50 MB",
+   "sides": "bt"
+  },
+  {
+   "from": "backend",
+   "to": "sentry",
+   "label": "errors",
+   "style": "optional",
+   "sides": "bt",
+   "label_seg": 1
+  },
+  {
+   "from": "worker",
+   "to": "sqlite",
+   "label": "polls pending outbox rows,\nwrites notification rows",
+   "style": "async",
+   "both": true,
+   "sides": "tb"
+  },
+  {
+   "from": "worker",
+   "to": "hooks",
+   "label": "signed POST",
+   "style": "optional"
+  }
+ ],
+ "details": [
+  {
+   "heading": "Where each box comes from",
+   "lines": [
+    "<strong>Attica web app</strong>: <code>frontend/package.json</code> (react 19.1, @mui/material 7.1).",
+    "<strong>Vite dev server</strong>: <code>frontend/vite.config.js</code> lines 16 to 25, the proxy for <code>/api</code>, <code>/vendors</code>, <code>/cart</code>, <code>/checkout</code> and <code>/ws</code>.",
+    "<strong>Django backend</strong>: one Daphne process serving <code>main.asgi:application</code>, holding the REST API (<code>rest_framework</code> in <code>INSTALLED_APPS</code>, JWT through <code>rest_framework_simplejwt</code>) and the WebSocket consumers (<code>channels</code>; <code>chat/consumers.py</code>, <code>notifications/consumers.py</code>). The chat consumer saves each message to SQLite before broadcasting it.",
+    "<strong>SQLite</strong>: <code>DATABASES</code> in <code>settings.py</code> line 156. Every app writes here through the Django ORM, including bookings, chat messages and the <code>scheduling_outboxevent</code> rows the worker reads.",
+    "<strong>Redis</strong>: <code>CHANNEL_LAYERS</code> (db 0) and <code>CACHES</code> at <code>redis://127.0.0.1:6379/1</code> in <code>settings.py</code>.",
+    "<strong>Uploaded media</strong>: <code>MEDIA_ROOT</code> in <code>settings.py</code> line 226; 50 MB cap at line 230.",
+    "<strong>Outbox worker</strong>: <code>scheduling/management/commands/run_outbox_worker.py</code>, calling <code>dispatch_outbox_events</code> in <code>scheduling/services.py</code>.",
+    "<strong>Webhook targets</strong>: <code>SCHEDULING_WEBHOOK_TARGETS = []</code> in <code>settings.py</code> line 239; delivery by <code>urllib</code> in <code>_dispatch_webhooks_for_event</code>.",
+    "<strong>Sentry</strong>: <code>settings.py</code> lines 247 to 257, skipped when <code>SENTRY_DSN</code> is unset.",
+    "<strong>OpenStreetMap</strong>: <code>frontend/src/ListingStep4.jsx</code> (Nominatim) and <code>components/MapComponent.jsx</code> (tiles)."
+   ]
+  },
+  {
+   "heading": "How to read the lines",
+   "lines": [
+    "A solid line is a request that waits for an answer. A dashed line is asynchronous (the channel layer, the worker polling its table). A dotted line only carries traffic when a setting turns it on: Sentry needs <code>SENTRY_DSN</code> and webhooks need a configured target."
+   ]
+  },
+  {
+   "heading": "What is not drawn",
+   "lines": [
+    "Stripe appears only as comments in <code>vendors/views.py</code> and as an MCP for future work, so it has no box. There is no Celery, no object storage and no CDN.",
+    "The booking-request write path stores its notification row and never pushes it to the channel layer (<code>scheduling/services.py</code>, <code>_create_in_app_notification</code>), so no line runs from the worker to Redis.",
+    "<code>node-websocket/</code> holds only <code>node_modules</code> and a lockfile, so it is not a running component.",
+    "Inside the Django backend box sit the REST API, the WebSocket consumers and the Django admin. Splitting it is the next diagram one level down."
+   ]
+  }
+ ]
+}
