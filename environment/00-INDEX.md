@@ -29,5 +29,8 @@ table](provenance.md).
 
 ## Pictures
 
-None yet. There is no `diagram-prompts.md` in this folder; the runtime topology is drawn instead in
+[Attica's high-level design](../artifacts/results/how-attica-actually-works/attica-high-level-design-explainer.svg)
+shows the ten running parts and how they talk: the React app, the Vite dev server, Django under
+Daphne, Redis, SQLite, uploaded media, the outbox worker, OpenStreetMap, Sentry and webhook targets.
+There is no `diagram-prompts.md` in this folder; the runtime topology is also drawn in
 [the scenes on how Attica actually works](../artifacts/scenes/how-attica-actually-works/).
