@@ -7,8 +7,8 @@ which only receive traffic when a setting turns them on.
 
 ## What is in here
 
-One high-level design diagram (the current version and each dated version), and the spec file it is
-drawn from.
+One high-level design diagram (the current version and each dated version), the spec file it is
+drawn from, and the stills of its scene page: one light and one dark screenshot per anchor.
 
 ## The high-level design
 
@@ -60,6 +60,41 @@ it.
 one-line link to it lands in that file's index under "Pictures", which this filing was not allowed to
 write.
 
+### The scene's stills
+
+The scene page opens every box into its inside, down to code and database rows, and each level has an
+anchor. `attica-high-level-design-explainer-stills/` holds one screenshot per anchor in light and dark
+(20 anchors, 40 stills), taken headless by the `hld-diagram` skill's `shoot_anchors.py` from the built
+page; its own card lists every anchor with what it shows. A runbook step can embed a still and link to
+the same anchor of the live page. This one is the inside of the Django backend:
+
+<a href="attica-high-level-design-explainer-stills/attica-high-level-design-explainer__backend-inside-light.png"><img src="attica-high-level-design-explainer-stills/attica-high-level-design-explainer__backend-inside-light.png" width="200" alt="The inside of the Django backend: REST API, WebSocket consumers and Booking services between the Vite dev server and SQLite and Redis"></a>
+
+### The scene, explained
+
+`attica-high-level-design-explainer.md` walks the scene's levels in order, one section a level with its
+still linking to the same place on the live page, and says what each part does and where that was
+read. It is written by the `hld-diagram` skill's `write_explainer.py` from the built page's own data,
+so it cannot disagree with the scene, and concept-link then links its terms (Redis, WebSocket, REST
+API, JWT, ORM, outbox, webhook, middleware, cache, foreign key) to their concept cards, each with its
+textbook pages, videos and system-design plans. Every term it names now reaches a card: the Django, Channels, channel-layer,
+serializer, ASGI, SQLite, Vite, Sentry, OpenStreetMap, SQL join and React cards were built for it on 2026-10-27, so its
+"No card yet" section is empty.
+
+### Learning a part on its own
+
+`attica-high-level-design-explainer-learn.md` holds a walk in five stages (get it, read first, start
+it alone, poke it, tear it down) for each of Attica's 9 parts that run or that it calls: six get a
+`/plumb` walk on a practice copy, and the three outside services (OpenStreetMap, Sentry, the webhook
+targets) get a walk that reads their docs and calls a test account. The same stages open on the page
+from each panel's "Learn it on its own" button, or straight at `#<box>-learn`. Redis has exact stages
+(Docker Desktop with WSL integration, a practice Redis on port 6380, four commands with what each
+prints, and the 6 channel-layer groups and 4 cache keys Attica's code uses); the other eight are
+drafts whose first steps find the install page and the docs.
+
+<a href="attica-high-level-design-explainer-stills/attica-high-level-design-explainer__redis-learn-light.png"><img src="attica-high-level-design-explainer-stills/attica-high-level-design-explainer__redis-learn-light.png" width="400" alt="The Redis panel with Learn Redis on its own open: four numbered cards to start a practice copy, copy the plumb prompt, come back, and tear it down"></a>
+
+
 ### Versions
 
 Each time a part is added or removed, the diagram is redrawn from the spec file and the new picture
@@ -70,3 +105,20 @@ is kept here with its date, so the build's growth stays visible.
 ![](attica-high-level-design-explainer__2026-10-24.svg)
 
 Ten boxes and ten arrows, drawn from the repository as it stood that day.
+
+**2026-10-27: second version, the scene**
+
+![](attica-high-level-design-explainer__2026-10-27.svg)
+
+The same ten boxes and ten arrows at the top, so the top picture is unchanged; what was added is
+everything below it. The picture is now the top level of an interactive page,
+`attica-high-level-design-explainer-scene.html`, built by the `hld-diagram` skill's scene mode from
+the spec's levels (`attica-high-level-design-explainer.json`), `hld-overrides.json`, the runbook, the
+code and the database: a start-up path of five steps read from the runbook, a panel of commands on
+every box from 53 of the runbook's 54 code blocks, and 17 levels below the boxes (the inside of the
+Django backend, the sequence and the tables of `create_request` read statically from
+`scheduling/services.py`, and the inside of SQLite with one level per app, every personal value
+hidden).
+
+Published on 2026-10-27 to https://claude.ai/artifact/GLg4UBzHQCdY4U9kteM4po as that page's version
+7, replacing the hand-built prototype.

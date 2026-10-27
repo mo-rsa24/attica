@@ -40,14 +40,14 @@ svg.hld .step-num{fill:var(--hld-bg);font-size:10px;font-weight:700}
 <rect class="bg" x="0" y="0" width="1878" height="494"/>
 <text class="title" x="32" y="40">Attica: high-level design</text>
 <text class="subtitle" x="32" y="60">Local development stack as the repository runs it today, read from the code and environment/overview.md on 2026-10-24</text>
-<path class="edge sync" d="M279.4 239.2 L354.8 239.2 L354.8 129.0 L430.2 129.0" marker-end="url(#hld-arrow)"/>
-<path class="edge sync" d="M669.2 129.0 L744.6 129.0 L744.6 239.2 L820.0 239.2" marker-end="url(#hld-arrow)"/>
-<path class="edge sync" d="M279.4 278.8 L820.0 278.8" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M279.4 259.0 L354.8 259.0 L354.8 129.0 L430.2 129.0" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M669.2 129.0 L744.6 129.0 L744.6 259.0 L820.0 259.0" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M279.4 259.0 L820.0 259.0" marker-end="url(#hld-arrow)"/>
 <path class="edge sync" d="M159.9 292.0 L159.9 388.5" marker-end="url(#hld-arrow)"/>
-<path class="edge async" d="M1059.0 239.2 L1134.4 239.2 L1134.4 129.0 L1209.8 129.0" marker-end="url(#hld-arrow)" marker-start="url(#hld-arrow)"/>
-<path class="edge sync" d="M1059.0 278.8 L1209.8 278.8" marker-end="url(#hld-arrow)"/>
-<path class="edge sync" d="M1011.2 292.0 L1011.2 388.5" marker-end="url(#hld-arrow)"/>
-<path class="edge optional" d="M867.8 292.0 L867.8 340.2 L549.7 340.2 L549.7 388.5" marker-end="url(#hld-arrow)"/>
+<path class="edge async" d="M1059.0 259.0 L1134.4 259.0 L1134.4 129.0 L1209.8 129.0" marker-end="url(#hld-arrow)" marker-start="url(#hld-arrow)"/>
+<path class="edge sync" d="M1059.0 259.0 L1209.8 259.0" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M939.5 292.0 L939.5 388.5" marker-end="url(#hld-arrow)"/>
+<path class="edge optional" d="M939.5 292.0 L939.5 340.2 L549.7 340.2 L549.7 388.5" marker-end="url(#hld-arrow)"/>
 <path class="edge async" d="M1329.3 388.5 L1329.3 297.0" marker-end="url(#hld-arrow)" marker-start="url(#hld-arrow)"/>
 <path class="edge optional" d="M1448.8 421.5 L1599.6 421.5" marker-end="url(#hld-arrow)"/>
 <g class="node" id="n-app" style="--k:var(--k-client)">
@@ -126,26 +126,26 @@ svg.hld .step-num{fill:var(--hld-bg);font-size:10px;font-weight:700}
 <text class="label" x="1719.1" y="426.0" text-anchor="middle">Webhook targets</text>
 <text class="sub" x="1719.1" y="440.0" text-anchor="middle">none configured by default</text>
 </g>
-<rect class="pill" x="284.8" y="167.1" width="140.0" height="34" rx="9"/>
-<text class="edge-label" x="290.8" y="179.9">/api /cart /checkout</text>
-<text class="edge-label" x="290.8" y="195.9">/vendors /ws</text>
-<rect class="pill" x="690.6" y="167.1" width="108.0" height="34" rx="9"/>
-<text class="edge-label" x="696.6" y="179.9">HTTP, and /ws</text>
-<text class="edge-label" x="696.6" y="195.9">with ?token=JWT</text>
-<rect class="pill" x="460.5" y="261.8" width="178.4" height="34" rx="9"/>
-<text class="edge-label" x="466.5" y="274.6">useAxios goes direct to</text>
-<text class="edge-label" x="466.5" y="290.6">127.0.0.1:8000, needs CORS</text>
+<rect class="pill" x="284.8" y="177.0" width="140.0" height="34" rx="9"/>
+<text class="edge-label" x="290.8" y="189.8">/api /cart /checkout</text>
+<text class="edge-label" x="290.8" y="205.8">/vendors /ws</text>
+<rect class="pill" x="690.6" y="177.0" width="108.0" height="34" rx="9"/>
+<text class="edge-label" x="696.6" y="189.8">HTTP, and /ws</text>
+<text class="edge-label" x="696.6" y="205.8">with ?token=JWT</text>
+<rect class="pill" x="460.5" y="242.0" width="178.4" height="34" rx="9"/>
+<text class="edge-label" x="466.5" y="254.8">useAxios goes direct to</text>
+<text class="edge-label" x="466.5" y="270.8">127.0.0.1:8000, needs CORS</text>
 <rect class="pill" x="73.9" y="331.2" width="172.0" height="18" rx="9"/>
 <text class="edge-label" x="79.9" y="344.1">straight from the browser</text>
-<rect class="pill" x="1067.6" y="167.1" width="133.6" height="34" rx="9"/>
-<text class="edge-label" x="1073.6" y="179.9">channel layer, db 0</text>
-<text class="edge-label" x="1073.6" y="195.9">page cache, db 1</text>
-<rect class="pill" x="1096.4" y="269.8" width="76.0" height="18" rx="9"/>
-<text class="edge-label" x="1102.4" y="282.6">Django ORM</text>
-<rect class="pill" x="944.4" y="331.2" width="133.6" height="18" rx="9"/>
-<text class="edge-label" x="950.4" y="344.1">uploads up to 50 MB</text>
-<rect class="pill" x="683.5" y="331.2" width="50.4" height="18" rx="9"/>
-<text class="edge-label" x="689.5" y="344.1">errors</text>
+<rect class="pill" x="1067.6" y="177.0" width="133.6" height="34" rx="9"/>
+<text class="edge-label" x="1073.6" y="189.8">channel layer, db 0</text>
+<text class="edge-label" x="1073.6" y="205.8">page cache, db 1</text>
+<rect class="pill" x="1096.4" y="250.0" width="76.0" height="18" rx="9"/>
+<text class="edge-label" x="1102.4" y="262.8">Django ORM</text>
+<rect class="pill" x="872.7" y="331.2" width="133.6" height="18" rx="9"/>
+<text class="edge-label" x="878.7" y="344.1">uploads up to 50 MB</text>
+<rect class="pill" x="719.4" y="331.2" width="50.4" height="18" rx="9"/>
+<text class="edge-label" x="725.4" y="344.1">errors</text>
 <rect class="pill" x="1240.1" y="325.8" width="178.4" height="34" rx="9"/>
 <text class="edge-label" x="1246.1" y="338.6">polls pending outbox rows,</text>
 <text class="edge-label" x="1246.1" y="354.6">writes notification rows</text>

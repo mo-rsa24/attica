@@ -1,0 +1,154 @@
+<svg class="hld" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1878 494" width="1878" height="494" role="img" aria-labelledby="hld-t hld-d">
+<title id="hld-t">Attica: high-level design</title><desc id="hld-d">Local development stack as the repository runs it today, read from the code and environment/overview.md on 2026-10-24</desc>
+<style>
+svg.hld{--hld-bg:#f6f7fa;--hld-ink:#18202e;--hld-muted:#566074;--hld-line:#5f6a7e;--hld-box:#ffffff;
+--hld-group:#eceff5;--hld-group-line:#b4bccb;--hld-pill:#ffffff;
+--k-client:#2f62d8;--k-edge:#7a4fe0;--k-service:#0b8a78;--k-worker:#566a86;--k-store:#c4701a;
+--k-cache:#c93a3a;--k-queue:#a67c00;--k-files:#8a6a3c;--k-external:#6b7383;--k-assumed:#b0457a}
+@media (prefers-color-scheme: dark){
+:root:not([data-theme="light"]) svg.hld, svg.hld:root{--hld-bg:#11151d;--hld-ink:#e7eaf1;--hld-muted:#9ba4b6;
+--hld-line:#97a1b4;--hld-box:#1a202b;--hld-group:#161b25;--hld-group-line:#3a4354;--hld-pill:#1a202b;
+--k-client:#7fa3ff;--k-edge:#b394ff;--k-service:#4fd1bc;--k-worker:#9fb0c8;--k-store:#f2a55a;
+--k-cache:#ff8080;--k-queue:#e8c04a;--k-files:#d3b07f;--k-external:#a9b0be;--k-assumed:#f08cbd}}
+:root[data-theme="dark"] svg.hld{--hld-bg:#11151d;--hld-ink:#e7eaf1;--hld-muted:#9ba4b6;
+--hld-line:#97a1b4;--hld-box:#1a202b;--hld-group:#161b25;--hld-group-line:#3a4354;--hld-pill:#1a202b;
+--k-client:#7fa3ff;--k-edge:#b394ff;--k-service:#4fd1bc;--k-worker:#9fb0c8;--k-store:#f2a55a;
+--k-cache:#ff8080;--k-queue:#e8c04a;--k-files:#d3b07f;--k-external:#a9b0be;--k-assumed:#f08cbd}
+svg.hld{font-family:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+svg.hld .bg{fill:var(--hld-bg)}
+svg.hld .title{fill:var(--hld-ink);font-size:20px;font-weight:700}
+svg.hld .subtitle{fill:var(--hld-muted);font-size:12px}
+svg.hld .group{fill:var(--hld-group);stroke:var(--hld-group-line);stroke-width:1.2;stroke-dasharray:5 4}
+svg.hld .group-label{fill:var(--hld-muted);font-size:11px;font-weight:600;letter-spacing:.04em}
+svg.hld .shape{fill:color-mix(in srgb,var(--k) 11%,var(--hld-box));stroke:var(--k);stroke-width:1.6}
+svg.hld .shape.dashed{stroke-dasharray:6 4}
+svg.hld .rim{fill:none;stroke:var(--k);stroke-width:1.6}
+svg.hld .eyebrow{fill:var(--k);font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+svg.hld .label{fill:var(--hld-ink);font-size:13px;font-weight:650}
+svg.hld .sub{fill:var(--hld-muted);font-size:10.5px}
+svg.hld .badge{fill:#ffffff;stroke:#d5dae3;stroke-width:1}
+svg.hld .edge{fill:none;stroke:var(--hld-line);stroke-width:1.5}
+svg.hld .edge.async{stroke-dasharray:7 5}
+svg.hld .edge.optional{stroke-dasharray:2 4;opacity:.8}
+svg.hld .arrow{fill:var(--hld-line)}
+svg.hld .pill{fill:var(--hld-pill);stroke:var(--hld-group-line);stroke-width:1}
+svg.hld .edge-label{fill:var(--hld-ink);font-size:10.5px}
+svg.hld .step{fill:var(--hld-ink)}
+svg.hld .step-num{fill:var(--hld-bg);font-size:10px;font-weight:700}
+</style>
+<defs><marker id="hld-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="bg" x="0" y="0" width="1878" height="494"/>
+<text class="title" x="32" y="40">Attica: high-level design</text>
+<text class="subtitle" x="32" y="60">Local development stack as the repository runs it today, read from the code and environment/overview.md on 2026-10-24</text>
+<path class="edge sync" d="M279.4 259.0 L354.8 259.0 L354.8 129.0 L430.2 129.0" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M669.2 129.0 L744.6 129.0 L744.6 259.0 L820.0 259.0" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M279.4 259.0 L820.0 259.0" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M159.9 292.0 L159.9 388.5" marker-end="url(#hld-arrow)"/>
+<path class="edge async" d="M1059.0 259.0 L1134.4 259.0 L1134.4 129.0 L1209.8 129.0" marker-end="url(#hld-arrow)" marker-start="url(#hld-arrow)"/>
+<path class="edge sync" d="M1059.0 259.0 L1209.8 259.0" marker-end="url(#hld-arrow)"/>
+<path class="edge sync" d="M939.5 292.0 L939.5 388.5" marker-end="url(#hld-arrow)"/>
+<path class="edge optional" d="M939.5 292.0 L939.5 340.2 L549.7 340.2 L549.7 388.5" marker-end="url(#hld-arrow)"/>
+<path class="edge async" d="M1329.3 388.5 L1329.3 297.0" marker-end="url(#hld-arrow)" marker-start="url(#hld-arrow)"/>
+<path class="edge optional" d="M1448.8 421.5 L1599.6 421.5" marker-end="url(#hld-arrow)"/>
+<g class="node" id="n-app" style="--k:var(--k-client)">
+<rect class="shape" x="40.4" y="226.0" width="239" height="66" rx="10"/>
+<rect class="badge" x="50.4" y="245.0" width="28" height="28" rx="6"/>
+<svg x="54.4" y="249.0" width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="React logo"><path fill="#61DAFB" d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z"/></svg>
+<text class="eyebrow" x="88.4" y="247.5" text-anchor="start">client</text>
+<text class="label" x="88.4" y="263.5" text-anchor="start">Attica web app</text>
+<text class="sub" x="88.4" y="277.5" text-anchor="start">React 19 + MUI, in the browser</text>
+</g>
+<g class="node" id="n-osm" style="--k:var(--k-external)">
+<rect class="shape dashed" x="40.4" y="388.5" width="239" height="66" rx="10"/>
+<rect class="badge" x="50.4" y="407.5" width="28" height="28" rx="6"/>
+<svg x="54.4" y="411.5" width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="OpenStreetMap logo"><path fill="#7EBC6F" d="M2.672 23.969c-.352-.089-.534-.234-1.471-1.168C.085 21.688.014 21.579.018 20.999c0-.645-.196-.414 3.368-3.986 3.6-3.608 3.415-3.451 4.064-3.449.302 0 .378.016.62.14l.277.14 1.744-1.744-.218-.343c-.425-.662-.825-1.629-1.006-2.429a7.657 7.657 0 0 1 1.479-6.44c2.49-3.12 6.959-3.812 10.26-1.588 1.812 1.218 2.99 3.099 3.328 5.314.07.467.07 1.579 0 2.074a7.554 7.554 0 0 1-2.205 4.402 6.712 6.712 0 0 1-1.943 1.401c-.959.483-1.775.71-2.881.803-1.573.131-3.32-.305-4.656-1.163l-.343-.218-1.744 1.744.14.28c.125.241.14.316.14.617.003.651.156.467-3.426 4.049-2.761 2.756-3.186 3.164-3.398 3.261-.271.125-.69.171-.945.106zM17.485 13.95a6.425 6.425 0 0 0 4.603-3.51c1.391-2.899.455-6.306-2.227-8.108-.638-.43-1.529-.794-2.367-.962-.581-.117-1.809-.104-2.414.025a6.593 6.593 0 0 0-2.452 1.064c-.444.315-1.177 1.048-1.487 1.487a6.384 6.384 0 0 0 .38 7.907 6.406 6.406 0 0 0 3.901 2.136c.509.078 1.542.058 2.065-.037zm-3.738 7.376a80.97 80.97 0 0 1-2.196-.651c-.025-.028 1.207-4.396 1.257-4.449.023-.026 4.242 1.152 4.414 1.236.062.026-.003.288-.525 2.102a398.513 398.513 0 0 0-.635 2.236c-.025.087-.069.156-.097.156-.028-.003-1.028-.287-2.219-.631zm2.912.524c0-.053 1.227-4.333 1.246-4.347.047-.034 4.324-1.23 4.341-1.211.019.019-1.199 4.337-1.23 4.36-.02.019-4.126 1.191-4.259 1.218-.054.011-.098 0-.098-.019zm-7.105-1.911c.846-.852 1.599-1.627 1.674-1.728.171-.218.405-.732.472-1.015.026-.118.053-.352.058-.522l.011-.307.182-.051c.103-.028.193-.044.202-.034.023.025-1.207 4.321-1.246 4.36-.02.016-.677.213-1.464.436l-1.425.405 1.537-1.542zm8.289-3.06a1.371 1.371 0 0 1-.059-.187l-.044-.156.156-.028c1.339-.227 2.776-.856 3.908-1.713.16-.125.252-.171.265-.134.054.165.272.95.265.959-.034.034-4.48 1.282-4.492 1.261zm-15.083-1.3c-.05-.039-1.179-3.866-1.264-4.29-.016-.084.146-.044 2.174.536 2.121.604 2.192.629 2.222.74.028.098.011.129-.125.223-.084.059-.769.724-1.523 1.479a63.877 63.877 0 0 1-1.39 1.367c-.016 0-.056-.025-.093-.054zm.821-4.378c-1.188-.343-2.164-.623-2.167-.626-.016-.012 1.261-4.433 1.285-4.46.022-.022 4.422 1.211 4.469 1.252.009.009-.269 1.017-.618 2.239-.576 2.02-.643 2.224-.723 2.22-.05-.003-1.059-.285-2.247-.626zm2.959.538c.012-.031.212-.723.444-1.534l.42-1.476.056.321c.093.556.265 1.188.464 1.741.106.296.187.539.181.545-.008.006-.332.101-.719.212-.389.109-.741.21-.786.224-.058.016-.075.006-.059-.034zM4.905 6.112c-1.187-.339-2.167-.635-2.18-.654-.04-.062-1.246-4.321-1.23-4.338.026-.025 4.31 1.204 4.351 1.246.047.051 1.28 4.379 1.246 4.376L4.91 6.113zm2.148-1.713l-.519-1.806-.078-.28 1.693-.483c.934-.265 1.724-.495 1.76-.508.034-.016-.083.14-.26.336A8.729 8.729 0 0 0 7.69 5.23a4.348 4.348 0 0 0-.132.561c0 .293-.115-.025-.505-1.39z"/></svg>
+<text class="eyebrow" x="88.4" y="410.0" text-anchor="start">third party</text>
+<text class="label" x="88.4" y="426.0" text-anchor="start">OpenStreetMap</text>
+<text class="sub" x="88.4" y="440.0" text-anchor="start">Nominatim geocoding, map tiles</text>
+</g>
+<g class="node" id="n-vite" style="--k:var(--k-edge)">
+<rect class="shape" x="430.2" y="96.0" width="239" height="66" rx="10"/>
+<rect class="badge" x="440.2" y="115.0" width="28" height="28" rx="6"/>
+<svg x="444.2" y="119.0" width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="Vite logo"><path fill="#646CFF" d="m8.286 10.578.512-8.657a.306.306 0 0 1 .247-.282L17.377.006a.306.306 0 0 1 .353.385l-1.558 5.403a.306.306 0 0 0 .352.385l2.388-.46a.306.306 0 0 1 .332.438l-6.79 13.55-.123.19a.294.294 0 0 1-.252.14c-.177 0-.35-.152-.305-.369l1.095-5.301a.306.306 0 0 0-.388-.355l-1.433.435a.306.306 0 0 1-.389-.354l.69-3.375a.306.306 0 0 0-.37-.36l-2.32.536a.306.306 0 0 1-.374-.316zm14.976-7.926L17.284 3.74l-.544 1.887 2.077-.4a.8.8 0 0 1 .84.369.8.8 0 0 1 .034.783L12.9 19.93l-.013.025-.015.023-.122.19a.801.801 0 0 1-.672.37.826.826 0 0 1-.634-.302.8.8 0 0 1-.16-.67l1.029-4.981-1.12.34a.81.81 0 0 1-.86-.262.802.802 0 0 1-.165-.67l.63-3.08-2.027.468a.808.808 0 0 1-.768-.233.81.81 0 0 1-.217-.6l.389-6.57-7.44-1.33a.612.612 0 0 0-.64.906L11.58 23.691a.612.612 0 0 0 1.066-.004l11.26-20.135a.612.612 0 0 0-.644-.9z"/></svg>
+<text class="eyebrow" x="478.2" y="117.5" text-anchor="start">dev proxy</text>
+<text class="label" x="478.2" y="133.5" text-anchor="start">Vite dev server</text>
+<text class="sub" x="478.2" y="147.5" text-anchor="start">localhost:5173</text>
+</g>
+<g class="node" id="n-sentry" style="--k:var(--k-external)">
+<rect class="shape dashed" x="430.2" y="388.5" width="239" height="66" rx="10"/>
+<rect class="badge" x="440.2" y="407.5" width="28" height="28" rx="6"/>
+<svg x="444.2" y="411.5" width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="Sentry logo"><path fill="#362D59" d="M13.91 2.505c-.873-1.448-2.972-1.448-3.844 0L6.904 7.92a15.478 15.478 0 0 1 8.53 12.811h-2.221A13.301 13.301 0 0 0 5.784 9.814l-2.926 5.06a7.65 7.65 0 0 1 4.435 5.848H2.194a.365.365 0 0 1-.298-.534l1.413-2.402a5.16 5.16 0 0 0-1.614-.913L.296 19.275a2.182 2.182 0 0 0 .812 2.999 2.24 2.24 0 0 0 1.086.288h6.983a9.322 9.322 0 0 0-3.845-8.318l1.11-1.922a11.47 11.47 0 0 1 4.95 10.24h5.915a17.242 17.242 0 0 0-7.885-15.28l2.244-3.845a.37.37 0 0 1 .504-.13c.255.14 9.75 16.708 9.928 16.9a.365.365 0 0 1-.327.543h-2.287c.029.612.029 1.223 0 1.831h2.297a2.206 2.206 0 0 0 1.922-3.31z"/></svg>
+<text class="eyebrow" x="478.2" y="410.0" text-anchor="start">third party</text>
+<text class="label" x="478.2" y="426.0" text-anchor="start">Sentry</text>
+<text class="sub" x="478.2" y="440.0" text-anchor="start">only when SENTRY_DSN is set</text>
+</g>
+<g class="node" id="n-backend" style="--k:var(--k-service)">
+<rect class="shape" x="820.0" y="226.0" width="239" height="66" rx="10"/>
+<rect class="badge" x="830.0" y="245.0" width="28" height="28" rx="6"/>
+<svg x="834.0" y="249.0" width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="Django logo"><path fill="#092E20" d="M11.146 0h3.924v18.166c-2.013.382-3.491.535-5.096.535-4.791 0-7.288-2.166-7.288-6.32 0-4.002 2.65-6.6 6.753-6.6.637 0 1.121.05 1.707.203zm0 9.143a3.894 3.894 0 00-1.325-.204c-1.988 0-3.134 1.223-3.134 3.365 0 2.09 1.096 3.236 3.109 3.236.433 0 .79-.025 1.35-.102V9.142zM21.314 6.06v9.098c0 3.134-.229 4.638-.917 5.937-.637 1.249-1.478 2.039-3.211 2.905l-3.644-1.733c1.733-.815 2.574-1.53 3.109-2.625.561-1.121.739-2.421.739-5.835V6.059h3.924zM17.39.021h3.924v4.026H17.39z"/></svg>
+<text class="eyebrow" x="868.0" y="247.5" text-anchor="start">backend, one ASGI process</text>
+<text class="label" x="868.0" y="263.5" text-anchor="start">Django backend</text>
+<text class="sub" x="868.0" y="277.5" text-anchor="start">Daphne :8000, REST + WebSockets</text>
+</g>
+<g class="node" id="n-media" style="--k:var(--k-files)">
+<rect class="shape" x="820.0" y="388.5" width="239" height="66" rx="10"/>
+<text class="eyebrow" x="939.5" y="410.0" text-anchor="middle">file store</text>
+<text class="label" x="939.5" y="426.0" text-anchor="middle">Uploaded media</text>
+<text class="sub" x="939.5" y="440.0" text-anchor="middle">backend/main/media on disk</text>
+</g>
+<g class="node" id="n-redis" style="--k:var(--k-cache)">
+<path class="shape" d="M1209.8 98.0 A119.5 7 0 0 1 1448.8 98.0 V160.0 A119.5 7 0 0 1 1209.8 160.0 Z"/>
+<path class="rim" d="M1209.8 98.0 A119.5 7 0 0 0 1448.8 98.0"/>
+<rect class="badge" x="1219.8" y="118.5" width="28" height="28" rx="6"/>
+<svg x="1223.8" y="122.5" width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="Redis logo"><path fill="#FF4438" d="M22.71 13.145c-1.66 2.092-3.452 4.483-7.038 4.483-3.203 0-4.397-2.825-4.48-5.12.701 1.484 2.073 2.685 4.214 2.63 4.117-.133 6.94-3.852 6.94-7.239 0-4.05-3.022-6.972-8.268-6.972-3.752 0-8.4 1.428-11.455 3.685C2.59 6.937 3.885 9.958 4.35 9.626c2.648-1.904 4.748-3.13 6.784-3.744C8.12 9.244.886 17.05 0 18.425c.1 1.261 1.66 4.648 2.424 4.648.232 0 .431-.133.664-.365a100.49 100.49 0 0 0 5.54-6.765c.222 3.104 1.748 6.898 6.014 6.898 3.819 0 7.604-2.756 9.33-8.965.2-.764-.73-1.361-1.261-.73zm-4.349-5.013c0 1.959-1.926 2.922-3.685 2.922-.941 0-1.664-.247-2.235-.568 1.051-1.592 2.092-3.225 3.21-4.973 1.972.334 2.71 1.43 2.71 2.619z"/></svg>
+<text class="eyebrow" x="1257.8" y="121.0" text-anchor="start">cache and channel layer</text>
+<text class="label" x="1257.8" y="137.0" text-anchor="start">Redis</text>
+<text class="sub" x="1257.8" y="151.0" text-anchor="start">127.0.0.1:6379</text>
+</g>
+<g class="node" id="n-sqlite" style="--k:var(--k-store)">
+<path class="shape" d="M1209.8 228.0 A119.5 7 0 0 1 1448.8 228.0 V290.0 A119.5 7 0 0 1 1209.8 290.0 Z"/>
+<path class="rim" d="M1209.8 228.0 A119.5 7 0 0 0 1448.8 228.0"/>
+<rect class="badge" x="1219.8" y="248.5" width="28" height="28" rx="6"/>
+<svg x="1223.8" y="252.5" width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="SQLite logo"><path fill="#003B57" d="M21.678.521c-1.032-.92-2.28-.55-3.513.544a8.71 8.71 0 0 0-.547.535c-2.109 2.237-4.066 6.38-4.674 9.544.237.48.422 1.093.544 1.561a13.044 13.044 0 0 1 .164.703s-.019-.071-.096-.296l-.05-.146a1.689 1.689 0 0 0-.033-.08c-.138-.32-.518-.995-.686-1.289-.143.423-.27.818-.376 1.176.484.884.778 2.4.778 2.4s-.025-.099-.147-.442c-.107-.303-.644-1.244-.772-1.464-.217.804-.304 1.346-.226 1.478.152.256.296.698.422 1.186.286 1.1.485 2.44.485 2.44l.017.224a22.41 22.41 0 0 0 .056 2.748c.095 1.146.273 2.13.5 2.657l.155-.084c-.334-1.038-.47-2.399-.41-3.967.09-2.398.642-5.29 1.661-8.304 1.723-4.55 4.113-8.201 6.3-9.945-1.993 1.8-4.692 7.63-5.5 9.788-.904 2.416-1.545 4.684-1.931 6.857.666-2.037 2.821-2.912 2.821-2.912s1.057-1.304 2.292-3.166c-.74.169-1.955.458-2.362.629-.6.251-.762.337-.762.337s1.945-1.184 3.613-1.72C21.695 7.9 24.195 2.767 21.678.521m-18.573.543A1.842 1.842 0 0 0 1.27 2.9v16.608a1.84 1.84 0 0 0 1.835 1.834h9.418a22.953 22.953 0 0 1-.052-2.707c-.006-.062-.011-.141-.016-.2a27.01 27.01 0 0 0-.473-2.378c-.121-.47-.275-.898-.369-1.057-.116-.197-.098-.31-.097-.432 0-.12.015-.245.037-.386a9.98 9.98 0 0 1 .234-1.045l.217-.028c-.017-.035-.014-.065-.031-.097l-.041-.381a32.8 32.8 0 0 1 .382-1.194l.2-.019c-.008-.016-.01-.038-.018-.053l-.043-.316c.63-3.28 2.587-7.443 4.8-9.791.066-.069.133-.128.198-.194Z"/></svg>
+<text class="eyebrow" x="1257.8" y="251.0" text-anchor="start">data store</text>
+<text class="label" x="1257.8" y="267.0" text-anchor="start">SQLite</text>
+<text class="sub" x="1257.8" y="281.0" text-anchor="start">backend/main/db.sqlite3</text>
+</g>
+<g class="node" id="n-worker" style="--k:var(--k-worker)">
+<rect class="shape" x="1209.8" y="388.5" width="239" height="66" rx="10"/>
+<text class="eyebrow" x="1329.3" y="410.0" text-anchor="middle">worker, started by hand</text>
+<text class="label" x="1329.3" y="426.0" text-anchor="middle">Outbox worker</text>
+<text class="sub" x="1329.3" y="440.0" text-anchor="middle">manage.py run_outbox_worker</text>
+</g>
+<g class="node" id="n-hooks" style="--k:var(--k-external)">
+<rect class="shape dashed" x="1599.6" y="388.5" width="239" height="66" rx="10"/>
+<text class="eyebrow" x="1719.1" y="410.0" text-anchor="middle">third party</text>
+<text class="label" x="1719.1" y="426.0" text-anchor="middle">Webhook targets</text>
+<text class="sub" x="1719.1" y="440.0" text-anchor="middle">none configured by default</text>
+</g>
+<rect class="pill" x="284.8" y="177.0" width="140.0" height="34" rx="9"/>
+<text class="edge-label" x="290.8" y="189.8">/api /cart /checkout</text>
+<text class="edge-label" x="290.8" y="205.8">/vendors /ws</text>
+<rect class="pill" x="690.6" y="177.0" width="108.0" height="34" rx="9"/>
+<text class="edge-label" x="696.6" y="189.8">HTTP, and /ws</text>
+<text class="edge-label" x="696.6" y="205.8">with ?token=JWT</text>
+<rect class="pill" x="460.5" y="242.0" width="178.4" height="34" rx="9"/>
+<text class="edge-label" x="466.5" y="254.8">useAxios goes direct to</text>
+<text class="edge-label" x="466.5" y="270.8">127.0.0.1:8000, needs CORS</text>
+<rect class="pill" x="73.9" y="331.2" width="172.0" height="18" rx="9"/>
+<text class="edge-label" x="79.9" y="344.1">straight from the browser</text>
+<rect class="pill" x="1067.6" y="177.0" width="133.6" height="34" rx="9"/>
+<text class="edge-label" x="1073.6" y="189.8">channel layer, db 0</text>
+<text class="edge-label" x="1073.6" y="205.8">page cache, db 1</text>
+<rect class="pill" x="1096.4" y="250.0" width="76.0" height="18" rx="9"/>
+<text class="edge-label" x="1102.4" y="262.8">Django ORM</text>
+<rect class="pill" x="872.7" y="331.2" width="133.6" height="18" rx="9"/>
+<text class="edge-label" x="878.7" y="344.1">uploads up to 50 MB</text>
+<rect class="pill" x="719.4" y="331.2" width="50.4" height="18" rx="9"/>
+<text class="edge-label" x="725.4" y="344.1">errors</text>
+<rect class="pill" x="1240.1" y="325.8" width="178.4" height="34" rx="9"/>
+<text class="edge-label" x="1246.1" y="338.6">polls pending outbox rows,</text>
+<text class="edge-label" x="1246.1" y="354.6">writes notification rows</text>
+<rect class="pill" x="1483.0" y="412.5" width="82.4" height="18" rx="9"/>
+<text class="edge-label" x="1489.0" y="425.3">signed POST</text>
+</svg>

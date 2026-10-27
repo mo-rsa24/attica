@@ -1,0 +1,78 @@
+{
+ "aliases": {
+  "redis": [
+   "redis-server",
+   "redis-cli",
+   "6379"
+  ],
+  "backend": [
+   "daphne",
+   "runserver",
+   "manage.py test",
+   "8000"
+  ],
+  "vite": [
+   "npm run dev",
+   "5173",
+   "5174"
+  ],
+  "app": [
+   "npm run test:e2e",
+   "Playwright",
+   "frontend/src"
+  ],
+  "sqlite": [
+   "db.sqlite3",
+   "sqlite3",
+   "manage.py migrate",
+   "seed_marketplace",
+   "seed_booking_workflow",
+   "seed_e2e",
+   "materialize_availability_slots"
+  ],
+  "worker": [
+   "run_outbox_worker",
+   "dispatch_scheduling_outbox"
+  ]
+ },
+ "db": {
+  "path": "backend/main/db.sqlite3",
+  "hide_text_in": "^(chat_|users_socialpost|notifications_|artists_artistpost|vendors_comment|vendors_review|events_|tickets_|scheduling_calendarevent)",
+  "framework": [
+   "auth",
+   "django"
+  ],
+  "people": {
+   "table": "users_customuser",
+   "columns": [
+    "username",
+    "first_name",
+    "last_name"
+   ],
+   "email": "email"
+  },
+  "seed_code": [
+   "backend/main/**/management/commands/*.py",
+   "backend/main/**/fixtures/*"
+  ]
+ },
+ "nudges": {
+  "backend-inside": {
+   "dj-views->services": {
+    "label_seg": 1
+   }
+  },
+  "context": {
+   "attica->ctx-osm": {
+    "label_seg": "last"
+   },
+   "attica->ctx-sentry": {
+    "label_seg": "last"
+   },
+   "attica->ctx-hooks": {
+    "label_seg": "last"
+   }
+  }
+ },
+ "dbms": "DBeaver"
+}

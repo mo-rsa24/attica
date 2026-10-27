@@ -1,0 +1,2311 @@
+{
+ "repo": "/home/molef/Work/attica",
+ "runbook": "/home/molef/Work/attica/runbook",
+ "counts": {
+  "blocks": 54,
+  "commands": 35,
+  "outputs": 19,
+  "placed": 53,
+  "unplaced": 1,
+  "component_sentence": 0,
+  "guessed": 37,
+  "with_command": 16,
+  "tombstones": 0,
+  "langs": {
+   "bash": 35,
+   "json": 3,
+   "untagged": 16
+  }
+ },
+ "records": [
+  {
+   "key": "runbook/driving-the-app/driving-the-booking-flow.md#3-inspect-the-seven-pre-built-scenarios||0",
+   "file": "runbook/driving-the-app/driving-the-booking-flow.md",
+   "anchor": "3-inspect-the-seven-pre-built-scenarios",
+   "recipe": "Inspect the seven pre-built scenarios",
+   "line": 103,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "",
+   "lines": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "  @ http://localhost:5173/api/events/my/"
+   ],
+   "verified": "ran 2026-08-23",
+   "checksum": "0ae535e933de",
+   "fold": 0,
+   "indented": false,
+   "boxes": [
+    "vite"
+   ],
+   "matched_by": [
+    "5173"
+   ],
+   "placement": "placement guessed",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/driving-the-booking-flow.md#3-inspect-the-seven-pre-built-scenarios|The cause is a one-word path mismatch. The backend registers|0",
+   "file": "runbook/driving-the-app/driving-the-booking-flow.md",
+   "anchor": "3-inspect-the-seven-pre-built-scenarios",
+   "recipe": "Inspect the seven pre-built scenarios",
+   "line": 113,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "The cause is a one-word path mismatch. The backend registers my-events/ (events/api_urls.py:14), so the working endpoint is /api/events/my-events/, which returns 401 for an unauthenticated call, meaning the route exists. The frontend asks for /api/events/my/, which does not exist. Two files call the wrong path:",
+   "lines": [
+    "frontend/src/EventOrganizerDashboard.jsx:252      fetch('/api/events/my/', { headers })",
+    "frontend/src/components/booking/EventSelector.jsx:21   fetch('/api/events/my/', {"
+   ],
+   "verified": "ran 2026-08-23",
+   "checksum": "27f70ccc33ce",
+   "fold": 0,
+   "indented": false,
+   "boxes": [
+    "app"
+   ],
+   "matched_by": [
+    "frontend/src"
+   ],
+   "placement": "placement guessed",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#before-any-of-these|All four processes up. Stack § 1.|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "before-any-of-these",
+   "recipe": "Before any of these",
+   "line": 78,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "All four processes up. Stack § 1.",
+   "lines": [
+    "(ss -ltnp || netstat -ltnp) | grep -E ':(8000|5173|6379)'"
+   ],
+   "verified": "no status recorded",
+   "checksum": "2e85488e401e",
+   "fold": 0,
+   "indented": true,
+   "setup": [],
+   "success": [
+    "Three LISTEN lines, daphne on 8000, vite on 5173, redis on 6379. Anything missing here shows up later as a screen that loads and then does nothing."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "vite",
+    "backend",
+    "redis"
+   ],
+   "matched_by": [
+    "5173",
+    "8000",
+    "6379"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#before-any-of-these|The marketplace seeded and at least one provider actually bo|0",
+    "lead": "The marketplace seeded and at least one provider actually bookable. Seeding § 1 then Seeding § 3. Bookable is not the same as visible in the catalogue."
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#before-any-of-these|The marketplace seeded and at least one provider actually bo|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "before-any-of-these",
+   "recipe": "Before any of these",
+   "line": 88,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "The marketplace seeded and at least one provider actually bookable. Seeding § 1 then Seeding § 3. Bookable is not the same as visible in the catalogue.",
+   "lines": [
+    "sqlite3 backend/main/db.sqlite3 \"select count(*) from scheduling_availabilityslot where is_bookable = 1;\""
+   ],
+   "verified": "no status recorded",
+   "checksum": "f9a9d9dd3495",
+   "fold": 0,
+   "indented": true,
+   "setup": [],
+   "success": [
+    "A number in the thousands. 0 means the slots were never materialized and every search below returns nothing."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Logged in as an organizer at http://localhost:5173/login. The account used throughout this file is e2e-organizer, user id 82; its password is in Seeding § 4.",
+    "A second terminal open at the repository root, for the database reads each recipe pairs with its screen. sqlite3 reads the development database directly, so nothing needs the Django shell."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in walking-the-event-wizard.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|Pick a date the seeded data covers, before you type it into |0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "1-fill-step-1-so-the-scheduler-has-something-to-search",
+   "recipe": "Fill step 1 so the scheduler has something to search",
+   "line": 158,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Pick a date the seeded data covers, before you type it into the form:",
+   "lines": [
+    "sqlite3 -header -column backend/main/db.sqlite3 \"",
+    "select r.resource_type, count(*) n, min(s.start_at) first_start, max(s.end_at) last_end",
+    "from scheduling_availabilityslot s",
+    "join scheduling_marketplaceresource r on r.id = s.resource_id",
+    "where date(s.start_at) = '2026-09-20' and s.is_bookable = 1",
+    "group by r.resource_type;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "cda57713631a",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "The URL changes to /listing//step3, skipping step2 entirely.",
+    "A row per provider type, with times in UTC:"
+   ],
+   "failure": [
+    "No rows at all: that date has no materialized slots. Pick another, or run Seeding § 3."
+   ],
+   "warn": [],
+   "notes": [
+    "Then, in the browser:",
+    "Go to http://localhost:5173/createEvent and click Get started in the footer. It creates the draft and drops you on /listing//step1. The id in the URL is the draft id you will use for every read below. 2. Fill Event Name, Description, Region, Theme / Style, Expected Capacity, and all four of Start Date, Start Time, End Date, End Time. 3. Click one event-type card (Concert). 4. Click Save & Continue in the footer.",
+    "*Date and time are four separate inputs, not two. Filling the dates and leaving the times empty is accepted by the form and is the failure that surfaces on route step3.*"
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|A row per provider type, with times in UTC:|0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|What the screen wrote. Two reads, against the draft id from |0",
+    "lead": "What the screen wrote. Two reads, against the draft id from your URL:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|A row per provider type, with times in UTC:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "1-fill-step-1-so-the-scheduler-has-something-to-search",
+   "recipe": "Fill step 1 so the scheduler has something to search",
+   "line": 169,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "A row per provider type, with times in UTC:",
+   "lines": [
+    "resource_type  n  first_start          last_end",
+    "-------------  -  -------------------  -------------------",
+    "artist         9  2026-09-20 04:47:43  2026-09-20 21:00:00",
+    "vendor         4  2026-09-20 06:00:00  2026-09-20 21:00:00",
+    "venue          3  2026-09-20 06:00:00  2026-09-20 21:00:00"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "9c62ad4c176b",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|Pick a date the seeded data covers, before you type it into |0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|What the screen wrote. Two reads, against the draft id from |0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "1-fill-step-1-so-the-scheduler-has-something-to-search",
+   "recipe": "Fill step 1 so the scheduler has something to search",
+   "line": 198,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "What the screen wrote. Two reads, against the draft id from your URL:",
+   "lines": [
+    "sqlite3 -header -line backend/main/db.sqlite3 \\",
+    "  \"select id, organizer_id, status, current_step from events_eventdraft where id = 45;\"",
+    "",
+    "sqlite3 backend/main/db.sqlite3 \\",
+    "  \"select json_extract(data,'$.steps.step1') from events_eventdraft where id = 45;\" \\",
+    "  | python3 -m json.tool"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "6859d1b769e9",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "The row, then everything the form sent:"
+   ],
+   "failure": [
+    "A field you filled is missing from the JSON: it is outside STEP_FIELD_WHITELIST.step1 in frontend/src/context/reactContext.jsx and was dropped on save without a message. Add it to the whitelist or stop expecting it downstream."
+   ],
+   "warn": [
+    "A date with no times is the failure that shows up two screens later. Route step3 derives its search window from what this screen saved, and the search runs on start_at and end_at. Saved without times, there is no window, the search returns nothing, and no message connects that back here."
+   ],
+   "notes": [
+    "What to notice in the pair. The form showed you eleven fields and the database holds twenty-two, because every answer is stored once in camelCase for the form to read back and once in snake_case for the publish step. current_step already says step3, so the draft records where you are going rather than where you were.",
+    "The snake_case half is not a clean copy, and it does not stay still. Straight after this save start_date and start_time both hold 2026-09-20T18:00, your local form value. Passing through route step3 later overwrites both from the scheduler's window in UTC (frontend/src/ListingStep3.jsx:174), so the same draft then reads start_date 2026-09-20T16:00:00.000Z and start_time 18:00.",
+    "So the ✅ block above is what you see at this point in the wizard, not for the rest of the draft's life. The camelCase fields are the stable ones: startDate and startTime keep what you typed the whole way through. Read those when you want to know what the organizer actually entered.",
+    "Variations",
+    "Check only whether the times survived: sqlite3 backend/main/db.sqlite3 \"select json_extract(data,'$.steps.step1.startTime'), json_extract(data,'$.steps.step1.endTime') from events_eventdraft where id = 45;\" - List your recent drafts to find the id again: sqlite3 -header -column backend/main/db.sqlite3 \"select id, status, current_step, created_at from events_eventdraft where organizer_id = 82 order by id desc limit 5…"
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|The row, then everything the form sent:|0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in walking-the-event-wizard.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|The row, then everything the form sent:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "1-fill-step-1-so-the-scheduler-has-something-to-search",
+   "recipe": "Fill step 1 so the scheduler has something to search",
+   "line": 209,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "The row, then everything the form sent:",
+   "lines": [
+    "          id = 45",
+    "organizer_id = 82",
+    "      status = draft",
+    "current_step = step3",
+    "",
+    "{",
+    "    \"eventName\": \"Runbook Walk Concert\",",
+    "    \"description\": \"A test event created while walking the runbook recipe for route step1.\",",
+    "    \"selectedEventType\": \"Concert\",",
+    "    \"region\": \"Gauteng\",",
+    "    \"genres\": [],",
+    "    \"tags\": [],",
+    "    \"theme\": \"Black Tie\",",
+    "    \"startDate\": \"2026-09-20\",",
+    "    \"startTime\": \"18:00\",",
+    "    \"endDate\": \"2026-09-20\",",
+    "    \"endTime\": \"23:00\",",
+    "    \"capacity\": \"250\",",
+    "    \"videoUrl\": \"\",",
+    "    \"additionalNotes\": \"\",",
+    "    \"name\": \"Runbook Walk Concert\",",
+    "    \"category\": \"Concert\",",
+    "    \"guest_count\": 250,",
+    "    \"start_date\": \"2026-09-20T18:00\",",
+    "    \"end_date\": \"2026-09-20\",",
+    "    \"start_time\": \"2026-09-20T18:00\",",
+    "    \"end_time\": \"23:00\",",
+    "    \"date\": \"2026-09-20\",",
+    "    \"notes\": \"A test event created while walking the runbook recipe for route step1.\"",
+    "}"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "9ab9f581287a",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#1-fill-step-1-so-the-scheduler-has-something-to-search|What the screen wrote. Two reads, against the draft id from |0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Check the screen against the database. The search sends your|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "4-send-a-booking-request-from-the-step3-marketplace",
+   "recipe": "Send a booking request from the step3 marketplace",
+   "line": 385,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Check the screen against the database. The search sends your local 18:00 to 23:00 as 16:00 to 21:00 UTC, so the query uses the UTC numbers:",
+   "lines": [
+    "sqlite3 -header -column backend/main/db.sqlite3 \"",
+    "select r.id, r.display_name, r.resource_type, count(s.id) as slots",
+    "from scheduling_marketplaceresource r",
+    "join scheduling_availabilityslot s on s.resource_id = r.id",
+    "where r.resource_type = 'venue'",
+    "  and r.is_active = 1",
+    "  and s.is_bookable = 1",
+    "  and s.start_at < '2026-09-20 21:00:00'",
+    "  and s.end_at   > '2026-09-20 16:00:00'",
+    "group by r.id, r.display_name",
+    "order by r.id;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "ee475bda2d49",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "What to notice in the pair. The screen shows display names and the database shows ids, and the id is what the next click sends. Rise Rooftop, Sandton is resource 17, which is the number to look for in the booking request row below. If the screen lists a venue this query does not, the two are reading different windows and the culprit is the local-to-UTC conversion."
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|The same three names the screen showed, with their resource |0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Request to Book writes four rows and cannot be undone from t|0",
+    "lead": "Request to Book writes four rows and cannot be undone from the screen. Count them first, so you can tell afterwards exactly what the click did:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|The same three names the screen showed, with their resource |0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "4-send-a-booking-request-from-the-step3-marketplace",
+   "recipe": "Send a booking request from the step3 marketplace",
+   "line": 401,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "The same three names the screen showed, with their resource ids:",
+   "lines": [
+    "id  display_name            resource_type  slots",
+    "--  ----------------------  -------------  -----",
+    "8   The Atrium Event Space  venue          1",
+    "9   Horizon Rooftop Venue   venue          1",
+    "17  Rise Rooftop, Sandton   venue          1"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "e33fa0f57e19",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Check the screen against the database. The search sends your|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Request to Book writes four rows and cannot be undone from t|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "4-send-a-booking-request-from-the-step3-marketplace",
+   "recipe": "Send a booking request from the step3 marketplace",
+   "line": 417,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Request to Book writes four rows and cannot be undone from the screen. Count them first, so you can tell afterwards exactly what the click did:",
+   "lines": [
+    "for t in scheduling_bookingrequest scheduling_auditlog scheduling_outboxevent \\",
+    "         notifications_notification scheduling_checkoutsession scheduling_booking; do",
+    "  printf \"%-30s %s\\n\" \"$t\" \"$(sqlite3 backend/main/db.sqlite3 \"select count(*) from $t;\")\"",
+    "done"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "b53443992ce5",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "POST /api/scheduling/requests/create/ returns 201, the card reads Awaiting response, and the Booking Summary button in the top bar gains a 1 badge."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Now click Request to Book on one card. Only one venue can be held at a time, and the screen says so above the cards: booking a second venue in an overlapping window cancels the first (backend/main/scheduling/services.py:426).",
+    "*The card you clicked swaps its pink Request to Book button for a pale Awaiting Response, and the footer chip flips from Venue: — to Venue: 1 pending. The other two cards stay clickable, which is what the exclusivity warning above them is about.*",
+    "Read the four rows the click wrote. Run the same six counts again first:"
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Six counts. Write them down. The run these numbers came from|0",
+    "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Exactly one new row in four tables, and nothing in the other|0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Then read them:|0",
+    "lead": "Then read them:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Six counts. Write them down. The run these numbers came from|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "4-send-a-booking-request-from-the-step3-marketplace",
+   "recipe": "Send a booking request from the step3 marketplace",
+   "line": 426,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "Six counts. Write them down. The run these numbers came from:",
+   "lines": [
+    "scheduling_bookingrequest      28",
+    "scheduling_auditlog            31",
+    "scheduling_outboxevent         31",
+    "notifications_notification     54",
+    "scheduling_checkoutsession      0",
+    "scheduling_booking              2"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "a7017063157a",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Request to Book writes four rows and cannot be undone from t|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Exactly one new row in four tables, and nothing in the other|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "4-send-a-booking-request-from-the-step3-marketplace",
+   "recipe": "Send a booking request from the step3 marketplace",
+   "line": 451,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "Exactly one new row in four tables, and nothing in the other two:",
+   "lines": [
+    "scheduling_bookingrequest      29     (+1)",
+    "scheduling_auditlog            32     (+1)",
+    "scheduling_outboxevent         32     (+1)",
+    "notifications_notification     55     (+1)",
+    "scheduling_checkoutsession      0     (unchanged)",
+    "scheduling_booking              2     (unchanged)"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "a9581e7593e0",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Request to Book writes four rows and cannot be undone from t|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Then read them:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "4-send-a-booking-request-from-the-step3-marketplace",
+   "recipe": "Send a booking request from the step3 marketplace",
+   "line": 462,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Then read them:",
+   "lines": [
+    "sqlite3 -header -line backend/main/db.sqlite3 \"",
+    "select id, event_draft_id, event_id, organizer_id, resource_id, status,",
+    "       requested_start_at, requested_end_at, attendee_count,",
+    "       expires_at, draft_hold_expires_at, checkout_session_id, idempotency_key",
+    "from scheduling_bookingrequest order by id desc limit 1;\"",
+    "",
+    "sqlite3 -header -line backend/main/db.sqlite3 \\",
+    "  \"select id, action, actor_id, target_type, target_id from scheduling_auditlog order by id desc limit 1;\"",
+    "",
+    "sqlite3 -header -line backend/main/db.sqlite3 \\",
+    "  \"select id, event_type, status from scheduling_outboxevent order by id desc limit 1;\"",
+    "",
+    "sqlite3 -header -line backend/main/db.sqlite3 \\",
+    "  \"select id, recipient_id, notification_type, title, is_read from notifications_notification order by id desc limit 1;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "26effcce815c",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [
+    "No provider cards after Find Available Providers. Almost never the provider record. Work through Preparing artist availability § 7, which walks the five things that have to line up, in dependency order. Run the venue query above first: if it returns rows and the screen does not, the problem is the window, not the data.",
+    "Cards appear, and Request to Book fails. That is the policy, not the availability. min_notice_hours defaults to 24 (backend/main/scheduling/models.py:97), so a request for tomorrow is refused at backend/main/scheduling/services.py:153 after the slot showed as free. See the fields that silently block a request."
+   ],
+   "warn": [],
+   "notes": [
+    "What to notice in the pair. resource_id is 17, the id the venue query gave for the card you clicked. event_id is empty and event_draft_id is 45, because no event exists yet. The times are stored in UTC, 16:00 to 21:00, against the 6 PM to 11 PM the screen showed you. expires_at is 48 hours out, and that clock is already running.",
+    "attendee_count is 1, not the 250 you typed into step1. The capacity from step1 never reaches the request, so any provider policy that checks headcount is checking against 1.",
+    "Neither checkout_session_id nor draft_hold_expires_at is set, and neither table moved. Requesting reserves nothing. The hold and the checkout session are both created later, when the provider approves, at backend/main/scheduling/services.py:805.",
+    "The provider has not been told. The outbox row sits at pending until a worker drains it, and the notification is a database row that the provider's client will find the next time it polls.",
+    "Variations",
+    "Watch the request from the provider's side instead: Driving the booking flow § 2. - List every request on this draft: sqlite3 -header -column backend/main/db.sqlite3 \"select id, resource_id, status, requested_start_at, expires_at from scheduling_bookingrequest where event_draft_id = 45;\" - See how much of the 48 hours is left: sqlite3 backend/main/db.sqlite3 \"select id, round((julianday(expires_at) - julianday('now'…"
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|The request, then its three companions:|0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in walking-the-event-wizard.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|The request, then its three companions:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "4-send-a-booking-request-from-the-step3-marketplace",
+   "recipe": "Send a booking request from the step3 marketplace",
+   "line": 481,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "The request, then its three companions:",
+   "lines": [
+    "                   id = 38",
+    "       event_draft_id = 45",
+    "             event_id =",
+    "         organizer_id = 82",
+    "          resource_id = 17",
+    "               status = pending",
+    "   requested_start_at = 2026-09-20 16:00:00",
+    "     requested_end_at = 2026-09-20 21:00:00",
+    "       attendee_count = 1",
+    "           expires_at = 2026-08-30 07:03:43.404373",
+    "draft_hold_expires_at =",
+    "  checkout_session_id =",
+    "      idempotency_key = request-8e78398c-6119-4c13-8f50-c62e4c284c49",
+    "",
+    "         id = 32",
+    "     action = request.created",
+    "   actor_id = 82",
+    "target_type = BookingRequest",
+    "  target_id = 38",
+    "",
+    "        id = 32",
+    "event_type = request.created",
+    "    status = pending",
+    "",
+    "               id = 55",
+    "     recipient_id = 79",
+    "notification_type = booking_request",
+    "            title = New booking request for Rise Rooftop, Sandton",
+    "          is_read = 0"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "b81e34d4c3a6",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#4-send-a-booking-request-from-the-step3-marketplace|Then read them:|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#5-set-the-location-on-route-step4|Check what was actually saved:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "5-set-the-location-on-route-step4",
+   "recipe": "Set the location on route step4",
+   "line": 608,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Check what was actually saved:",
+   "lines": [
+    "sqlite3 backend/main/db.sqlite3 \\",
+    "  \"select json_extract(data,'$.steps.step4') from events_eventdraft where id = 45;\" \\",
+    "  | python3 -m json.tool"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "f37243e4eb43",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [
+    "The address is somewhere you have never been. That is the geolocation overwrite. Retype the address, wait a few seconds for the box to settle, then pick the suggestion and click Next promptly."
+   ],
+   "warn": [],
+   "notes": [
+    "What to notice in the pair. The saved address matched the box exactly, and in an earlier run of this same recipe it saved an address 90 km away in Emfuleni while the pin still showed Sandton, because the geolocation callback landed between the pick and the click. The screen is truthful at the instant you read it and not a moment longer.",
+    "A step4 key appears the moment you arrive, before you touch anything. It is created empty, so the key existing tells you nothing about whether the screen was filled. Check the contents, not the key.",
+    "Variations",
+    "Check only the saved address: sqlite3 backend/main/db.sqlite3 \"select json_extract(data,'$.steps.step4.location.address') from events_eventdraft where id = 45;\" - Find drafts where step4 was reached but never filled: sqlite3 backend/main/db.sqlite3 \"select id from events_eventdraft where json_extract(data,'$.steps.step4') = '{}';\""
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#5-set-the-location-on-route-step4|A lat, a lon and an address, matching the box at the moment |0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in walking-the-event-wizard.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#5-set-the-location-on-route-step4|A lat, a lon and an address, matching the box at the moment |0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "5-set-the-location-on-route-step4",
+   "recipe": "Set the location on route step4",
+   "line": 616,
+   "lang": "json",
+   "kind": "output",
+   "lead": "A lat, a lon and an address, matching the box at the moment you clicked:",
+   "lines": [
+    "{",
+    "    \"location\": {",
+    "        \"lat\": -26.1090427,",
+    "        \"lon\": 28.0524052,",
+    "        \"address\": \"The Mandy Manas, 5th Street, Sandown, Johannesburg Ward 103, Sandton, City of Johannesburg Metropolitan Municipality, Gauteng, 2146, South Africa\"",
+    "    }",
+    "}"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "9148c827ab9c",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#5-set-the-location-on-route-step4|Check what was actually saved:|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#6-set-the-ticket-price-on-route-step5|What the screen wrote:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "6-set-the-ticket-price-on-route-step5",
+   "recipe": "Set the ticket price on route step5",
+   "line": 664,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "What the screen wrote:",
+   "lines": [
+    "sqlite3 backend/main/db.sqlite3 \\",
+    "  \"select json_extract(data,'$.steps.step5') from events_eventdraft where id = 45;\" \\",
+    "  | python3 -m json.tool"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "f3d69170e2b9",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "What to notice in the pair. There is no ticket-quantity field anywhere in what was saved, so the \"100 tickets\" the revenue panel is based on has no stored counterpart. The estimate is decoration and nothing downstream reads it. Unlike step1, this screen stores each value once, in snake_case only."
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#6-set-the-ticket-price-on-route-step5|Eight fields, all snake_case:|0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in walking-the-event-wizard.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#6-set-the-ticket-price-on-route-step5|Eight fields, all snake_case:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "6-set-the-ticket-price-on-route-step5",
+   "recipe": "Set the ticket price on route step5",
+   "line": 672,
+   "lang": "json",
+   "kind": "output",
+   "lead": "Eight fields, all snake_case:",
+   "lines": [
+    "{",
+    "    \"base_price\": 350,",
+    "    \"currency\": \"ZAR\",",
+    "    \"max_tickets_per_buyer\": 10,",
+    "    \"refund_policy\": \"full\",",
+    "    \"custom_policy\": null,",
+    "    \"is_seated\": false,",
+    "    \"is_age_restricted\": false,",
+    "    \"access_type\": \"public\"",
+    "}"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "67dc781d26c9",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#6-set-the-ticket-price-on-route-step5|What the screen wrote:|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|It is not free, though. Leaving it writes an empty object an|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "7-add-features-and-media-before-review",
+   "recipe": "Add features and media before review",
+   "line": 706,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "It is not free, though. Leaving it writes an empty object and advances the draft:",
+   "lines": [
+    "sqlite3 backend/main/db.sqlite3 \\",
+    "  \"select json_extract(data,'$.steps.step6'), current_step from events_eventdraft where id = 45;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "40a4a2c5968b",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "{}|step7. The interstitial persists nothing of its own but still costs a save, and still leaves a step6 key behind that looks exactly like a filled step."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Route step7, \"What does your event offer?\" Click the amenity and perk cards you want. A selected card turns purple with a tick and the footer counts them. Click Next Step (this screen labels the button differently from every other one).",
+    "*Selected means purple with a tick in the corner. The footer count is the quickest check that a click registered.*"
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|What it saved, which is the labels themselves, not ids:|0",
+    "lead": "What it saved, which is the labels themselves, not ids:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|What it saved, which is the labels themselves, not ids:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "7-add-features-and-media-before-review",
+   "recipe": "Add features and media before review",
+   "line": 724,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "What it saved, which is the labels themselves, not ids:",
+   "lines": [
+    "sqlite3 backend/main/db.sqlite3 \"select json_extract(data,'$.steps.step7') from events_eventdraft where id = 45;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "b65beadaec90",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Route step8, \"Add photos & video for your event\". Click Browse files and pick your images. Order matters: the first image you upload becomes the event poster and the second becomes the banner.",
+    "*\"Saved to draft\" appears as soon as the upload finishes. These files are already in the database before you click Next, unlike every other screen in the wizard.*"
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review||0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|Confirm they landed, without clicking Next:|0",
+    "lead": "Confirm they landed, without clicking Next:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review||0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "7-add-features-and-media-before-review",
+   "recipe": "Add features and media before review",
+   "line": 728,
+   "lang": "json",
+   "kind": "output",
+   "lead": "",
+   "lines": [
+    "{\"features\": [\"Bar Available\", \"VIP Area\"]}"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "8fd9aef07412",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|What it saved, which is the labels themselves, not ids:|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|Confirm they landed, without clicking Next:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "7-add-features-and-media-before-review",
+   "recipe": "Add features and media before review",
+   "line": 742,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Confirm they landed, without clicking Next:",
+   "lines": [
+    "sqlite3 -header -column backend/main/db.sqlite3 \\",
+    "  \"select id, name, mime_type, size, created_at from events_eventdraftasset where draft_id = 45 order by id;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "d3ab054c77c4",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "The files themselves sit under backend/main/media/event_draft_assets/organizer_/draft_/media/, renamed to a random hex string. The name column is the only place the original filename survives.",
+    "What to notice in the pair. steps.step8 stays {} however many files you upload, because the media lives entirely in events_eventdraftasset. That is the third screen whose stepN key is an empty object, alongside step4 on arrival and step6. An empty {} is normal and a stepN key is not evidence that a screen was filled.",
+    "Variations",
+    "Count what a draft has uploaded: sqlite3 backend/main/db.sqlite3 \"select count(*) from events_eventdraftasset where draft_id = 45;\" - See which file will become the poster: sqlite3 backend/main/db.sqlite3 \"select name from events_eventdraftasset where draft_id = 45 order by id limit 1;\""
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|One row per file, in upload order, with your original filena|0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in walking-the-event-wizard.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|One row per file, in upload order, with your original filena|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "7-add-features-and-media-before-review",
+   "recipe": "Add features and media before review",
+   "line": 749,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "One row per file, in upload order, with your original filenames kept:",
+   "lines": [
+    "id  name               mime_type  size  created_at",
+    "--  -----------------  ---------  ----  --------------------------",
+    "6   poster-first.png   image/png  3326  2026-08-28 12:26:26.008861",
+    "7   banner-second.png  image/png  3708  2026-08-28 12:26:26.071131"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "d58c2264ce59",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#7-add-features-and-media-before-review|Confirm they landed, without clicking Next:|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got|Publishing creates a real event row and re-parents your book|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "8-publish-the-draft-and-check-what-the-event-got",
+   "recipe": "Publish the draft and check what the event got",
+   "line": 813,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Publishing creates a real event row and re-parents your booking requests. Count first:",
+   "lines": [
+    "for t in events_event scheduling_bookingrequest scheduling_booking; do",
+    "  printf \"%-30s %s\\n\" \"$t\" \"$(sqlite3 backend/main/db.sqlite3 \"select count(*) from $t;\")\"",
+    "done",
+    "sqlite3 -header -column backend/main/db.sqlite3 \\",
+    "  \"select id, status, event_draft_id, event_id from scheduling_bookingrequest where event_draft_id = 45;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "a037dbb532b6",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Click Publish listing. This does not publish. It opens a Ready to publish? modal that lists every provider still owed an answer. Click Publish now in the modal to actually publish.",
+    "*A pending request does not block publishing. The modal names it and lets you go ahead, which is the answer to \"do I have to wait for the venue first\".*"
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got|The draft flips and one event row appears:|0",
+    "lead": "The draft flips and one event row appears:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got|The draft flips and one event row appears:|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "8-publish-the-draft-and-check-what-the-event-got",
+   "recipe": "Publish the draft and check what the event got",
+   "line": 830,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "The draft flips and one event row appears:",
+   "lines": [
+    "sqlite3 -header -line backend/main/db.sqlite3 \"select id, status, published_at from events_eventdraft where id = 45;\"",
+    "sqlite3 -header -line backend/main/db.sqlite3 \"select id, name, category, guest_count, theme, start_date, end_time, base_price, currency, is_draft, image_url, banner_image from events_event order by id desc limit 1;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "bd6337a9df4a",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [
+    "location_id and venue are both empty on the event. The address you set on route step4 stays on the draft and does not reach the published event. Read it from steps.step4.location if you need it."
+   ],
+   "warn": [],
+   "notes": [
+    "What to notice in the pair. Every value the review screen called \"Not provided\" is on the event: the name, the category, the capacity of 250, the theme. image_url is the first file you uploaded and banner_image is the second, so the upload order really does decide poster and banner. The pricing from step5 is carried across whole."
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got||0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got|Your request query returns nothing after publishing. Publish|0",
+    "lead": "Your request query returns nothing after publishing. Publish clears event_draft_id and sets event_id instead, so search by the new event id:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got||0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "8-publish-the-draft-and-check-what-the-event-got",
+   "recipe": "Publish the draft and check what the event got",
+   "line": 835,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "",
+   "lines": [
+    "          id = 45",
+    "      status = published",
+    "published_at = 2026-08-28 12:29:56.143450",
+    "",
+    "           id = 48",
+    "         name = Runbook Walk Concert",
+    "     category = Concert",
+    "  guest_count = 250",
+    "        theme = Black Tie",
+    "   start_date = 2026-09-20 16:00:00",
+    "     end_time = 23:00:00",
+    "   base_price = 350",
+    "     currency = ZAR",
+    "     is_draft = 0",
+    "    image_url = .../draft_45/media/2641303e93ef4aa3856f2fbe51bd4a35.png",
+    " banner_image = .../draft_45/media/28b668400f244e9db869fdac5eddd5a9.png"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "0c36d898e720",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got|The draft flips and one event row appears:|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got|Your request query returns nothing after publishing. Publish|0",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "8-publish-the-draft-and-check-what-the-event-got",
+   "recipe": "Publish the draft and check what the event got",
+   "line": 866,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Your request query returns nothing after publishing. Publish clears event_draft_id and sets event_id instead, so search by the new event id:",
+   "lines": [
+    "sqlite3 -header -line backend/main/db.sqlite3 \\",
+    "  \"select id, status, event_draft_id, event_id from scheduling_bookingrequest where event_id = 48;\""
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "13e43177596f",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "The request keeps its pending status and its original 48-hour expiry across the publish. Nothing about publishing tells the provider anything.",
+    "Variations",
+    "Find the event a draft became: sqlite3 backend/main/db.sqlite3 \"select id, name, created_at from events_event where organizer_id = 82 order by id desc limit 3;\" - Compare what published against what the draft held: sqlite3 backend/main/db.sqlite3 \"select json_extract(data,'$.steps.step1.eventName'), json_extract(data,'$.steps.step1.capacity') from events_eventdraft where id = 45;\""
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got||1"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in walking-the-event-wizard.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got||1",
+   "file": "runbook/driving-the-app/walking-the-event-wizard.md",
+   "anchor": "8-publish-the-draft-and-check-what-the-event-got",
+   "recipe": "Publish the draft and check what the event got",
+   "line": 871,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "",
+   "lines": [
+    "            id = 38",
+    "        status = pending",
+    "event_draft_id =",
+    "      event_id = 48"
+   ],
+   "verified": "ran 2026-08-28",
+   "checksum": "ca50dc889897",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/driving-the-app/walking-the-event-wizard.md#8-publish-the-draft-and-check-what-the-event-got|Your request query returns nothing after publishing. Publish|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/preparing-artist-availability.md#1-make-an-artist-bookable-from-scratch|The command, turning the rule into rows.|0",
+   "file": "runbook/preparing-the-data/preparing-artist-availability.md",
+   "anchor": "1-make-an-artist-bookable-from-scratch",
+   "recipe": "Make an artist bookable from scratch",
+   "line": 64,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "The command, turning the rule into rows.",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "python manage.py materialize_availability_slots --start-date 2026-04-25 --end-date 2026-05-01"
+   ],
+   "verified": "unverified",
+   "checksum": "749e68dc83fb",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [
+    "Rows exist across the whole range, is_bookable checked, capacity_reserved below capacity_total."
+   ],
+   "failure": [
+    "No rows at all: the rule's effective_* dates do not overlap the range you materialized, or is_active is unchecked."
+   ],
+   "warn": [],
+   "notes": [
+    "Same command as Seeding § 3, narrowed to one date range instead of a horizon. --resource-id narrows it to one artist.",
+    "Screen 4, checking it worked. Scheduling > Availability slots, filtered to the resource.",
+    "Drawn in A slot's spare capacity is the whole hold."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "materialize_availability_slots"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in preparing-artist-availability.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/preparing-artist-availability.md#7-find-out-why-an-artist-is-not-in-the-search-results|Read-only. Four queries in the order the five rows depend on|0",
+   "file": "runbook/preparing-the-data/preparing-artist-availability.md",
+   "anchor": "7-find-out-why-an-artist-is-not-in-the-search-results",
+   "recipe": "Find out why an artist is not in the search results",
+   "line": 159,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Read-only. Four queries in the order the five rows depend on each other, so the first one that comes back empty is the answer.",
+   "lines": [
+    "cd /home/molef/Work/attica/backend/main",
+    "",
+    "# 1. is there a scheduling resource at all?",
+    "sqlite3 db.sqlite3 \"SELECT id, display_name, artist_id, is_active FROM scheduling_marketplaceresource WHERE resource_type='artist' ORDER BY id;\"",
+    "",
+    "# 2. is there an active rule behind it?",
+    "sqlite3 db.sqlite3 \"SELECT id, resource_id, name, is_active, frequency, weekdays, effective_start_date, effective_end_date, local_start_time, local_end_time FROM scheduling_availabilityrule ORDER BY resource_id, id;\"",
+    "",
+    "# 3. is a blackout covering the window?",
+    "sqlite3 db.sqlite3 \"SELECT id, resource_id, exception_type, start_at, end_at, reason FROM scheduling_availabilityexception ORDER BY resource_id, start_at;\"",
+    "",
+    "# 4. did anyone materialize the slots? (edit the dates)",
+    "sqlite3 db.sqlite3 \"SELECT resource_id, start_at, end_at, is_bookable, capacity_total, capacity_reserved FROM scheduling_availabilityslot WHERE date(start_at) BETWEEN '2026-04-25' AND '2026-05-01' ORDER BY resource_id, start_at;\""
+   ],
+   "verified": "unverified",
+   "checksum": "a8a07143d5c8",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [
+    "Query 4 returning rows while the search returns nothing means the problem is the search window, not the data: the scheduler is asking about different dates than you are."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in preparing-artist-availability.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/preparing-artist-availability.md#8-change-the-rule-for-every-artist-at-once|A fallback for resetting demo data, not an operating procedu|0",
+   "file": "runbook/preparing-the-data/preparing-artist-availability.md",
+   "anchor": "8-change-the-rule-for-every-artist-at-once",
+   "recipe": "Change the rule for every artist at once",
+   "line": 196,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "A fallback for resetting demo data, not an operating procedure. It writes to every artist resource in the database at once.",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "",
+    "sqlite3 db.sqlite3 \"",
+    "UPDATE scheduling_availabilityrule",
+    "SET effective_start_date = '2026-04-25',",
+    "    effective_end_date   = '2026-05-01',",
+    "    is_active            = 1",
+    "WHERE resource_id IN (",
+    "  SELECT id FROM scheduling_marketplaceresource WHERE resource_type = 'artist'",
+    ");",
+    "\"",
+    "",
+    "python manage.py materialize_availability_slots --start-date 2026-04-25 --end-date 2026-05-01"
+   ],
+   "verified": "unverified",
+   "checksum": "8cb9797a7317",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [],
+   "failure": [],
+   "warn": [
+    "Run query 2 from recipe 7 first and read what you are about to overwrite. A UPDATE with no WHERE on the resource type would hit venues and vendors too."
+   ],
+   "notes": [],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in preparing-artist-availability.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#1-seed-the-marketplace-providers|Creates the bookable providers: artists, vendors and their a|0",
+   "file": "runbook/preparing-the-data/seeding-and-resetting-data.md",
+   "anchor": "1-seed-the-marketplace-providers",
+   "recipe": "Seed the marketplace providers",
+   "line": 24,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Creates the bookable providers: artists, vendors and their availability rules.",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "python manage.py seed_marketplace"
+   ],
+   "verified": "unverified",
+   "checksum": "8b2702096e31",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [
+    "Providers appear in the marketplace at http://localhost:5173. It creates MarketplaceResource rows with AvailabilityRule rows behind them."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Run recipe 3 afterwards, or nothing will be searchable."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "seed_marketplace"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in seeding-and-resetting-data.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#2-seed-the-booking-scenarios|Creates the two interactive test users and seven booking req|0",
+   "file": "runbook/preparing-the-data/seeding-and-resetting-data.md",
+   "anchor": "2-seed-the-booking-scenarios",
+   "recipe": "Seed the booking scenarios",
+   "line": 52,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Creates the two interactive test users and seven booking requests, one per status, so every state in the flow has something to look at.",
+   "lines": [
+    "python manage.py seed_booking_workflow",
+    "",
+    "# for a clean slate first:",
+    "python manage.py seed_booking_workflow --clear && python manage.py seed_booking_workflow"
+   ],
+   "verified": "unverified",
+   "checksum": "4b39d4fef0a4",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "Real output:"
+   ],
+   "failure": [
+    "Providers missing from the scenario lines means recipe 1 has not run. Run it, then run this again."
+   ],
+   "warn": [],
+   "notes": [],
+   "checks": [],
+   "outputs": [
+    "runbook/preparing-the-data/seeding-and-resetting-data.md#2-seed-the-booking-scenarios|Real output:|0"
+   ],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "seed_booking_workflow"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in seeding-and-resetting-data.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#2-seed-the-booking-scenarios|Real output:|0",
+   "file": "runbook/preparing-the-data/seeding-and-resetting-data.md",
+   "anchor": "2-seed-the-booking-scenarios",
+   "recipe": "Seed the booking scenarios",
+   "line": 61,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "Real output:",
+   "lines": [
+    "User [created]: test_organizer  (EVENT_ORGANIZER)",
+    "User [created]: test_artist     (ARTIST)",
+    "Artist resource [created]: Test Artist",
+    "Scenario [pending]          request [created]: Afrobeats Night [seed]         → Zola & The Band",
+    "Scenario [counter_proposed] request [created]: Jazz Under the Stars [seed]    → Nandi Dlamini",
+    "Scenario [confirmed]        request [created]: House Music Festival [seed]     → DJ Karabo",
+    "Scenario [completed]        request [created]: New Year's Eve Gala [seed]     → The Brass Co.",
+    "Scenario [declined]         request [created]: Corporate Gala Dinner [seed]   → Feast Cape Town",
+    "Scenario [withdrawn]        request [created]: Tech Conference Afterparty [seed] → Luminary Productions",
+    "Scenario [live]             request [created]: Demo Event – Live Test [seed]  → Test Artist"
+   ],
+   "verified": "unverified",
+   "checksum": "b6fe14fc4392",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/preparing-the-data/seeding-and-resetting-data.md#2-seed-the-booking-scenarios|Creates the two interactive test users and seven booking req|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#3-materialize-availability-slots|This is the step that gets forgotten, and its symptom looks |0",
+   "file": "runbook/preparing-the-data/seeding-and-resetting-data.md",
+   "anchor": "3-materialize-availability-slots",
+   "recipe": "Materialize availability slots",
+   "line": 87,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "This is the step that gets forgotten, and its symptom looks like a bug. Without it the availability search returns nothing and the calendar timeline is empty, even though providers exist and look correct.",
+   "lines": [
+    "python manage.py materialize_availability_slots --days 90"
+   ],
+   "verified": "unverified",
+   "checksum": "9bd3c9c7332e",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "It writes AvailabilitySlot rows from the AvailabilityRule rows that seed_marketplace created. Confirm by searching availability at /scheduling and getting results."
+   ],
+   "failure": [
+    "Search still returns nothing: check that seed_marketplace actually created rules, since this command has nothing to materialize without them."
+   ],
+   "warn": [],
+   "notes": [
+    "The expected-output block that used to sit here in the original QA guide was the output of seed_booking_workflow, pasted under the wrong command. It has been removed rather than guessed at; fill it in the next time you run this.",
+    "Drawn in Steps 1 to 3, the search that reserves."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "materialize_availability_slots"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in seeding-and-resetting-data.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#5-reset-the-database-completely|Check first, read-only. See what you would be losing:|0",
+   "file": "runbook/preparing-the-data/seeding-and-resetting-data.md",
+   "anchor": "5-reset-the-database-completely",
+   "recipe": "Reset the database completely",
+   "line": 151,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Check first, read-only. See what you would be losing:",
+   "lines": [
+    "cd /home/molef/Work/attica/backend/main",
+    "python3 -c \"",
+    "import sqlite3",
+    "c = sqlite3.connect('db.sqlite3')",
+    "for t in ['events_event','events_eventdraft','scheduling_booking','scheduling_bookingrequest']:",
+    "    print(t, c.execute(f'select count(*) from {t}').fetchone()[0])",
+    "\""
+   ],
+   "verified": "unverified",
+   "checksum": "95a239a5d840",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#5-reset-the-database-completely|Then reset|0",
+    "lead": "Then reset"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#5-reset-the-database-completely|Then reset|0",
+   "file": "runbook/preparing-the-data/seeding-and-resetting-data.md",
+   "anchor": "5-reset-the-database-completely",
+   "recipe": "Reset the database completely",
+   "line": 163,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Then reset",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "mv db.sqlite3 db.sqlite3.bak          # keep it; the file is small",
+    "python manage.py migrate",
+    "python manage.py seed_marketplace",
+    "python manage.py seed_booking_workflow",
+    "python manage.py materialize_availability_slots --days 90",
+    "python manage.py seed_e2e"
+   ],
+   "verified": "unverified",
+   "checksum": "10ced3d2ee10",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [
+    "Every command completes without a traceback, and logging in as test_organizer shows the seven scenarios from Booking § 3."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Move the backup aside rather than deleting it. If the reset was a mistake, mv db.sqlite3.bak db.sqlite3 puts it back; a git checkout would only restore the last committed state."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in seeding-and-resetting-data.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 1, Redis|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "1-bring-the-whole-stack-up",
+   "recipe": "Bring the whole stack up",
+   "line": 28,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Terminal 1, Redis",
+   "lines": [
+    "redis-server"
+   ],
+   "verified": "unverified",
+   "checksum": "abd47c1cb512",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "It prints a banner ending Ready to accept connections. Check it from another shell with redis-cli ping, which answers PONG."
+   ],
+   "failure": [
+    "Could not create server TCP listening socket *:6379: bind: Address already in use means it is already running. That is fine; carry on."
+   ],
+   "warn": [],
+   "notes": [],
+   "checks": [
+    "redis-cli ping"
+   ],
+   "outputs": [],
+   "boxes": [
+    "redis"
+   ],
+   "matched_by": [
+    "redis-server"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 2, the backend|0",
+    "lead": "Terminal 2, the backend"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 2, the backend|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "1-bring-the-whole-stack-up",
+   "recipe": "Bring the whole stack up",
+   "line": 40,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Terminal 2, the backend",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "daphne -b 0.0.0.0 -p 8000 main.asgi:application"
+   ],
+   "verified": "unverified",
+   "checksum": "4cae3b876b46",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [
+    "Listening on TCP address 0.0.0.0:8000."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Use daphne, not runserver. See recipe 2 for why."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "backend"
+   ],
+   "matched_by": [
+    "daphne"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 3, the frontend|0",
+    "lead": "Terminal 3, the frontend"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 3, the frontend|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "1-bring-the-whole-stack-up",
+   "recipe": "Bring the whole stack up",
+   "line": 52,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Terminal 3, the frontend",
+   "lines": [
+    "cd /home/molef/Work/attica/frontend",
+    "npm run dev"
+   ],
+   "verified": "unverified",
+   "checksum": "eb9f601af0da",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "cd /home/molef/Work/attica/frontend"
+   ],
+   "success": [
+    "Vite prints Local: http://localhost:5173/."
+   ],
+   "failure": [],
+   "warn": [
+    "Read the port it actually printed. If 5173 was taken, Vite silently uses 5174 and part of the app will fail with no useful error. See recipe 3."
+   ],
+   "notes": [],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "vite"
+   ],
+   "matched_by": [
+    "npm run dev"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 4, the outbox worker, only when you are exercising |0",
+    "lead": "Terminal 4, the outbox worker, only when you are exercising bookings"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 4, the outbox worker, only when you are exercising |0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "1-bring-the-whole-stack-up",
+   "recipe": "Bring the whole stack up",
+   "line": 64,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Terminal 4, the outbox worker, only when you are exercising bookings",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "python manage.py run_outbox_worker"
+   ],
+   "verified": "unverified",
+   "checksum": "c079afc50f38",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Skip it and everything still appears to work. Notifications just never arrive. See recipe 4."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "worker"
+   ],
+   "matched_by": [
+    "run_outbox_worker"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in bringing-the-stack-up.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#2-start-the-backend-with-websockets||0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "2-start-the-backend-with-websockets",
+   "recipe": "Start the backend with websockets",
+   "line": 88,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "daphne -b 0.0.0.0 -p 8000 main.asgi:application"
+   ],
+   "verified": "unverified",
+   "checksum": "4cae3b876b46",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [
+    "Listening on TCP address 0.0.0.0:8000, and a browser at http://localhost:8000/api/events/ returns JSON."
+   ],
+   "failure": [
+    "Chat and notifications connect and immediately drop, with nothing useful in the server log. You started python manage.py runserver, which serves HTTP only. There is no error message for this; the symptom is the diagnosis.",
+    "ConnectionRefusedError on the first request that touches the cache means Redis is not up. Start it (recipe 1) and restart the backend."
+   ],
+   "warn": [],
+   "notes": [],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "backend"
+   ],
+   "matched_by": [
+    "daphne"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in bringing-the-stack-up.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#3-find-out-why-half-the-app-is-failing|Check it, read-only|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "3-find-out-why-half-the-app-is-failing",
+   "recipe": "Find out why half the app is failing",
+   "line": 125,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Check it, read-only",
+   "lines": [
+    "# what port did Vite actually take?",
+    "ss -ltn | grep -E '5173|5174'"
+   ],
+   "verified": "unverified",
+   "checksum": "8a751a885c61",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [
+    "You will see two kinds of request: relative ones (/api/...) that succeed through the proxy, and at least one to http://127.0.0.1:8000 that fails CORS. That split is the diagnosis."
+   ],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Then in Chrome DevTools, Network tab, filtered to Fetch/XHR with Preserve log on, reload and look at the failing requests.",
+    "The fix, either one"
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "vite"
+   ],
+   "matched_by": [
+    "5173"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/running-the-web-app/bringing-the-stack-up.md#3-find-out-why-half-the-app-is-failing|Free port 5173 and restart Vite, or extend the allowed origi|0",
+    "lead": "Free port 5173 and restart Vite, or extend the allowed origins:"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#3-find-out-why-half-the-app-is-failing|Free port 5173 and restart Vite, or extend the allowed origi|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "3-find-out-why-half-the-app-is-failing",
+   "recipe": "Find out why half the app is failing",
+   "line": 140,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Free port 5173 and restart Vite, or extend the allowed origins:",
+   "lines": [
+    "export CORS_ALLOWED_ORIGINS=\"http://localhost:5173,http://localhost:5174,http://localhost:3000\""
+   ],
+   "verified": "unverified",
+   "checksum": "71087cb2584d",
+   "fold": 0,
+   "indented": false,
+   "setup": [],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "then restart the backend.",
+    "> 📷 Screenshot wanted: the Network tab showing one CORS-failed request beside one that > succeeded through the proxy. Save as images/stack/01-cors-failure-beside-success.png."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "vite"
+   ],
+   "matched_by": [
+    "5173"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in bringing-the-stack-up.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox|Check first, read-only|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "4-drain-the-outbox",
+   "recipe": "Drain the outbox",
+   "line": 170,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Check first, read-only",
+   "lines": [
+    "cd /home/molef/Work/attica/backend/main",
+    "python3 -c \"",
+    "import sqlite3",
+    "c = sqlite3.connect('db.sqlite3')",
+    "for r in c.execute('select status, count(*) from scheduling_outboxevent group by status'):",
+    "    print(r[0], r[1])",
+    "\""
+   ],
+   "verified": "ran 2026-08-22",
+   "checksum": "abc003d1a72f",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Anything above zero in pending means rows are queued and nobody is consuming them."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "db.sqlite3"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox|Then drain it|0",
+    "lead": "Then drain it"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox|Then drain it|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "4-drain-the-outbox",
+   "recipe": "Drain the outbox",
+   "line": 184,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Then drain it",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "python manage.py dispatch_scheduling_outbox     # one pass",
+    "# or, to keep consuming:",
+    "python manage.py run_outbox_worker"
+   ],
+   "verified": "ran 2026-08-22",
+   "checksum": "bdc6537a9e8e",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [],
+   "failure": [
+    "If pending does not move, the dispatch path itself is the problem, not the worker. Note that the booking-request write path never calls group_send at all: _create_in_app_notification (backend/main/scheduling/services.py:2658) writes a database row and stops. That is a known gap, recorded in Environment § Known gaps."
+   ],
+   "warn": [],
+   "notes": [
+    "After: 31 sent, nothing pending. The dispatcher works. A backlog here means nobody ran it, not that anything is broken, which is worth knowing before you go looking for a fault.",
+    "Drawn in Every event is written and none is sent."
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox|Real run, 2026-08-22. Before, 23 pending and 8 sent. Then:|0"
+   ],
+   "boxes": [
+    "worker"
+   ],
+   "matched_by": [
+    "run_outbox_worker"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in bringing-the-stack-up.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox|Real run, 2026-08-22. Before, 23 pending and 8 sent. Then:|0",
+   "file": "runbook/running-the-web-app/bringing-the-stack-up.md",
+   "anchor": "4-drain-the-outbox",
+   "recipe": "Drain the outbox",
+   "line": 194,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "Real run, 2026-08-22. Before, 23 pending and 8 sent. Then:",
+   "lines": [
+    "Outbox dispatched: processed=23 failed=0 dead_lettered=0"
+   ],
+   "verified": "ran 2026-08-22",
+   "checksum": "d02a62be1799",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/running-the-web-app/bringing-the-stack-up.md#4-drain-the-outbox|Then drain it|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/running-the-tests.md#1-run-the-playwright-suite|Once per setup, or whenever the database is reset|0",
+   "file": "runbook/running-the-web-app/running-the-tests.md",
+   "anchor": "1-run-the-playwright-suite",
+   "recipe": "Run the Playwright suite",
+   "line": 23,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Once per setup, or whenever the database is reset",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "python manage.py seed_e2e"
+   ],
+   "verified": "unverified",
+   "checksum": "ef32a670d87c",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [],
+   "failure": [],
+   "warn": [],
+   "notes": [
+    "Creates e2e-organizer / E2eOrganizerPass!23."
+   ],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "sqlite"
+   ],
+   "matched_by": [
+    "seed_e2e"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": "runbook/running-the-web-app/running-the-tests.md#1-run-the-playwright-suite|Then, with the backend running|0",
+    "lead": "Then, with the backend running"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/running-the-tests.md#1-run-the-playwright-suite|Then, with the backend running|0",
+   "file": "runbook/running-the-web-app/running-the-tests.md",
+   "anchor": "1-run-the-playwright-suite",
+   "recipe": "Run the Playwright suite",
+   "line": 33,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Then, with the backend running",
+   "lines": [
+    "cd /home/molef/Work/attica/frontend",
+    "npm run test:e2e          # headless",
+    "npm run test:e2e:ui       # the interactive Playwright UI"
+   ],
+   "verified": "unverified",
+   "checksum": "39799fe7c91b",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "cd /home/molef/Work/attica/frontend"
+   ],
+   "success": [
+    "The run completes and reports passes. Some of them pass *because they failed*: see recipe 3."
+   ],
+   "failure": [
+    "Everything fails at login: the backend is not on :8000, or seed_e2e has not run against the current database.",
+    "Playwright cannot reach the app: something else is already on the port Vite wants. Free it rather than letting Vite pick another, since the suite expects the default."
+   ],
+   "warn": [],
+   "notes": [],
+   "checks": [],
+   "outputs": [],
+   "boxes": [
+    "app"
+   ],
+   "matched_by": [
+    "npm run test:e2e"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in running-the-tests.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|Use the Django runner. There is no working pytest here, what|0",
+   "file": "runbook/running-the-web-app/running-the-tests.md",
+   "anchor": "2-run-the-django-and-pytest-suites",
+   "recipe": "Run the Django and pytest suites",
+   "line": 57,
+   "lang": "bash",
+   "kind": "command",
+   "lead": "Use the Django runner. There is no working pytest here, whatever CLAUDE.md says; see the fold below.",
+   "lines": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main",
+    "python manage.py test"
+   ],
+   "verified": "ran 2026-08-22",
+   "checksum": "8499c4db8c81",
+   "fold": 0,
+   "indented": false,
+   "setup": [
+    "source /home/molef/lobola/bin/activate",
+    "cd /home/molef/Work/attica/backend/main"
+   ],
+   "success": [
+    "Real output, 2026-08-22, trimmed:"
+   ],
+   "failure": [
+    "RuntimeWarning: DateTimeField Event.created_at received a naive datetime appears several times and is noise, not a failure. Event sets naive defaults while USE_TZ is on.",
+    "ConnectionRefusedError during a test that touches the cache or the channel layer means Redis is not running. Start it: Stack § 1."
+   ],
+   "warn": [],
+   "notes": [
+    "This suite needs neither the frontend nor Daphne. It builds and destroys its own test database, so it does not touch db.sqlite3."
+   ],
+   "checks": [],
+   "outputs": [
+    "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|Real output, 2026-08-22, trimmed:|0",
+    "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|The suite is red, and these two are the reason. They are not|0"
+   ],
+   "boxes": [
+    "backend"
+   ],
+   "matched_by": [
+    "manage.py test"
+   ],
+   "placement": "placement guessed",
+   "next": {
+    "key": null,
+    "lead": "the next recipe in running-the-tests.md"
+   },
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|Real output, 2026-08-22, trimmed:|0",
+   "file": "runbook/running-the-web-app/running-the-tests.md",
+   "anchor": "2-run-the-django-and-pytest-suites",
+   "recipe": "Run the Django and pytest suites",
+   "line": 65,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "Real output, 2026-08-22, trimmed:",
+   "lines": [
+    "Found 43 test(s).",
+    "System check identified no issues (0 silenced).",
+    "..F......E.................................",
+    "Ran 43 tests in 23.652s",
+    "FAILED (failures=1, errors=1)"
+   ],
+   "verified": "ran 2026-08-22",
+   "checksum": "4a0d2f47e4e8",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|Use the Django runner. There is no working pytest here, what|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|The suite is red, and these two are the reason. They are not|0",
+   "file": "runbook/running-the-web-app/running-the-tests.md",
+   "anchor": "2-run-the-django-and-pytest-suites",
+   "recipe": "Run the Django and pytest suites",
+   "line": 76,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "The suite is red, and these two are the reason. They are not flaky and they are not environmental.",
+   "lines": [
+    "ERROR: test_upload_asset_persists_on_draft (events.tests.EventDraftAPITests)",
+    "  events/tests.py:91  IndexError: list index out of range",
+    "  response.data[\"assets\"] came back empty: the uploaded asset did not persist.",
+    "",
+    "FAIL: test_cross_organizer_access_denied (events.tests.EventDraftAPITests)",
+    "  events/tests.py:248  AssertionError: 404 != 403",
+    "  Reading another organizer's draft returns 404, and the test expects 403.",
+    "  Note the publish action DOES return 403 (events/views.py:499), so the two",
+    "  paths disagree with each other about which is right."
+   ],
+   "verified": "ran 2026-08-22",
+   "checksum": "9abb44a5e74d",
+   "fold": 0,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "with its command",
+   "output_of": "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|Use the Django runner. There is no working pytest here, what|0",
+   "since_last_build": "unchanged"
+  },
+  {
+   "key": "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|pytest is not installed in /home/molef/lobola, not in backen|0",
+   "file": "runbook/running-the-web-app/running-the-tests.md",
+   "anchor": "2-run-the-django-and-pytest-suites",
+   "recipe": "Run the Django and pytest suites",
+   "line": 104,
+   "lang": "untagged",
+   "kind": "output",
+   "lead": "pytest is not installed in /home/molef/lobola, not in backend/venv, and not listed in backend/main/requirements.txt. The only pytest on the PATH is /usr/bin/pytest, the system one, which has no Django. Running it gives:",
+   "lines": [
+    "ERROR collecting main/test_urls_cli.py",
+    "ERROR collecting scheduling/test_urls.py",
+    "E   ModuleNotFoundError: No module named 'django'",
+    "Interrupted: 2 errors during collection"
+   ],
+   "verified": "ran 2026-08-22",
+   "checksum": "fb3d39e0ce85",
+   "fold": 1,
+   "indented": false,
+   "boxes": [],
+   "matched_by": [],
+   "placement": "unplaced",
+   "since_last_build": "unchanged"
+  }
+ ],
+ "path": [
+  {
+   "box": "redis",
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 1, Redis|0",
+   "terminal": 1,
+   "optional": false,
+   "hint": "",
+   "order": 1
+  },
+  {
+   "box": "sqlite",
+   "key": "runbook/preparing-the-data/seeding-and-resetting-data.md#5-reset-the-database-completely|Then reset|0",
+   "set_up": true,
+   "optional": false,
+   "hint": "first time",
+   "order": 2
+  },
+  {
+   "box": "backend",
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 2, the backend|0",
+   "terminal": 2,
+   "optional": false,
+   "hint": "",
+   "order": 3
+  },
+  {
+   "box": "vite",
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 3, the frontend|0",
+   "terminal": 3,
+   "optional": false,
+   "hint": "",
+   "order": 4
+  },
+  {
+   "box": "worker",
+   "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 4, the outbox worker, only when you are exercising |0",
+   "terminal": 4,
+   "optional": true,
+   "hint": "you are exercising bookings",
+   "order": 5
+  }
+ ],
+ "unrecorded": [
+  {
+   "what": "get the code",
+   "cmd": "cd /home/molef/Work/attica && git pull"
+  },
+  {
+   "what": "Python packages",
+   "cmd": "source /home/molef/lobola/bin/activate && pip install -r backend/main/requirements.txt",
+   "cwd": "/home/molef/Work/attica"
+  },
+  {
+   "what": "JavaScript packages",
+   "cmd": "cd /home/molef/Work/attica/frontend && npm install"
+  }
+ ],
+ "edges": [
+  {
+   "from": "app",
+   "to": "vite",
+   "checks": []
+  },
+  {
+   "from": "vite",
+   "to": "backend",
+   "checks": []
+  },
+  {
+   "from": "app",
+   "to": "backend",
+   "checks": []
+  },
+  {
+   "from": "app",
+   "to": "osm",
+   "checks": []
+  },
+  {
+   "from": "backend",
+   "to": "redis",
+   "checks": [
+    {
+     "cmd": "redis-cli ping",
+     "key": "runbook/running-the-web-app/bringing-the-stack-up.md#1-bring-the-whole-stack-up|Terminal 1, Redis|0"
+    }
+   ]
+  },
+  {
+   "from": "backend",
+   "to": "sqlite",
+   "checks": []
+  },
+  {
+   "from": "backend",
+   "to": "media",
+   "checks": []
+  },
+  {
+   "from": "backend",
+   "to": "sentry",
+   "checks": []
+  },
+  {
+   "from": "worker",
+   "to": "sqlite",
+   "checks": []
+  },
+  {
+   "from": "worker",
+   "to": "hooks",
+   "checks": []
+  }
+ ],
+ "tombstones": [],
+ "unplaced": [
+  "runbook/running-the-web-app/running-the-tests.md#2-run-the-django-and-pytest-suites|pytest is not installed in /home/molef/lobola, not in backen|0"
+ ]
+}

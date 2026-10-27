@@ -1,0 +1,462 @@
+{
+ "title": "Attica: high-level design",
+ "page_title": "Attica High-Level Design",
+ "subtitle": "Local development stack as the repository runs it today, read from the code and environment/overview.md on 2026-10-24",
+ "lede": "What runs when Attica runs, from the browser on the left to the data on the right. Four of these boxes are processes started by hand: Redis, the Django backend under Daphne, the Vite dev server and the outbox worker.",
+ "version_line": "Version 1, 2026-10-24: 10 boxes, 10 arrows. Read from /home/molef/Work/attica at commit a85cc0c plus its uncommitted working tree.",
+ "col_w": 0,
+ "row_h": 130,
+ "nodes": [
+  {
+   "id": "app",
+   "kind": "client",
+   "label": "Attica web app",
+   "sub": "React 19 + MUI, in the browser",
+   "logo": "react",
+   "col": 0,
+   "row": 1,
+   "does": "The React and MUI front end people use in the browser. It has no process of its own: Vite serves it."
+  },
+  {
+   "id": "osm",
+   "kind": "external",
+   "label": "OpenStreetMap",
+   "sub": "Nominatim geocoding, map tiles",
+   "logo": "openstreetmap",
+   "col": 0,
+   "row": 2.25,
+   "does": "Map tiles and geocoding (Nominatim), called straight from the browser. Nothing to start; it needs internet access."
+  },
+  {
+   "id": "vite",
+   "kind": "edge",
+   "eyebrow": "dev proxy",
+   "label": "Vite dev server",
+   "sub": "localhost:5173",
+   "logo": "vite",
+   "col": 1,
+   "row": 0,
+   "does": "Serves the React app while developing and forwards /api, /vendors, /cart, /checkout and /ws to the Django backend."
+  },
+  {
+   "id": "sentry",
+   "kind": "external",
+   "label": "Sentry",
+   "sub": "only when SENTRY_DSN is set",
+   "logo": "sentry",
+   "col": 1,
+   "row": 2.25,
+   "does": "Receives the backend's error reports, only when SENTRY_DSN is set."
+  },
+  {
+   "id": "backend",
+   "kind": "service",
+   "eyebrow": "backend, one ASGI process",
+   "label": "Django backend",
+   "sub": "Daphne :8000, REST + WebSockets",
+   "logo": "django",
+   "col": 2,
+   "row": 1,
+   "does": "One Daphne process that answers the REST API and holds the WebSocket connections for chat and notifications."
+  },
+  {
+   "id": "media",
+   "kind": "files",
+   "label": "Uploaded media",
+   "sub": "backend/main/media on disk",
+   "col": 2,
+   "row": 2.25,
+   "does": "The files people upload, kept on disk under backend/main/media, up to 50 MB each."
+  },
+  {
+   "id": "redis",
+   "kind": "cache",
+   "eyebrow": "cache and channel layer",
+   "label": "Redis",
+   "sub": "127.0.0.1:6379",
+   "logo": "redis",
+   "col": 3,
+   "row": 0,
+   "does": "Carries the WebSocket channel layer in db 0, so consumers can reach each other, and the page cache in db 1."
+  },
+  {
+   "id": "sqlite",
+   "kind": "store",
+   "label": "SQLite",
+   "sub": "backend/main/db.sqlite3",
+   "logo": "sqlite",
+   "col": 3,
+   "row": 1,
+   "does": "The one database file every app reads and writes through the Django ORM."
+  },
+  {
+   "id": "worker",
+   "kind": "worker",
+   "eyebrow": "worker, started by hand",
+   "label": "Outbox worker",
+   "sub": "manage.py run_outbox_worker",
+   "col": 3,
+   "row": 2.25,
+   "does": "Turns queued outbox rows into notifications and webhook calls, after the request that wrote them has finished."
+  },
+  {
+   "id": "hooks",
+   "kind": "external",
+   "label": "Webhook targets",
+   "sub": "none configured by default",
+   "col": 4,
+   "row": 2.25,
+   "does": "Where the outbox worker POSTs signed events. None are configured by default."
+  }
+ ],
+ "groups": [],
+ "edges": [
+  {
+   "from": "app",
+   "to": "vite",
+   "label": "/api /cart /checkout\n/vendors /ws",
+   "label_seg": 1
+  },
+  {
+   "from": "vite",
+   "to": "backend",
+   "label": "HTTP, and /ws\nwith ?token=JWT",
+   "label_seg": 1
+  },
+  {
+   "from": "app",
+   "to": "backend",
+   "label": "useAxios goes direct to\n127.0.0.1:8000, needs CORS",
+   "label_dy": 0
+  },
+  {
+   "from": "app",
+   "to": "osm",
+   "label": "straight from the browser",
+   "sides": "bt"
+  },
+  {
+   "from": "backend",
+   "to": "redis",
+   "label": "channel layer, db 0\npage cache, db 1",
+   "style": "async",
+   "both": true,
+   "label_seg": 1
+  },
+  {
+   "from": "backend",
+   "to": "sqlite",
+   "label": "Django ORM"
+  },
+  {
+   "from": "backend",
+   "to": "media",
+   "label": "uploads up to 50 MB",
+   "sides": "bt"
+  },
+  {
+   "from": "backend",
+   "to": "sentry",
+   "label": "errors",
+   "style": "optional",
+   "sides": "bt",
+   "label_seg": 1
+  },
+  {
+   "from": "worker",
+   "to": "sqlite",
+   "label": "polls pending outbox rows,\nwrites notification rows",
+   "style": "async",
+   "both": true,
+   "sides": "tb"
+  },
+  {
+   "from": "worker",
+   "to": "hooks",
+   "label": "signed POST",
+   "style": "optional"
+  }
+ ],
+ "details": [
+  {
+   "heading": "Where each box comes from",
+   "lines": [
+    "<strong>Attica web app</strong>: <code>frontend/package.json</code> (react 19.1, @mui/material 7.1).",
+    "<strong>Vite dev server</strong>: <code>frontend/vite.config.js</code> lines 16 to 25, the proxy for <code>/api</code>, <code>/vendors</code>, <code>/cart</code>, <code>/checkout</code> and <code>/ws</code>.",
+    "<strong>Django backend</strong>: one Daphne process serving <code>main.asgi:application</code>, holding the REST API (<code>rest_framework</code> in <code>INSTALLED_APPS</code>, JWT through <code>rest_framework_simplejwt</code>) and the WebSocket consumers (<code>channels</code>; <code>chat/consumers.py</code>, <code>notifications/consumers.py</code>). The chat consumer saves each message to SQLite before broadcasting it.",
+    "<strong>SQLite</strong>: <code>DATABASES</code> in <code>settings.py</code> line 156. Every app writes here through the Django ORM, including bookings, chat messages and the <code>scheduling_outboxevent</code> rows the worker reads.",
+    "<strong>Redis</strong>: <code>CHANNEL_LAYERS</code> (db 0) and <code>CACHES</code> at <code>redis://127.0.0.1:6379/1</code> in <code>settings.py</code>.",
+    "<strong>Uploaded media</strong>: <code>MEDIA_ROOT</code> in <code>settings.py</code> line 226; 50 MB cap at line 230.",
+    "<strong>Outbox worker</strong>: <code>scheduling/management/commands/run_outbox_worker.py</code>, calling <code>dispatch_outbox_events</code> in <code>scheduling/services.py</code>.",
+    "<strong>Webhook targets</strong>: <code>SCHEDULING_WEBHOOK_TARGETS = []</code> in <code>settings.py</code> line 239; delivery by <code>urllib</code> in <code>_dispatch_webhooks_for_event</code>.",
+    "<strong>Sentry</strong>: <code>settings.py</code> lines 247 to 257, skipped when <code>SENTRY_DSN</code> is unset.",
+    "<strong>OpenStreetMap</strong>: <code>frontend/src/ListingStep4.jsx</code> (Nominatim) and <code>components/MapComponent.jsx</code> (tiles)."
+   ]
+  },
+  {
+   "heading": "How to read the lines",
+   "lines": [
+    "A solid line is a request that waits for an answer. A dashed line is asynchronous (the channel layer, the worker polling its table). A dotted line only carries traffic when a setting turns it on: Sentry needs <code>SENTRY_DSN</code> and webhooks need a configured target."
+   ]
+  },
+  {
+   "heading": "What is not drawn",
+   "lines": [
+    "Stripe appears only as comments in <code>vendors/views.py</code> and as an MCP for future work, so it has no box. There is no Celery, no object storage and no CDN.",
+    "The booking-request write path stores its notification row and never pushes it to the channel layer (<code>scheduling/services.py</code>, <code>_create_in_app_notification</code>), so no line runs from the worker to Redis.",
+    "<code>node-websocket/</code> holds only <code>node_modules</code> and a lockfile, so it is not a running component.",
+    "Inside the Django backend box sit the REST API, the WebSocket consumers and the Django admin. Splitting it is the next diagram one level down."
+   ]
+  }
+ ],
+ "levels": {
+  "context": {
+   "parent": null,
+   "box": "attica",
+   "view": "boxes",
+   "crumb": "Context",
+   "title": "Attica in context: who uses it and what it calls",
+   "subtitle": "The people who use Attica and the outside services it calls, read from users/models.py, main/urls.py and settings.py",
+   "intro": "The level above the system: Attica as one box, the people who use it, and the outside services it calls. Attica opens into the running parts that make it up.",
+   "row_h": 120,
+   "nodes": [
+    {
+     "id": "organizer",
+     "kind": "client",
+     "eyebrow": "person",
+     "label": "Organizer",
+     "sub": "plans events, requests bookings",
+     "col": 0,
+     "row": 0,
+     "does": "Plans events and asks venues, artists and vendors to book."
+    },
+    {
+     "id": "providers",
+     "kind": "client",
+     "eyebrow": "people",
+     "label": "Vendors, artists, venue reps",
+     "sub": "answer booking requests",
+     "col": 0,
+     "row": 1,
+     "does": "Receive booking requests and approve, decline or counter them."
+    },
+    {
+     "id": "attendee",
+     "kind": "client",
+     "eyebrow": "person",
+     "label": "Attendee",
+     "sub": "finds events, buys tickets",
+     "col": 0,
+     "row": 2,
+     "does": "Finds events and buys tickets."
+    },
+    {
+     "id": "staff",
+     "kind": "client",
+     "eyebrow": "person",
+     "label": "Staff",
+     "sub": "the Django admin at /admin/",
+     "col": 0,
+     "row": 3,
+     "does": "Manage the data directly in the Django admin."
+    },
+    {
+     "id": "attica",
+     "kind": "service",
+     "eyebrow": "the system",
+     "label": "Attica",
+     "sub": "web app, backend, data, worker",
+     "col": 1.4,
+     "row": 1.5,
+     "does": "The whole system: the web app, the backend, its data and its worker."
+    },
+    {
+     "id": "ctx-osm",
+     "same_as": "osm",
+     "kind": "external",
+     "label": "OpenStreetMap",
+     "sub": "maps and geocoding",
+     "logo": "openstreetmap",
+     "col": 2.8,
+     "row": 0.5
+    },
+    {
+     "id": "ctx-sentry",
+     "same_as": "sentry",
+     "kind": "external",
+     "label": "Sentry",
+     "sub": "only when SENTRY_DSN is set",
+     "logo": "sentry",
+     "col": 2.8,
+     "row": 1.5
+    },
+    {
+     "id": "ctx-hooks",
+     "same_as": "hooks",
+     "kind": "external",
+     "label": "Webhook targets",
+     "sub": "none configured by default",
+     "col": 2.8,
+     "row": 2.5
+    }
+   ],
+   "edges": [
+    {
+     "from": "organizer",
+     "to": "attica",
+     "label": "browser",
+     "style": "sync"
+    },
+    {
+     "from": "providers",
+     "to": "attica",
+     "label": "browser",
+     "style": "sync"
+    },
+    {
+     "from": "attendee",
+     "to": "attica",
+     "label": "browser",
+     "style": "sync"
+    },
+    {
+     "from": "staff",
+     "to": "attica",
+     "label": "/admin/",
+     "style": "sync"
+    },
+    {
+     "from": "attica",
+     "to": "ctx-osm",
+     "label": "maps, geocoding",
+     "style": "sync"
+    },
+    {
+     "from": "attica",
+     "to": "ctx-sentry",
+     "label": "errors",
+     "style": "optional"
+    },
+    {
+     "from": "attica",
+     "to": "ctx-hooks",
+     "label": "signed POST",
+     "style": "optional"
+    }
+   ],
+   "details": [
+    {
+     "heading": "Where each box comes from",
+     "lines": [
+      "<strong>Organizer</strong>: <code>users/models.py</code> lines 26 to 33, <code>USER_TYPES</code>, the default <code>user_type</code>.",
+      "<strong>Vendors, artists, venue reps</strong>: the same <code>USER_TYPES</code>, the three kinds of provider a booking request is sent to.",
+      "<strong>Attendee</strong>: the same <code>USER_TYPES</code>.",
+      "<strong>Staff</strong>: <code>main/urls.py</code> line 33, <code>admin.site.urls</code>.",
+      "<strong>Attica</strong>: the system level below, its ten running parts.",
+      "<strong>OpenStreetMap</strong>, <strong>Sentry</strong> and <strong>Webhook targets</strong>: the same boxes as at the system level."
+     ]
+    }
+   ]
+  },
+  "backend-inside": {
+   "parent": "system",
+   "box": "backend",
+   "view": "boxes",
+   "title": "Inside the Django backend: model, view, template",
+   "subtitle": "One Daphne process, read from the code: a request falls through the ASGI router, the middleware, the URL routes and a view, which reads models and returns a template or serializer",
+   "intro": "A request falls top to bottom: the ASGI router sends HTTP through the middleware to the URL routes, a view handles it, reads and writes through the models, and returns what a template or serializer builds. Websockets go left, through their own middleware to the consumers and Redis. Booking services opens into its code.",
+   "row_h": 112,
+   "nodes": [
+    {
+     "id": "services",
+     "kind": "worker",
+     "eyebrow": "scheduling/services.py",
+     "label": "Booking services",
+     "sub": "the row and its outbox event",
+     "col": 2,
+     "row": 5,
+     "does": "Writes a booking request, its audit row and its outbox event in one commit, so nothing is ever half-written."
+    }
+   ],
+   "edges": [
+    {
+     "from": "dj-views",
+     "to": "services",
+     "label": "booking calls",
+     "style": "sync"
+    },
+    {
+     "from": "services",
+     "to": "dj-models",
+     "label": "writes",
+     "style": "sync"
+    }
+   ],
+   "details": [
+    {
+     "heading": "Where each box comes from",
+     "lines": [
+      "<strong>Booking services</strong>: <code>scheduling/services.py</code>, <code>create_request</code> at line 422 and <code>dispatch_outbox_events</code> at line 3353."
+     ]
+    }
+   ],
+   "read_django": {
+    "root": "backend/main",
+    "from": "vite",
+    "from_label": "Vite dev server",
+    "store": "sqlite",
+    "store_label": "SQLite",
+    "channel_layer": "redis",
+    "channel_layer_label": "Redis"
+   }
+  },
+  "services-inside": {
+   "parent": "backend-inside",
+   "box": "services",
+   "view": "sequence",
+   "tab": "Sequence: create_request",
+   "title": "create_request, step by step",
+   "read": {
+    "file": "backend/main/scheduling/services.py",
+    "function": "create_request"
+   }
+  },
+  "services-data": {
+   "parent": "backend-inside",
+   "box": "services",
+   "view": "data",
+   "tab": "Data: tables and rows",
+   "title": "The tables create_request reads and writes",
+   "read": {
+    "file": "backend/main/scheduling/services.py",
+    "function": "create_request"
+   }
+  },
+  "sqlite-inside": {
+   "parent": "system",
+   "box": "sqlite",
+   "view": "db",
+   "title": "Inside SQLite"
+  },
+  "redis-inside": {
+   "parent": "system",
+   "box": "redis",
+   "view": "redis",
+   "title": "Inside Redis: its databases and keys",
+   "read_redis": {
+    "root": "backend/main"
+   },
+   "intro": "Redis holds two things for Attica in two of its numbered databases: the websocket channel layer in db 0 and Django's cache in db 1. Each opens into the key names the code builds, some of the live keys when Redis was running at build time, and the redis-cli commands to look yourself."
+  },
+  "views-inside": {
+   "parent": "backend-inside",
+   "box": "dj-views",
+   "view": "joins",
+   "title": "What the views return: the joins behind them",
+   "read_views": {
+    "root": "backend/main"
+   },
+   "intro": "Every view whose query pulls related rows in with select_related, written out as the SQL join it runs, with the rows it returns from the local database. Copy the SQL into DBeaver to run it yourself."
+  }
+ }
+}
